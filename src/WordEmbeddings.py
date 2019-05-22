@@ -1,0 +1,56 @@
+"""
+    File:   WordEmbeddings
+    Author: Jose Juan Zavala Iglesias
+    Date:   19/02/2019
+
+    Word Embedding Models Wrapper for ease of use
+"""
+
+import os
+import re
+import sys
+import pickle
+import numpy as np
+import pandas as pd
+from gensim.models import Word2Vec
+
+WND_SIZE = 8
+VEC_SIZE = 300
+
+class Word2Vec_Embeddings:
+    model = None
+
+    def __init__(self, corpus, size=VEC_SIZE, window=WND_SIZE, min_count=1, workers=4):
+        self.model = Word2Vec(corpus, size=size, window=window, min_count=min_count, workers=4)
+
+    def train(self, corpus, epochs=10):
+        self.model.train(corpus, total_examples=len(corpus), epochs=10)
+
+    def save(self, modelDir):
+        self.model.save(modelDir)
+
+    def load(self, modelDir):
+        self.model.load(modelDir)
+
+    def GenerateFeatVector(self, sentence, vec_size = VEC_SIZE):
+        if(self.model is None):
+            print("Model not loading. Terminating Process.")
+            return np.zeros(vec_size)
+        
+        featVector = np.empty((0, vec_size))
+
+        for word in sentence:
+            featVector = np.append(featVector, [self.model.wv[word]], axis=0)
+
+        return np.average(featVector, axis=0).reshape(1, vec_size)
+
+    def GenerateFeatMatrix(sentences, vec_size = VEC_SIZE):
+        it = 0
+        featMatrix = np.empty((sentences.shape[0], vec_size))
+
+        for sentence in sentences:
+            sentence = sentence.split()
+            featMatrix[it, :] = self.GenerateFeatVector(sentence, vec_size=vec_size)
+            it += 1
+
+        return featMatrix
