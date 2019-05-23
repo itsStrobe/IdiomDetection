@@ -18,43 +18,36 @@ VEC_SIZE = 300
 WND_SIZE = 8
 EPOCHS   = 5
 
-initialize_models = True
-
 model_W2V = None
 model_SCB = None
 model_SkT = None
 model_ELM = None
 
-for corpora_name in CORPORA_PRE:
-    print("Loading Corpora:", corpora_name)
-    corpora = CorpusExtraction.LoadCorpora(corpora_name)
+CorporaIterator = [sent for sent in CorpusExtraction.IterateOverCorpora(CORPORA_PRE)]
 
-    for corpus in corpora:
-        print("Training Models on Corpus:", corpus)
-        sentences = corpora[corpus].tolist()
 
-        if (initialize_models):
+## VOCABULARY INITIALIZATION ##
+# Initializing Word2Vec's Vocabulary
+model_W2V = W2V(corpus=CorporaIterator, size=VEC_SIZE, window=WND_SIZE)
+# TODO: Initializing Siamese CBOW's Vocabulary
+# TODO: Initializing Skip-Thoughts' Vocabulary
+# TODO: Initializing ELMo's Vocabulary
 
-            # Initializing Word2Vec
-            model_W2V = W2V(sentences, size=VEC_SIZE, window=WND_SIZE)
-            # TODO: Initializing Siamese CBOW
-            # TODO: Initializing Skip-Thoughts
-            # TODO: Initializing ELMo
+## MODEL TRAINING ##
+# Train Word2Vec
+model_W2V.train(CorporaIterator, epochs=EPOCHS)
+# TODO: Train Siamese CBOW
+# TODO: Train Skip-Thoughts
+# TODO: Train ELMo
 
-            initialize_models = False
-
-        # Train Word2Vec
-        model_W2V.train(sentences, epochs=EPOCHS)
-        # TODO: Train Siamese CBOW
-        # TODO: Train Skip-Thoughts
-        # TODO: Train ELMo
-
+## MODEL TESTING ##
 # Testing Word2Vec
 print(model_W2V.model.most_similar(positive=["happy"], topn=5))
 # TODO: Testing Siamese CBOW
 # TODO: Testing Skip-Thoughts
 # TODO: Testing ELMo
 
+## SAVING MODELS ##
 # Saving Word2Vec
 model_W2V.save(MODEL_DIR + "W2V" + MODEL_SUFFIX)
 # TODO: Saving Siamese CBOW

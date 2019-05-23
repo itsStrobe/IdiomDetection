@@ -20,8 +20,11 @@ VEC_SIZE = 300
 class Word2Vec_Embeddings:
     model = None
 
-    def __init__(self, corpus, size=VEC_SIZE, window=WND_SIZE, min_count=1, workers=4):
-        self.model = Word2Vec(corpus, size=size, window=window, min_count=min_count, workers=4)
+    def __init__(self, corpus=None, size=VEC_SIZE, window=WND_SIZE, min_count=1, workers=4):
+        if corpus == None:
+            self.model = Word2Vec(size=size, window=window, min_count=min_count, workers=4)
+        else:
+            self.model = Word2Vec(corpus, size=size, window=window, min_count=min_count, workers=4)
 
     def train(self, corpus, epochs=10):
         self.model.train(corpus, total_examples=len(corpus), epochs=10)
@@ -30,7 +33,7 @@ class Word2Vec_Embeddings:
         self.model.save(modelDir)
 
     def load(self, modelDir):
-        self.model.load(modelDir)
+        self.model = Word2Vec.load(modelDir)
 
     def GenerateFeatVector(self, sentence, vec_size = VEC_SIZE):
         if(self.model is None):
