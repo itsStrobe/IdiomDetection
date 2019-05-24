@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and limitations
 under the License.
 '''
 
+# Extracted from SiameseCBOW implementation file to be able to unpickle pre-trained SiameseCBOW models.
+
 import codecs
 import numpy as np
 import sys

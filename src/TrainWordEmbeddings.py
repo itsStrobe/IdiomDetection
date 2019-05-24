@@ -29,24 +29,24 @@ CorporaIterator = [sent for sent in CorpusExtraction.IterateOverCorpora(CORPORA_
 
 ## VOCABULARY INITIALIZATION ##
 # Initializing Word2Vec's Vocabulary
-model_W2V = W2V(corpus=CorporaIterator, size=VEC_SIZE, window=WND_SIZE)
+# model_W2V = W2V(corpus=CorporaIterator, size=VEC_SIZE, window=WND_SIZE)
 # Initializing Siamese CBOW's Vocabulary - NOT NEEDED: Using Pre-Trained Model ; Loading Model Instead
-model_CBOW = CBOW(pretrainned="./models/cosine_sharedWeights_adadelta_lr_1_noGradClip_epochs_2_batch_100_neg_2_voc_65536x300_noReg_lc_noPreInit_vocab_65535.end_of_epoch_2.pickle")
+model_SCB = CBOW(pretrainned="./models/cosine_sharedWeights_adadelta_lr_1_noGradClip_epochs_2_batch_100_neg_2_voc_65536x300_noReg_lc_noPreInit_vocab_65535.end_of_epoch_2_p3.pkl")
 # TODO: Initializing Skip-Thoughts' Vocabulary
 # TODO: Initializing ELMo's Vocabulary
 
 ## MODEL TRAINING ##
 # Train Word2Vec
-model_W2V.train(CorporaIterator, epochs=EPOCHS)
+# model_W2V.train(CorporaIterator, epochs=EPOCHS)
 # Train Siamese CBOW - NOT NEEDED: Using Pre-Trained Model
 # TODO: Train Skip-Thoughts
 # TODO: Train ELMo
 
 ## MODEL TESTING ##
 # Testing Word2Vec
-print(model_W2V.GetMostSimilar("happy"))
+# print(model_W2V.GetMostSimilar("happy"))
 # Testing Siamese CBOW
-print(model_CBOW.GetMostSimilar("happy"))
+print(model_SCB.GetMostSimilar("happy"))
 # TODO: Testing Skip-Thoughts
 # TODO: Testing ELMo
 

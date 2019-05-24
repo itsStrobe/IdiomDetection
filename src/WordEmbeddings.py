@@ -67,7 +67,7 @@ class Word2Vec_Embeddings:
 class SiameseCBOW_Embeddings:
     model = None
 
-    def __init__(self, pretrainned="./models/cosine_sharedWeights_adadelta_lr_1_noGradClip_epochs_2_batch_100_neg_2_voc_65536x300_noReg_lc_noPreInit_vocab_65535.end_of_epoch_2.pickle"):
+    def __init__(self, pretrainned="./models/cosine_sharedWeights_adadelta_lr_1_noGradClip_epochs_2_batch_100_neg_2_voc_65536x300_noReg_lc_noPreInit_vocab_65535.end_of_epoch_2_p3.pkl"):
         self.model = SiameseCBOW.wordEmbeddings(pretrainned)
 
     def train(self, corpus, epochs=10):
@@ -78,7 +78,7 @@ class SiameseCBOW_Embeddings:
         print("Not implemented")
         raise NotImplementedError
 
-    def load(self, pretrainned="./models/cosine_sharedWeights_adadelta_lr_1_noGradClip_epochs_2_batch_100_neg_2_voc_65536x300_noReg_lc_noPreInit_vocab_65535.end_of_epoch_2.pickle"):
+    def load(self, pretrainned="./models/cosine_sharedWeights_adadelta_lr_1_noGradClip_epochs_2_batch_100_neg_2_voc_65536x300_noReg_lc_noPreInit_vocab_65535.end_of_epoch_2_p3.pkl"):
         self.model = SiameseCBOW.wordEmbeddings(pretrainned)
 
     def GetMostSimilar(self, word, topN=5):
