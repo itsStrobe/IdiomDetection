@@ -13,7 +13,7 @@ import pickle
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-import tensorlow_hub as tfhub
+import tensorflow_hub as tfhub
 import SiameseCBOW.wordEmbeddings as SiameseCBOW
 from gensim.models import Word2Vec
 
@@ -54,7 +54,7 @@ class Word2Vec_Embeddings:
 
         return np.average(featVector, axis=0).reshape(1, vec_size)
 
-    def GenerateFeatMatrix(sentences, vec_size = VEC_SIZE):
+    def GenerateFeatMatrix(self, sentences, vec_size = VEC_SIZE):
         it = 0
         featMatrix = np.empty((sentences.shape[0], vec_size))
 
@@ -94,7 +94,7 @@ class SiameseCBOW_Embeddings:
 
         return featVector
 
-    def GenerateFeatMatrix(sentences, vec_size = VEC_SIZE):
+    def GenerateFeatMatrix(self, sentences, vec_size = VEC_SIZE):
         it = 0
         featMatrix = np.empty((sentences.shape[0], vec_size))
 
@@ -127,20 +127,14 @@ class ELMo_Embeddings:
         raise NotImplementedError
 
     def GenerateFeatVector(self, sentence, vec_size = ELMo_VEC_SIZE):
-        if(self.model is None):
-            print("Model not loading. Terminating Process.")
-            return np.zeros(vec_size)
-        
-        featVector = model(sentence, signature="default", as_dict=True)["elmo"]
+        print("Not implemented. Use a single element list for single sentence embedding.")
+        raise NotImplementedError
 
-        return featVector
+    def GenerateFeatMatrix(self, sentences, vec_size = ELMo_VEC_SIZE):
+        featVector = self.model(sentences.tolist(), signature="default", as_dict=True)["elmo"]
 
-    def GenerateFeatMatrix(sentences, vec_size = ELMo_VEC_SIZE):
-        it = 0
-        featMatrix = np.empty((sentences.shape[0], vec_size))
-
-        for sentence in sentences:
-            featMatrix[it, :] = self.GenerateFeatVector(sentence, vec_size=vec_size)
-            it += 1
-
-        return featMatrix
+        with tf.Session() as sess:
+            sess.run(tf.global_variables_initializer())
+            sess.run(tf.tables_initializer())
+            # return average of ELMo features
+            return sess.run(tf.reduce_mean(featVector,1))

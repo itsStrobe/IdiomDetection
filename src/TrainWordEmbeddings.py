@@ -8,7 +8,7 @@
 import numpy as np
 from Util import CorpusExtraction
 from WordEmbeddings import Word2Vec_Embeddings as W2V
-# from WordEmbeddings import SiameseCBOW_Embeddings as CBOW
+from WordEmbeddings import SiameseCBOW_Embeddings as CBOW
 from WordEmbeddings import ELMo_Embeddings as ELMo
 
 CORPORA_PRE  = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"]
@@ -18,7 +18,7 @@ MODEL_SUFFIX = "_ver1.model"
 # Following values by King and Cook (2018)
 VEC_SIZE = 300
 WND_SIZE = 8
-EPOCHS   = 5
+EPOCHS   = 10
 
 train_W2V = False
 train_SCB = False
@@ -30,8 +30,7 @@ model_SCB = None
 model_SkT = None
 model_ELM = None
 
-CorporaIterator = [sent for sent in CorpusExtraction.IterateOverCorpora(CORPORA_PRE)]
-CorporaIterator_sentAsString = [sent for sent in CorpusExtraction.IterateOverCorpora(CORPORA_PRE, sentAsList=False)]
+# CorporaIterator = [sent for sent in CorpusExtraction.IterateOverCorpora(CORPORA_PRE)]
 
 ## VOCABULARY INITIALIZATION ##
 # Initializing Word2Vec's Vocabulary
@@ -55,7 +54,7 @@ if (train_W2V): print(model_W2V.GetMostSimilar("happy"))
 # Testing Siamese CBOW
 if (train_SCB): print(model_SCB.GetMostSimilar("happy"))
 # TODO: Testing Skip-Thoughts
-if (train_ELM): print(model_ELM.GenerateFeatVector("I am happy ."))
+if (train_ELM): print(model_ELM.GenerateFeatMatrix(np.array(["I am sad .", "I hate everyone ."])))
 
 ## SAVING MODELS ##
 # Saving Word2Vec
