@@ -76,10 +76,11 @@ class CorpusExtraction:
                 return pickle.load(file)
 
     @staticmethod
-    def IterateOverCorpora(corporaDir):
+    def IterateOverCorpora(corporaDir, sentAsList=True):
         for corpora_name in corporaDir:
             print("Loading Corpora:", corpora_name)
             corpora = CorpusExtraction.LoadCorpora(corpora_name)
             for corpus in corpora:
                 for sentence in corpora[corpus]:
+                    if(sentAsList == False): ' '.join(sentence)
                     yield sentence    

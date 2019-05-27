@@ -12,11 +12,14 @@ import sys
 import pickle
 import numpy as np
 import pandas as pd
+import tensorflow as tf
+import tensorlow_hub as tfhub
 import SiameseCBOW.wordEmbeddings as SiameseCBOW
 from gensim.models import Word2Vec
 
 WND_SIZE = 8
 VEC_SIZE = 300
+ELMo_VEC_SIZE = 1024
 
 class Word2Vec_Embeddings:
     model = None
@@ -62,8 +65,6 @@ class Word2Vec_Embeddings:
 
         return featMatrix
 
-# TODO - Send to another file being executed with Python2. Wack.
-
 class SiameseCBOW_Embeddings:
     model = None
 
@@ -89,12 +90,9 @@ class SiameseCBOW_Embeddings:
             print("Model not loading. Terminating Process.")
             return np.zeros(vec_size)
         
-        featVector = np.empty((0, vec_size))
+        featVector = self.model.getRandomEmbedding(word)
 
-        for word in sentence:
-            featVector = np.append(featVector, [self.model.getRandomEmbedding(word)], axis=0)
-
-        return np.average(featVector, axis=0).reshape(1, vec_size)
+        return featVector
 
     def GenerateFeatMatrix(sentences, vec_size = VEC_SIZE):
         it = 0
@@ -102,6 +100,46 @@ class SiameseCBOW_Embeddings:
 
         for sentence in sentences:
             sentence = sentence.split()
+            featMatrix[it, :] = self.GenerateFeatVector(sentence, vec_size=vec_size)
+            it += 1
+
+        return featMatrix
+
+class ELMo_Embeddings:
+    model = None
+
+    def __init__(self, hub_module="https://tfhub.dev/google/elmo/2"):
+        self.model = tfhub.Module(hub_module, trainable=True)
+
+    def train(self, corpus, epochs=10):
+        print("Not implemented")
+        raise NotImplementedError
+
+    def save(self, modelDir):
+        print("Not implemented")
+        raise NotImplementedError
+
+    def load(self, hub_module="https://tfhub.dev/google/elmo/2"):
+        self.model = tfhub.Module(hub_module, trainable=True)
+
+    def GetMostSimilar(self, word, topN=5):
+        print("Not implemented")
+        raise NotImplementedError
+
+    def GenerateFeatVector(self, sentence, vec_size = ELMo_VEC_SIZE):
+        if(self.model is None):
+            print("Model not loading. Terminating Process.")
+            return np.zeros(vec_size)
+        
+        featVector = model(sentence, signature="default", as_dict=True)["elmo"]
+
+        return featVector
+
+    def GenerateFeatMatrix(sentences, vec_size = ELMo_VEC_SIZE):
+        it = 0
+        featMatrix = np.empty((sentences.shape[0], vec_size))
+
+        for sentence in sentences:
             featMatrix[it, :] = self.GenerateFeatVector(sentence, vec_size=vec_size)
             it += 1
 
