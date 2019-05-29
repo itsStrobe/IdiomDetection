@@ -109,7 +109,7 @@ class vocabulary:
 
   def write(self):
     for iIndex in range(1, self.iNrOfWords):
-      print("[%d] %s" % (iIndex, self.index2word(iIndex)))
+      print "[%d] %s" % (iIndex, self.index2word(iIndex))
 
 if __name__ == "__main__":
   import argparse
@@ -132,4 +132,4 @@ if __name__ == "__main__":
                       sInputMode=oArgs.sInputMode)
 
   for i in range(10):
-    print("%s: %d" % (oVocab.dIndex2word[i], i))
+    print "%s: %d" % (oVocab.dIndex2word[i], i)

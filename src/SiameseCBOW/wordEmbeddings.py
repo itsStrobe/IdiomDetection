@@ -16,11 +16,12 @@ under the License.
 
 import numpy as np
 import codecs
+import cPickle
 import pickle
 from gensim import matutils
 import lasagne
 
-import SiameseCBOW.vocabUtils
+import vocabUtils
 
 class wordEmbeddings:
   '''
@@ -45,7 +46,7 @@ class wordEmbeddings:
 
     if sPickleFile is not None:
       fhFile = open(sPickleFile, mode='rb')
-      dDict = pickle.load(fhFile)
+      dDict = cPickle.load(fhFile)
       fhFile.close()
 
     self.oArgs = dDict["oArgs"]
@@ -168,8 +169,7 @@ class wordEmbeddings:
       aIndexRange = range(1, self.oVocab.iNrOfWords)
 
     for iIndex in aIndexRange:
-      print("[%d] %s: %s" % \
+      print "[%d] %s: %s" % \
           (iIndex, self.oVocab.index2word(iIndex),
            ', '.join(["%s (%f)" % x for x in self.most_similar(self.oVocab.index2word(iIndex), fMinDist=fMinDist)] )
            )
-          )
