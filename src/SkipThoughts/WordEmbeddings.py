@@ -14,10 +14,15 @@ import numpy as np
 import pandas as pd
 import skipthoughts as SkipThoughts
 
-WND_SIZE = 8
-VEC_SIZE = 300
+"""
+The first 2400 dimensions is the uni-skip model, and the last 2400 is the bi-skip model.
+We highly recommend using the combine-skip vectors, as they are almost universally the best performing in the paper experiments.
+- Ryan Kiros
+"""
+VEC_SIZE = 4800
 
 class Embeddings:
+    vec_dim = 4800
     model   = None
     encoder = None
 

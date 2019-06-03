@@ -24,7 +24,9 @@ print("Training Model - NOT NEEDED: Using Pre-Trained Model")
 ## MODEL TESTING ##
 # Testing ELMo
 print("Testing Model")
-print(model.GenerateFeatMatrix(np.array(["I am happy .", "I love everyone ."])))
+featVector = model.GenerateFeatMatrix(np.array(["I am happy .", "I love everyone ."])) 
+print(featVector)
+print(featVector.shape)
 
 ## SAVING MODELS ##
 # Saving ELMo - NOT NEEDED: Using Pre-Trained Hub Model

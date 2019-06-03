@@ -16,10 +16,10 @@ from gensim.models import Word2Vec
 
 WND_SIZE = 8
 VEC_SIZE = 300
-ELMo_VEC_SIZE = 1024
 
 class Embeddings:
-    model = None
+    vec_dim = VEC_SIZE
+    model   = None
 
     def __init__(self, corpus=None, size=VEC_SIZE, window=WND_SIZE, min_count=1, workers=4):
         if corpus == None:

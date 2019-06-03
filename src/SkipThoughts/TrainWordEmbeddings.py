@@ -9,11 +9,6 @@ import numpy as np
 from Util import CorpusExtraction
 from WordEmbeddings import Embeddings as SkipThoughts
 
-# Following values by King and Cook (2018)
-VEC_SIZE = 300
-WND_SIZE = 8
-EPOCHS   = 10
-
 model = None
 
 ## VOCABULARY INITIALIZATION ##
@@ -28,7 +23,9 @@ print("Training Model - NOT NEEDED: Using Pre-Trained Model")
 ## MODEL TESTING ##
 # TODO: Testing Skip-Thoughts
 print("Testing Model")
-print(model.GenerateFeatMatrix(np.array(["I am happy .", "I love everyone ."])))
+featVector = model.GenerateFeatMatrix(np.array(["I am happy .", "I love everyone ."]))
+print(featVector)
+print(featVector.shape)
 
 ## SAVING MODELS ##
 # TODO: Saving Skip-Thoughts - NOT NEEDED: Using Pre-Trained Model

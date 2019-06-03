@@ -16,11 +16,11 @@ import tensorflow as tf
 import tensorflow_hub as tfhub
 
 HUB_MODULE = "https://tfhub.dev/google/elmo/2"
-
-ELMo_VEC_SIZE = 1024
+VEC_SIZE = 1024
 
 class Embeddings:
-    model = None
+    vec_dim = VEC_SIZE
+    model   = None
 
     def __init__(self, hub_module=HUB_MODULE):
         self.model = tfhub.Module(hub_module, trainable=True)
@@ -40,11 +40,11 @@ class Embeddings:
         print("Not implemented")
         raise NotImplementedError
 
-    def GenerateFeatVector(self, sentence, vec_size = ELMo_VEC_SIZE):
+    def GenerateFeatVector(self, sentence, vec_size = VEC_SIZE):
         print("Not implemented. Use a single element list for single as parameter on GenerateFeatMatrix sentence embedding.")
         raise NotImplementedError
 
-    def GenerateFeatMatrix(self, sentences, vec_size = ELMo_VEC_SIZE):
+    def GenerateFeatMatrix(self, sentences, vec_size = VEC_SIZE):
         featVector = self.model(sentences.tolist(), signature="default", as_dict=True)["elmo"]
 
         with tf.Session() as sess:
