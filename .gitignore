@@ -1,4 +1,13 @@
-Corpora
-__pycache__
-data
+# Unecessary Python Files
+__pychache__
+*.pyc
 
+# Datasets (See Google Drive for docs)
+Corpora
+data
+models
+embeddings.csv
+targets
+
+# Virtuanenv Installs
+venv

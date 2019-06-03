@@ -63,7 +63,7 @@ class CorpusExtraction:
     """
     @staticmethod
     def SaveCorpora(rootDir, fileName, suffix='', indexed=False):
-        corporaName = './data/' + fileName + suffix + '.pkl'
+        corporaName = '../data/' + fileName + suffix + '.pkl'
         corpora = CorpusExtraction.ReadCorpora(rootDir, indexed=indexed)
 
         with open(corporaName, 'wb+') as file:
@@ -74,7 +74,7 @@ class CorpusExtraction:
     """
     @staticmethod
     def LoadCorpora(fileName, suffix=''):
-        corporaName = './data/' + fileName + suffix + '.pkl'
+        corporaName = '../data/' + fileName + suffix + '.pkl'
 
         if(os.path.isfile(corporaName)):
             with open(corporaName, 'rb') as file:

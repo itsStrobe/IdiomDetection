@@ -21,29 +21,24 @@ class CorpusExtraction:
     Each list represents a tokenized sentence.
     """
     @staticmethod
-    def ReadCorpus(fileDir, asNumpy=True, indexed=False):
+    def ReadCorpus(fileDir, asNumpy=True):
         tagRegexp = re.compile(r'<.*>')
         flatten = lambda l: [item for sublist in l for item in sublist]
         with open(fileDir, "r", encoding="utf_8") as corpus:
             corpusSoup = Soup(corpus, 'xml')
             sentTags   = corpusSoup.findAll('s')
-            if(indexed):
-                sent = {}
-                for sentTag in sentTags:
-                    if(sentTag['n'].isdigit()):
-                        sent[int(sentTag['n'])] = flatten([token.text.split() for token in sentTag if tagRegexp.search(str(token))])
-            else:
-                sent = [flatten([token.text.split() for token in sentTag if tagRegexp.search(str(token))]) for sentTag in sentTags]
-                if(asNumpy):
-                    sent = np.array(sent)
+            sent       = [flatten([token.text.split() for token in sentTag if tagRegexp.search(str(token))]) for sentTag in sentTags]
 
-        return sent
+            if(asNumpy):
+                return np.array(sent)
+            else:
+                return sent
 
     """
     Reads the Corpora in a given directory. Creates a map in which in it allocates each extracted corpus.
     """
     @staticmethod
-    def ReadCorpora(rootDir, indexed=False):
+    def ReadCorpora(rootDir):
         corpora = {}
         for root, _, files in os.walk(rootDir):
             if files == []:
@@ -54,7 +49,7 @@ class CorpusExtraction:
                 fileDir = os.path.join(root, corpus)
                 print(fileDir)
                 name, _ = os.path.splitext(corpus)
-                corpora[name] = CorpusExtraction.ReadCorpus(fileDir, indexed=indexed)
+                corpora[name] = IO_Util.ReadCorpus(fileDir)
 
         return corpora
 
@@ -62,9 +57,9 @@ class CorpusExtraction:
     Saves a extracted corpora into a pickle file for quick access.
     """
     @staticmethod
-    def SaveCorpora(rootDir, fileName, suffix='', indexed=False):
-        corporaName = './data/' + fileName + suffix + '.pkl'
-        corpora = CorpusExtraction.ReadCorpora(rootDir, indexed=indexed)
+    def SaveCorpora(rootDir, fileName):
+        corporaName = '../data/' + fileName + '.pkl'
+        corpora = IO_Util.ReadCorpora(rootDir)
 
         with open(corporaName, 'wb+') as file:
             pickle.dump(corpora, file, pickle.HIGHEST_PROTOCOL)
@@ -73,18 +68,19 @@ class CorpusExtraction:
     Loads a pre-saved corpora from a pickle file.
     """
     @staticmethod
-    def LoadCorpora(fileName, suffix=''):
-        corporaName = './data/' + fileName + suffix + '.pkl'
+    def LoadCorpora(fileName):
+        corporaName = '../data/' + fileName + '.pkl'
 
         if(os.path.isfile(corporaName)):
             with open(corporaName, 'rb') as file:
                 return pickle.load(file)
 
     @staticmethod
-    def IterateOverCorpora(corporaDir, suffix=''):
+    def IterateOverCorpora(corporaDir, sentAsList=True):
         for corpora_name in corporaDir:
             print("Loading Corpora:", corpora_name)
-            corpora = CorpusExtraction.LoadCorpora(corpora_name, suffix=suffix)
+            corpora = CorpusExtraction.LoadCorpora(corpora_name)
             for corpus in corpora:
                 for sentence in corpora[corpus]:
-                    yield sentence
+                    if(sentAsList == False): ' '.join(sentence)
+                    yield sentence    
