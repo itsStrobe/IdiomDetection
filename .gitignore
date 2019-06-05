@@ -3,7 +3,7 @@ __pychache__
 *.pyc
 
 # Datasets (See Google Drive for docs)
-Corpora
+Corpora*
 data
 models
 embeddings.csv

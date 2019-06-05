@@ -31,9 +31,9 @@ class CorpusExtraction:
                 sent = {}
                 for sentTag in sentTags:
                     if(sentTag['n'].isdigit()):
-                        sent[int(sentTag['n'])] = flatten([token.text.split() for token in sentTag if tagRegexp.search(str(token))])
+                        sent[int(sentTag['n'])] = flatten([tag.text.split() for tag in sentTag if tagRegexp.search(str(tag))])
             else:
-                sent = [flatten([token.text.split() for token in sentTag if tagRegexp.search(str(token))]) for sentTag in sentTags]
+                sent = [flatten([tag.text.split() for tag in sentTag if tagRegexp.search(str(tag))]) for sentTag in sentTags]
                 if(asNumpy):
                     sent = np.array(sent)
 
@@ -88,3 +88,43 @@ class CorpusExtraction:
             for corpus in corpora:
                 for sentence in corpora[corpus]:
                     yield sentence
+
+class CorpusEdition:
+    """
+    Iterates over the lines of a Corpus from the BNC XML Dataset. Removes a list of patterns. 
+    Prints the processed files into outFileDir
+    """
+    @staticmethod
+    def RemovePatternsFromCorpus(inFileDir, outFileDir, patterns):
+        with open(inFileDir, "r", encoding="utf_8") as inFile:
+            if not os.path.exists(os.path.dirname(outFileDir)):
+                try:
+                    os.makedirs(os.path.dirname(outFileDir))
+                except OSError as exc: # Guard against race condition
+                    if exc.errno != errno.EEXIST:
+                        raise
+            with open(outFileDir, "w+", encoding="utf_8") as outFile:
+                for line in inFile:
+                    edited_line = line
+                    for pattern in patterns:
+                        edited_line = re.sub(pattern, "", edited_line)
+
+                    outFile.write(edited_line)
+
+    """
+    Iterates over the Corpora in a given directory. Removes patters from all files.
+    Prints the editted files into a new subdirectory specified by the split.
+    """
+    @staticmethod
+    def RemovePatternsFromCorpora(rootDir, patterns, processedDirSuffix="_RemPatterns"):
+        for root, _, files in os.walk(rootDir):
+            if files == []:
+                continue
+
+            print("Extracting Corpora in:", root)
+            for corpus in files:
+                inFileDir  = os.path.join(root, corpus)
+                outFileDir = inFileDir.replace(rootDir, rootDir + processedDirSuffix)
+                print(inFileDir)
+                name, _ = os.path.splitext(corpus)
+                CorpusEdition.RemovePatternsFromCorpus(inFileDir, outFileDir, patterns)

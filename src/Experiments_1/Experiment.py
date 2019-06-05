@@ -28,10 +28,14 @@ SCBOW_DIR     = "../SiameseCBOW/"
 SKIP_DIR      = "../SkipThoughts/"
 ELMO_DIR      = "../ELMo/"
 VECTORS_FILE  = "embeddings.csv"
-W2V_RESULTS   = "./results/W2V.csv"
-SCBOW_RESULTS = "./results/SCBOW.csv"
-SKIP_RESULTS  = "./results/SKIP.csv"
-ELMO_RESULTS  = "./results/ELMO.csv"
+RESULTS_DIR   = "./results/"
+W2V_RESULTS   = "W2V"
+SCBOW_RESULTS = "SCBOW"
+SKIP_RESULTS  = "SKIP"
+ELMO_RESULTS  = "ELMO"
+IDIOMATIC_EXT = "_i"
+LITERAL_EXT   = "_l"
+FILE_EXT      = ".csv"
 
 # SVM Parameters: | Based on experiments by King and Cook (2018)
 PARAMS  = {'C':[0.01, 0.1, 1, 10, 100]}
@@ -42,13 +46,14 @@ SCORING = ['accuracy', 'f1', 'precision', 'recall']
 SPLITS    = 10
 TEST_SIZE = 0.1
 SEED      = 5
-VERBOSE   = 3
+VERBOSE   = 4
 
 # -- EXTRACT DATASETS -- #
 # Extract all targets and remove those where classification is Q (unknown)
 targets = pd.read_csv(TARGETS_DIR, header=None, usecols=[0], sep=' ').values.flatten()
 indexes = np.where(targets != 'Q')
-targets = (targets[indexes] == 'I')
+targets_idiomatic = (targets[indexes] == 'I')
+targets_literal   = (targets[indexes] == 'L')
 
 features_w2v   = np.genfromtxt(W2V_DIR   + VECTORS_FILE, delimiter=',')[indexes]
 features_scbow = np.genfromtxt(SCBOW_DIR + VECTORS_FILE, delimiter=',')[indexes]
@@ -62,25 +67,53 @@ cv = ShuffleSplit(n_splits=SPLITS, test_size=TEST_SIZE, random_state=SEED)
 svm_clf = svm.SVC(kernel=KERNEL, random_state=SEED)
 
 # -- WORD2VEC CROSSVALIDATION -- #
+print("<===================> Word2Vec <===================>")
+# Idiomatic Detection
 grid_w2v    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
-svm_w2v     = grid_w2v.fit(features_w2v, targets)
+svm_w2v     = grid_w2v.fit(features_w2v, targets_idiomatic)
 results_w2v = pd.DataFrame.from_dict(svm_w2v.cv_results_)
-results_w2v.to_csv(W2V_RESULTS)
+results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + IDIOMATIC_EXT + FILE_EXT)
+# Literal Detection
+grid_w2v    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
+svm_w2v     = grid_w2v.fit(features_w2v, targets_literal)
+results_w2v = pd.DataFrame.from_dict(svm_w2v.cv_results_)
+results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + LITERAL_EXT + FILE_EXT)
 
 # -- SIAMESE CBOW CROSSVALIDATION -- #
+print("<=================> Siamese CBOW <=================>")
+# Idiomatic Detection
 grid_scbow    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
-svm_scbow     = grid_scbow.fit(features_scbow, targets)
+svm_scbow     = grid_scbow.fit(features_scbow, targets_idiomatic)
 results_scbow = pd.DataFrame.from_dict(svm_scbow.cv_results_)
-results_scbow.to_csv(SCBOW_RESULTS)
+results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + IDIOMATIC_EXT + FILE_EXT)
+# Literal Detection
+grid_scbow    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
+svm_scbow     = grid_scbow.fit(features_scbow, targets_literal)
+results_scbow = pd.DataFrame.from_dict(svm_scbow.cv_results_)
+results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + LITERAL_EXT + FILE_EXT)
 
 # -- SKIP-THOUGHTS CROSSVALIDATION -- #
+print("<================> Skip - Thoughts <===============>")
+# Idiomatic Detection
 grid_skip    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
-svm_skip     = grid_skip.fit(features_skip, targets)
+svm_skip     = grid_skip.fit(features_skip, targets_idiomatic)
 results_skip = pd.DataFrame.from_dict(svm_skip.cv_results_)
-results_skip.to_csv(SKIP_RESULTS)
+results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + IDIOMATIC_EXT + FILE_EXT)
+# Literal Detection
+grid_skip    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
+svm_skip     = grid_skip.fit(features_skip, targets_literal)
+results_skip = pd.DataFrame.from_dict(svm_skip.cv_results_)
+results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + LITERAL_EXT + FILE_EXT)
 
 # -- ELMO CROSSVALIDATION -- #
+print("<=====================> ELMo <=====================>")
+# Idiomatic Detection
 grid_elmo    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
-svm_elmo     = grid_elmo.fit(features_elmo, targets)
-results_elmo = pd.DataFrame.from_dict(svm_elmo.cv_results_)
-results_elmo.to_csv(ELMO_RESULTS)
+svm_elmo     = grid_elmo.fit(features_elmo, targets_idiomatic)
+results_skip = pd.DataFrame.from_dict(svm_elmo.cv_results_)
+results_skip.to_csv(RESULTS_DIR + ELMO_RESULTS + IDIOMATIC_EXT + FILE_EXT)
+# Literal Detection
+grid_elmo    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
+svm_elmo     = grid_elmo.fit(features_elmo, targets_literal)
+results_skip = pd.DataFrame.from_dict(svm_elmo.cv_results_)
+results_skip.to_csv(RESULTS_DIR + ELMO_RESULTS + LITERAL_EXT + FILE_EXT)
