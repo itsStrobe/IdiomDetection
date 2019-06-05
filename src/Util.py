@@ -1,7 +1,7 @@
 """
     File:   Util
     Author: Jose Juan Zavala Iglesias
-    Date:   19/02/2019
+    Date:   19/05/2019
 
     Util packages for file processing and generic applications.
 """
@@ -15,6 +15,92 @@ import pandas as pd
 from bs4 import BeautifulSoup as Soup
 
 class CorpusExtraction:
+
+    """
+    Extracts the texts of a corpus either in the present state or in a lemmatized state.
+    It has the posibility of also extracting the tags.
+    """
+    @staticmethod
+    def ExtractCorpus(inFileDir, outFileDir, getLemma=True, posFileDir=None, hasMW=False, tags=['w', 'c']):
+        if(hasMW):
+            print("Not implemented")
+            raise NotImplementedError
+
+        # Create outFileDir
+        if not os.path.exists(os.path.dirname(outFileDir)):
+            try:
+                os.makedirs(os.path.dirname(outFileDir))
+            except OSError as exc: # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
+
+        # Create posFileDir
+        if(posFileDir != None):
+            if not os.path.exists(os.path.dirname(posFileDir)):
+                try:
+                    os.makedirs(os.path.dirname(posFileDir))
+                except OSError as exc: # Guard against race condition
+                    if exc.errno != errno.EEXIST:
+                        raise
+
+        with open(inFileDir, "r", encoding="utf_8") as inFile:
+            with open(outFileDir, "w+", encoding="utf_8") as outFile:
+                fileSoup = Soup(inFile, 'xml')
+                sentTags = fileSoup.findAll('s')
+
+                if(posFileDir != None):
+                    with open(posFileDir, "w+", encoding="utf_8") as posFile:
+                        for sentTag in sentTags:
+                            sentence = ""
+                            posTags  = ""
+                            # Implement hasMW exception here:
+                            wordTags = sentTag.findAll(tags)
+                            for wordTag in wordTags:
+                                if(wordTag.name == 'w' and getLemma):
+                                    sentence = sentence + wordTag['hw'].strip() + " "
+                                else:
+                                    sentence = sentence + wordTag.text.strip() + " "
+
+                                posTags = posTags + wordTag['c5'].strip() + " "
+
+                            sentence = sentence.strip() + '\n'
+                            posTags  = posTags.strip() + '\n'
+
+                            outFile.write(sentence)
+                            posFile.write(posTags)
+                else:
+                    for sentTag in sentTags:
+                        sentence = ""
+                        # Implement hasMW exception here:
+                        for wordTag in sentTag.findAll(tags):
+                            if(wordTag.name == 'w' and getLemma):
+                                sentence = sentence + wordTag['hw'].strip() + " "
+                            else:
+                                sentence = sentence + wordTag.text.strip() + " "
+
+                        sentence = sentence.strip()
+
+                        outFile.write(sentence)
+
+    """
+    Wrapper method for ExtractCorpus for iterating over the whole corpora.
+    """
+    @staticmethod
+    def ExtractCorpora(rootDir, outDirSuffix="_CleanText", posDirSuffix="_PosTags", getLemma=True, getPosTags=True, hasMW=False, tags=['w', 'c']):
+        for root, _, files in os.walk(rootDir):
+            if files == []:
+                continue
+
+            print("Extracting Corpora in:", root)
+            for corpus in files:
+                inFileDir = os.path.join(root, corpus)
+                outFileDir = inFileDir.replace(rootDir, rootDir + outDirSuffix).replace(".xml", ".txt")
+                if(getPosTags):
+                    posFileDir = inFileDir.replace(rootDir, rootDir + posDirSuffix).replace(".xml", ".txt")
+                else:
+                    posFileDir = None
+                print(inFileDir)
+                CorpusExtraction.ExtractCorpus(inFileDir, outFileDir, getLemma=getLemma, posFileDir=posFileDir, hasMW=hasMW, tags=tags)
 
     """
     Reads a Corpus from the BNC XML Dataset format. Returns it as a Numpy of lists or a lists of lists.
@@ -126,5 +212,4 @@ class CorpusEdition:
                 inFileDir  = os.path.join(root, corpus)
                 outFileDir = inFileDir.replace(rootDir, rootDir + processedDirSuffix)
                 print(inFileDir)
-                name, _ = os.path.splitext(corpus)
                 CorpusEdition.RemovePatternsFromCorpus(inFileDir, outFileDir, patterns)
