@@ -57,9 +57,9 @@ class CorpusExtraction:
                             wordTags = sentTag.findAll(tags)
                             for wordTag in wordTags:
                                 if(wordTag.name == 'w' and getLemma):
-                                    sentence = sentence + wordTag['hw'].strip() + " "
+                                    sentence = sentence + wordTag['hw'].strip().replace(" ", "_") + " "
                                 else:
-                                    sentence = sentence + wordTag.text.strip() + " "
+                                    sentence = sentence + wordTag.text.strip().replace(" ", "_") + " "
 
                                 posTags = posTags + wordTag['c5'].strip() + " "
 
@@ -74,9 +74,9 @@ class CorpusExtraction:
                         # Implement hasMW exception here:
                         for wordTag in sentTag.findAll(tags):
                             if(wordTag.name == 'w' and getLemma):
-                                sentence = sentence + wordTag['hw'].strip() + " "
+                                sentence = sentence + wordTag['hw'].strip().replace(" ", "_") + " "
                             else:
-                                sentence = sentence + wordTag.text.strip() + " "
+                                sentence = sentence + wordTag.text.strip().replace(" ", "_") + " "
 
                         sentence = sentence.strip()
 

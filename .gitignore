@@ -8,6 +8,7 @@ data
 models
 embeddings.csv
 targets
+Pattern*
 
 # Virtuanenv Installs
 venv
