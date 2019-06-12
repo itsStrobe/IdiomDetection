@@ -119,14 +119,14 @@ class CorpusExtraction:
                 for sentTag in sentTags:
                     if(sentTag['n'].isdigit()):
                         if(not posTags):
-                            sent[int(sentTag['n'])] = flatten([tag.text.split() for tag in sentTag if tagRegexp.search(str(tag))])
+                            sent[int(sentTag['n'])] = flatten([tag.text.split() for tag in sentTag.findAll(tags) if tagRegexp.search(str(tag))])
                         else:
                             sent[int(sentTag['n'])] = [wordTag['c5'] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag))]
             else:
                 if(not posTags):
-                    sent = [flatten([tag.text.split() for tag in sentTag if tagRegexp.search(str(tag))]) for sentTag in sentTags]
+                    sent = [flatten([tag.text.split() for tag in sentTag.findAll(tags) if tagRegexp.search(str(tag))]) for sentTag in sentTags]
                 else:
-                    sent = [wordTag['c5'] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag))]
+                    sent = [wordTag['c5'] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag)) for sentTag in sentTags]
 
                 if(asNumpy):
                     sent = np.array(sent)

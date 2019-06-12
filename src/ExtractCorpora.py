@@ -1,7 +1,7 @@
 """
     File:   Util
     Author: Jose Juan Zavala Iglesias
-    Date:   20/02/2019
+    Date:   20/05/2019
 
     Generate Pre-Processed Corpora for Word Embedding Models Training
 """

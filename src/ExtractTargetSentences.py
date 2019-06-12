@@ -1,7 +1,7 @@
 """
     File:   ExtractTargetSentences
     Author: Jose Juan Zavala Iglesias
-    Date:   29/02/2019
+    Date:   29/05/2019
 
     Extract the target sentences for the VNC dataset.
 """
@@ -41,11 +41,12 @@ sentences = []
 # Extract Sentences
 with open(SENT_DIR, "w+") as sent_file:
     for sentenceLoc in vncTokens:
-        print(sentenceLoc)
         fileLoc = sentenceLoc[2].split(LOC_TOKEN)
         sentNum = int(sentenceLoc[3])
 
         sent = corpora[fileLoc[0]][fileLoc[2]][sentNum]
+        if(sentNum == 1938):
+            print(sent)
 
         sentences.append(sent)
 
@@ -70,12 +71,16 @@ cForms = np.zeros(len(vncTokens))
 # Determine CForms
 it = 0
 for sentenceLoc, sent in zip(vncTokens, sentences):
-    print(sentenceLoc)
     fileLoc = sentenceLoc[2].split(LOC_TOKEN)
     sentNum = int(sentenceLoc[3])
 
     vnc     = sentenceLoc[1].split(VNC_TOKEN)
     posTags = corpora_tags[fileLoc[0]][fileLoc[2]][sentNum]
+
+    if(len(sent) != len(posTags)):
+        print(sentenceLoc)
+        print(sent)
+        print(posTags)
 
     if(cForm_model.IsCForm(vnc[0], vnc[1], sent, posTags)):
         cForms[it] = 1
