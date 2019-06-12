@@ -61,7 +61,6 @@ class CForm(object):
             T = self.T
 
         for pattern in range(1, 12):
-            print(pattern, self.PatternZ_Score(verb, noun, pattern))
             if(self.PatternZ_Score(verb, noun, pattern) > T):
                 cForms.append(pattern)
 

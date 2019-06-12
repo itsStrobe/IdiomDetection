@@ -107,7 +107,8 @@ class CorpusExtraction:
     Each list represents a tokenized sentence.
     """
     @staticmethod
-    def ReadCorpus(fileDir, asNumpy=True, indexed=False):
+    def ReadCorpus(fileDir, asNumpy=True, indexed=False, posTags=False):
+        tags=['w', 'c']
         tagRegexp = re.compile(r'<.*>')
         flatten = lambda l: [item for sublist in l for item in sublist]
         with open(fileDir, "r", encoding="utf_8") as corpus:
@@ -117,9 +118,16 @@ class CorpusExtraction:
                 sent = {}
                 for sentTag in sentTags:
                     if(sentTag['n'].isdigit()):
-                        sent[int(sentTag['n'])] = flatten([tag.text.split() for tag in sentTag if tagRegexp.search(str(tag))])
+                        if(not posTags):
+                            sent[int(sentTag['n'])] = flatten([tag.text.split() for tag in sentTag if tagRegexp.search(str(tag))])
+                        else:
+                            sent[int(sentTag['n'])] = [wordTag['c5'] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag))]
             else:
-                sent = [flatten([tag.text.split() for tag in sentTag if tagRegexp.search(str(tag))]) for sentTag in sentTags]
+                if(not posTags):
+                    sent = [flatten([tag.text.split() for tag in sentTag if tagRegexp.search(str(tag))]) for sentTag in sentTags]
+                else:
+                    sent = [wordTag['c5'] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag))]
+
                 if(asNumpy):
                     sent = np.array(sent)
 
@@ -129,7 +137,7 @@ class CorpusExtraction:
     Reads the Corpora in a given directory. Creates a map in which in it allocates each extracted corpus.
     """
     @staticmethod
-    def ReadCorpora(rootDir, indexed=False):
+    def ReadCorpora(rootDir, indexed=False, posTags=False):
         corpora = {}
         for root, _, files in os.walk(rootDir):
             if files == []:
@@ -140,17 +148,17 @@ class CorpusExtraction:
                 fileDir = os.path.join(root, corpus)
                 print(fileDir)
                 name, _ = os.path.splitext(corpus)
-                corpora[name] = CorpusExtraction.ReadCorpus(fileDir, indexed=indexed)
+                corpora[name] = CorpusExtraction.ReadCorpus(fileDir, indexed=indexed, posTags=posTags)
 
         return corpora
 
     """
-    Saves a extracted corpora into a pickle file for quick access.
+    Saves a extracted corpora's Pos Tags into a pickle file for quick access.
     """
     @staticmethod
-    def SaveCorpora(rootDir, fileName, suffix='', indexed=False):
+    def SaveCorpora(rootDir, fileName, suffix='', indexed=False, posTags=False):
         corporaName = './data/' + fileName + suffix + '.pkl'
-        corpora = CorpusExtraction.ReadCorpora(rootDir, indexed=indexed)
+        corpora = CorpusExtraction.ReadCorpora(rootDir, indexed=indexed, posTags=posTags)
 
         with open(corporaName, 'wb+') as file:
             pickle.dump(corpora, file, pickle.HIGHEST_PROTOCOL)

@@ -13,6 +13,7 @@ from Util import CorpusExtraction
 CORPORA_DIR = "./Corpora/BNC XML/2554/download/Texts/"
 CORPORA_PRE = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"]
 INDEXED_SUF = "_idx"
+POSTAGS_SUF = "_posTags"
 
 # Extract Corpora as Sentences for Embedding Model Training
 for prefix in CORPORA_PRE:
@@ -20,5 +21,6 @@ for prefix in CORPORA_PRE:
     corpora = CORPORA_DIR + prefix
     CorpusExtraction.SaveCorpora(corpora, prefix)
     CorpusExtraction.SaveCorpora(corpora, prefix, suffix=INDEXED_SUF, indexed=True)
+    CorpusExtraction.SaveCorpora(corpora, prefix, suffix=POSTAGS_SUF, indexed=True, posTags=True)
 
 print("Succesfully Extracted Corpora")
