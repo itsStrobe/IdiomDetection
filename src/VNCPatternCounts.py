@@ -68,7 +68,9 @@ MAX_WINDOW = 5
 
 # CLASS FUNCTIONS
 
-
+"""
+Finds the next noun in setence. Returns Integer if any and None if none.
+"""
 def FindNextNoun(idx, posTags):
     while(idx < len(posTags)):
         if(posTags[idx] in NOUN_SG or posTags[idx] in NOUN_PL):
@@ -77,7 +79,9 @@ def FindNextNoun(idx, posTags):
 
     return None
 
-
+"""
+Disambiguation for similar patterns that have differences in cardinality.
+"""
 def SimilarPatternDesambiguation(nounTag, pat_SG, pat_PL, verb, noun):
     patterns = []
 
@@ -92,7 +96,9 @@ def SimilarPatternDesambiguation(nounTag, pat_SG, pat_PL, verb, noun):
         patterns.append([verb, noun, pat_PL])
         return patterns
 
-
+"""
+Finds the fitting patterns (1-10) for a VNC.
+"""
 def FindPattern_1_10(verbPos, nounPos, sentence, posTags, max_window=MAX_WINDOW):
     patternLength = nounPos - verbPos
     patterns      = []
@@ -150,7 +156,9 @@ def IsBeInRange(range):
 
     return False
 
-
+"""
+Finds the fitting patterns (11) for a VNC.
+"""
 def FindPattern_11(nounPos, sentence, posTags, max_window=MAX_WINDOW):
     # Window smaller that required for Pattern 11 to occur.
     if(max_window < 3):
@@ -171,7 +179,9 @@ def FindPattern_11(nounPos, sentence, posTags, max_window=MAX_WINDOW):
 
     return []
 
-
+"""
+Given a Sentence and its sequence of POS Tags (C5 Format), it extracts the VNCs and Pattern numbers.
+"""
 def ExtractPatternsFromSentence(sentence, posTags, max_window=MAX_WINDOW):
     if(isinstance(sentence, str)):
         sentence = sentence.split()
@@ -198,7 +208,10 @@ def ExtractPatternsFromSentence(sentence, posTags, max_window=MAX_WINDOW):
 
     return patterns
 
-
+"""
+Finds all VNC patterns in a Corpus given a sentence file and a tag file.
+Outputs findings into a new directory.
+"""
 def ExtractPatternsFromCorpus(inFileDir, posFileDir, outFileDir, max_window=MAX_WINDOW):
     # Create outFileDir
     if not os.path.exists(os.path.dirname(outFileDir)):
@@ -218,7 +231,10 @@ def ExtractPatternsFromCorpus(inFileDir, posFileDir, outFileDir, max_window=MAX_
                 for pattern in patterns:
                     outFile.write(' '.join(pattern) + '\n')
 
-
+"""
+Envelope function for ExtractPatternsFromCorpus.
+Iterates over all Corpus in the Corpora and writes the pattern files for each Corpus.
+"""
 def ExtractPatternsFromCorpora(corporaTextRootDir, outRootDir, cleanTextSuffix="_CleanText", posTagsTextSuffix="_PosTags", max_window=MAX_WINDOW):
     for root, _, files in os.walk(corporaTextRootDir):
         if files == []:
@@ -235,7 +251,12 @@ def ExtractPatternsFromCorpora(corporaTextRootDir, outRootDir, cleanTextSuffix="
             print(inFileDir)
             ExtractPatternsFromCorpus(inTextFileDir, inPosTagFileDir, outFileDir, max_window=max_window)
 
-
+"""
+Gets all the VNC Pattern counts into a Dictionary.
+Each VNC uses an array in which:
+    Position  0    -> Total Number of Counts of VNC
+    Positions 1-11 -> Pattern Count
+"""
 def GenerateModelFromPatternFile(patternFileDir, model={}):
     # Position  0    -> Total Number of Counts of VNC
     # Positions 1-11 -> Pattern Count
@@ -255,7 +276,10 @@ def GenerateModelFromPatternFile(patternFileDir, model={}):
 
     return model
 
-
+"""
+Envelope function for GenerateModelFromPatternFile
+Iterates over all Pattern Files and saves the VNC Pattern.
+"""
 def GenerateModelFromPatternFiles(patternFilesRoot):
     model = {}
 

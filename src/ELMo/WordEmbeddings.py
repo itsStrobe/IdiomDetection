@@ -1,7 +1,7 @@
 """
     File:   WordEmbeddings
     Author: Jose Juan Zavala Iglesias
-    Date:   19/02/2019
+    Date:   19/05/2019
 
     Word Embedding Models Wrapper for ease of use
 """

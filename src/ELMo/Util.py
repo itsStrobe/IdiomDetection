@@ -1,7 +1,7 @@
 """
     File:   Util
     Author: Jose Juan Zavala Iglesias
-    Date:   19/02/2019
+    Date:   19/05/2019
 
     Util packages for file processing and generic applications.
 """

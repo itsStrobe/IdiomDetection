@@ -174,6 +174,9 @@ class CorpusExtraction:
             with open(corporaName, 'rb') as file:
                 return pickle.load(file)
 
+    """
+    Creates an iterator for reading a Corpora.
+    """
     @staticmethod
     def IterateOverCorpora(corporaDir, suffix=''):
         for corpora_name in corporaDir:

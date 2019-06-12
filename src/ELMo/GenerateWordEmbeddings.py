@@ -1,7 +1,7 @@
 """
     File:   GenerateWordEmbeddings
     Author: Jose Juan Zavala Iglesias
-    Date:   29/02/2019
+    Date:   29/05/2019
 
     Use the trained Embeddings Model (ELMo) to generate word embeddings for target sentences.
 """
