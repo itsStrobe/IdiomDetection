@@ -18,7 +18,7 @@ from WordEmbeddings import Embeddings
 SENT_DIR   = "../targets/Extracted_Sentences.txt"
 EMBD_DIR   = "./embeddings.csv"
 MODEL_DIR  = "https://tfhub.dev/google/elmo/2"
-BATCH_SIZE = 400
+BATCH_SIZE = 300
 
 # Load Sentences
 sentences = np.genfromtxt(SENT_DIR, dtype='str', delimiter='\t')

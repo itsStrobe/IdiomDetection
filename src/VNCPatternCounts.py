@@ -265,11 +265,12 @@ def GenerateModelFromPatternFile(patternFileDir, model={}):
     with open(patternFileDir, "r", encoding="utf_8") as patternFile:
         for line in patternFile:
             pattern = line.split()
+
             vnc = (pattern[0], pattern[1])
             pat = int(pattern[2]) # Array indexing starts in 0
 
             if vnc not in model:
-                model[vnc] = defPatCount
+                model[vnc] = defPatCount.copy()
 
             model[vnc][0]   += 1
             model[vnc][pat] += 1
