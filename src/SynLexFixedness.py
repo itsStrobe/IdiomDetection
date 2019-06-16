@@ -20,11 +20,35 @@ from nltk.corpus import lin_thesaurus as lin
 nltk.download('lin_thesaurus')
 
 # CONSTANTS
-K       = 50
-PMI_LOG = 2
-W2V_SIM = 100 # Base number of W2V similar words; Increase if experiments prove necessary
+K        = 50 # Number of similar verb/nouns for Lexical Fixedness equation. Base value based on work by Fazly et al. (2009)
+LOG_BASE = 2
+W2V_SIM  = 100 # Base number of W2V similar words; Increase if experiments prove necessary
+ALPHA    = 0.6 # Base number for alpha parameter in Overall Fixedness equation. Base value based on work by Fazly et al. (2009)
 
 class SynLexFixedness(object):
+
+    # INSTANCE FUNCTIONS
+    def LoadModel(self, modelDir):
+        with open(modelDir, 'rb') as file:
+            self.model = pickle.load(file)
+
+    def SaveModel(self, modelDir):
+        # Create modelDir
+        if not os.path.exists(os.path.dirname(modelDir)):
+            try:
+                os.makedirs(os.path.dirname(modelDir))
+            except OSError as exc: # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
+
+        with open(modelDir, 'wb+') as file:
+            pickle.dump(self.model, file, pickle.HIGHEST_PROTOCOL)
+
+    def LoadW2VModel(self, w2vModelDir):
+        self.w2vModel = w2v()
+        self.w2vModel.load(w2vModelDir)
+
+    # LEXICAL FIXEDNESS AUXILIARY METHODS #    
 
     def GetKMostSimilar(self, word, k=K, isNoun=True, useLin=True):
         kSimilar = []
@@ -91,27 +115,6 @@ class SynLexFixedness(object):
 
         return simVNCs
 
-    # INSTANCE FUNCTIONS
-    def LoadModel(self, modelDir):
-        with open(modelDir, 'rb') as file:
-            self.model = pickle.load(file)
-
-    def SaveModel(self, modelDir):
-        # Create modelDir
-        if not os.path.exists(os.path.dirname(modelDir)):
-            try:
-                os.makedirs(os.path.dirname(modelDir))
-            except OSError as exc: # Guard against race condition
-                if exc.errno != errno.EEXIST:
-                    raise
-
-        with open(modelDir, 'wb+') as file:
-            pickle.dump(self.model, file, pickle.HIGHEST_PROTOCOL)
-
-    def LoadW2VModel(self, w2vModelDir):
-        self.w2vModel = w2v()
-        self.w2vModel.load(w2vModelDir)
-
     def CalcVerbNounCounts(self):
         if(self.model is None):
             print("VNC Model not loaded")
@@ -119,6 +122,7 @@ class SynLexFixedness(object):
 
         nounCounts = {}
         verbCounts = {}
+        patCounts  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
         for vnc in self.model:
             verb  = vnc[0]
@@ -132,11 +136,14 @@ class SynLexFixedness(object):
 
             nounCounts[noun] += count
             verbCounts[verb] += count
+            for i in range(12):
+                patCounts[i] += self.model[vnc][i]
 
         self.nounCounts = nounCounts
         self.verbCounts = verbCounts
+        self.patCounts  = patCounts
 
-    def PMI(self, verb, noun, logBase=PMI_LOG):
+    def PMI(self, verb, noun, logBase=LOG_BASE):
         if(self.model is None):
             print("VNC Model not loaded")
             return None
@@ -166,7 +173,7 @@ class SynLexFixedness(object):
         
         return math.log(((len(self.model) * self.model[(verb, noun)][0]) / (self.verbCounts[verb] * self.nounCounts[noun])), logBase)
 
-    def Fixedness_Lex(self, verb, noun, vK=K, nK=K, logBase=PMI_LOG, useLin=True):
+    def Fixedness_Lex(self, verb, noun, vK=K, nK=K, logBase=LOG_BASE, useLin=True):
         if(K is not None):
             vK = K
             nK = K
@@ -182,8 +189,40 @@ class SynLexFixedness(object):
 
         return (self.PMI(verb, noun, logBase=logBase) - avgPMI) / stdPMI
 
+    # SYNTACTIC FIXEDNESS AUXILIARY METHODS #
+
+    def PatMLE(self, pat):
+        if(self.patCounts is None):
+            print("Pattern Counts not available. Run CalcVerbNounCounts()")
+            return None
+        return self.patCounts[pat] / self.patCounts[0]
+
+    def PatPosProb(self, pat, verb, noun):
+        if(self.model is None):
+            print("VNC Model not loaded")
+            return None
+
+        vnc = (verb, noun)
+
+        return self.model[vnc][pat] / self.model[vnc][0]
+
+    def Fixedness_Syn(self, verb, noun, logBase=LOG_BASE):
+        fixSyn = 0
+
+        for pat in range(1, 12):
+            posProb = self.PatPosProb(pat, verb, noun)
+            patProb = self.PatMLE(pat)
+            if(posProb/patProb > 0):
+                fixSyn += posProb * math.log(posProb / patProb, logBase)
+
+        return fixSyn
+
+    def Fixedness_Overall(self, verb, noun, alpha=ALPHA, vK=K, nK=K, logBase=LOG_BASE, useLin=True):
+        return alpha * self.Fixedness_Syn(verb, noun, logBase=logBase) + (1 - alpha) * self.Fixedness_Lex(verb, noun, vK=vK, nK=nK, logBase=logBase, useLin=useLin)
+
     def __init__(self, patternFileDir=None, modelDir=None, w2vModelDir=None, K=None):
         self.model      = None
+        self.patCounts  = None
         self.nounCounts = None
         self.verbCounts = None
         self.w2vModel   = None
