@@ -18,8 +18,7 @@ import numpy as np
 import pandas as pd
 from sklearn import svm
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score 
-from sklearn.model_selection import ShuffleSplit
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import ShuffleSplit, GridSearchCV
 
 # Files and Directories:
 TARGETS_DIR   = "../targets/English_VNC_Cook/VNC-Tokens_cleaned"
