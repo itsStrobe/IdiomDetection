@@ -1,7 +1,7 @@
 """
     File:   TrainWordEmbeddings - Word2Vec
     Author: Jose Juan Zavala Iglesias
-    Date:   21/02/2019
+    Date:   21/05/2019
 
     Train Word Embedding Models with BNC XML Corpora and Store them for later use.
 """
