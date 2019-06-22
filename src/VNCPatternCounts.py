@@ -85,60 +85,81 @@ Disambiguation for similar patterns that have differences in cardinality.
 def SimilarPatternDesambiguation(nounTag, pat_SG, pat_PL, verb, noun):
     patterns = []
 
-    if(nounTag in NOUN_SG and nounTag in NOUN_PL):
-        patterns.append([verb, noun, pat_SG])
-        patterns.append([verb, noun, pat_PL])
-        return patterns
     if(nounTag in NOUN_SG):
         patterns.append([verb, noun, pat_SG])
-        return patterns
+
     if(nounTag in NOUN_PL):
         patterns.append([verb, noun, pat_PL])
-        return patterns
+
+    return patterns
 
 """
 Finds the fitting patterns (1-10) for a VNC.
 """
-def FindPattern_1_10(verbPos, nounPos, sentence, posTags, max_window=MAX_WINDOW):
+def FindPattern_1_10(verbPos, nounPos, sentence, posTags, max_window=MAX_WINDOW, returnPos=False):
     patternLength = nounPos - verbPos
     patterns      = []
 
     if(patternLength >= max_window):
-        return patterns # Outside set window
+        if(not returnPos):
+            return patterns # Outside set window
+        else:
+            return patterns, (None, None)
 
     # Check for patterns 1 and 6
     if(patternLength == 1):
-        return SimilarPatternDesambiguation(posTags[nounPos], '1', '6', sentence[verbPos], sentence[nounPos])
+        if(not returnPos):
+            return SimilarPatternDesambiguation(posTags[nounPos], '1', '6', sentence[verbPos], sentence[nounPos])
+        else:
+            return SimilarPatternDesambiguation(posTags[nounPos], '1', '6', sentence[verbPos], sentence[nounPos]), (verbPos, nounPos)
 
     # Check for punctuation marks that interrupt pattern
     # This solves the last condition for Pattern 10
     for idx in range(verbPos, nounPos + 1):
         if(posTags[idx] in PUNC):
-            return patterns
+            if(not returnPos):
+                return patterns
+            else:
+                return patterns, (None, None)
 
     # Check for pattern 2, 3, and 7
     for idx in range(verbPos, nounPos + 1):
         if(posTags[idx] in A_AN_THE):
             if(sentence[idx] == 'a' or sentence[idx] == 'an'):
                 patterns.append([sentence[verbPos], sentence[nounPos], '2'])
-                return patterns
+                if(not returnPos):
+                    return patterns
+                else:
+                    return patterns, (verbPos, nounPos)
 
             if(sentence[idx] == 'the'):
-                return SimilarPatternDesambiguation(posTags[nounPos], '3', '7', sentence[verbPos], sentence[nounPos])
+                if(not returnPos):
+                    return SimilarPatternDesambiguation(posTags[nounPos], '3', '7', sentence[verbPos], sentence[nounPos])
+                else:
+                    return SimilarPatternDesambiguation(posTags[nounPos], '3', '7', sentence[verbPos], sentence[nounPos]), (verbPos, nounPos)
 
     # Check for pattern 4 and 8
     for idx in range(verbPos, nounPos + 1):
         if(posTags[idx] in DEM):
-            return SimilarPatternDesambiguation(posTags[nounPos], '4', '8', sentence[verbPos], sentence[nounPos])
+            if(not returnPos):
+                return SimilarPatternDesambiguation(posTags[nounPos], '4', '8', sentence[verbPos], sentence[nounPos])
+            else:
+                return SimilarPatternDesambiguation(posTags[nounPos], '4', '8', sentence[verbPos], sentence[nounPos]), (verbPos, nounPos)
 
     # Check for pattern 5 and 9
     for idx in range(verbPos, nounPos + 1):
         if(posTags[idx] in POSS):
-            return SimilarPatternDesambiguation(posTags[nounPos], '5', '9', sentence[verbPos], sentence[nounPos])
+            if(not returnPos):
+                return SimilarPatternDesambiguation(posTags[nounPos], '5', '9', sentence[verbPos], sentence[nounPos])
+            else:
+                return SimilarPatternDesambiguation(posTags[nounPos], '5', '9', sentence[verbPos], sentence[nounPos]), (verbPos, nounPos)
 
     # Check for pattern 10 - Since PUNCs were already checked, just return Pattern 10
     patterns.append([sentence[verbPos], sentence[nounPos], '10'])
-    return patterns
+    if(not returnPos):
+        return patterns
+    else:
+        return patterns, (verbPos, nounPos)
 
 
 def IsPuncInRange(range):
@@ -159,7 +180,7 @@ def IsBeInRange(range):
 """
 Finds the fitting patterns (11) for a VNC.
 """
-def FindPattern_11(nounPos, sentence, posTags, max_window=MAX_WINDOW):
+def FindPattern_11(nounPos, sentence, posTags, max_window=MAX_WINDOW, returnPos=False):
     # Window smaller that required for Pattern 11 to occur.
     if(max_window < 3):
         return []
@@ -172,12 +193,50 @@ def FindPattern_11(nounPos, sentence, posTags, max_window=MAX_WINDOW):
     for verbPos in range(nounPos + 2, rightEdge):
         # PUNC breaks pattern
         if(IsPuncInRange(posTags[(nounPos + 1):verbPos])):
-            return []
+            if(not returnPos):
+                return []
+            else:
+                return [], (None, None)
 
         if(posTags[verbPos] in VERB_PASS and IsBeInRange(posTags[(nounPos + 1):verbPos])):
-            return [[sentence[verbPos], sentence[nounPos], '11']]
+            if(not returnPos):
+                return [[sentence[verbPos], sentence[nounPos], '11']]
+            else:
+                return [[sentence[verbPos], sentence[nounPos], '11']], (nounPos, verbPos)
 
     return []
+
+def ExtractPatternsRangeFromSentence(sentence, posTags, vnc, max_window=MAX_WINDOW):
+    if(isinstance(sentence, str)):
+        sentence = sentence.split()
+    if(isinstance(posTags, str)):
+        posTags = posTags.split()
+
+    # Inconsistencies between Words and Tags - Ignore Sentence
+    if(len(sentence) != len(posTags)):
+        return patterns
+
+    verb = vnc[0]
+    noun = vnc[1]
+
+    for idx in range(len(sentence)):
+        # Pattern 1-10
+        if(posTags[idx] in VERB_ACT and sentence[idx] == verb):
+            nextNoun = FindNextNoun(idx, posTags)
+            while(nextNoun is not None and (nextNoun - idx) < max_window):
+                patterns, foundVNC = FindPattern_1_10(idx, nextNoun, sentence, posTags, max_window=max_window, returnPos=True)
+                if(sentence[foundVNC[0]] == verb and sentence[foundVNC[1]] == noun and len(patterns) > 0):
+                    return foundVNC[0], foundVNC[1]
+
+                nextNoun = FindNextNoun(nextNoun + 1, posTags)
+
+        # Pattern 11
+        if(posTags[idx] in NOUN_SG or posTags[idx] in NOUN_PL and sentence[idx] == noun):
+            patterns, foundVNC = FindPattern_11(idx, sentence, posTags, max_window=max_window, returnPos=True)
+            if(sentence[foundVNC[0]] == noun and sentence[foundVNC[1]] == verb and len(patterns) > 0):
+                return foundVNC[0], foundVNC[1]
+
+    return None, None
 
 """
 Given a Sentence and its sequence of POS Tags (C5 Format), it extracts the VNCs and Pattern numbers.

@@ -21,10 +21,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report
+from sklearn.utils import shuffle
 from sklearn.model_selection import ShuffleSplit, GridSearchCV, train_test_split
 from sklearn.decomposition import PCA
 
 # Files and Directories:
+OG_SENT_DIR   = "../targets/Extracted_Sentences.txt"
 TARGETS_DIR   = "../targets/English_VNC_Cook/VNC-Tokens_cleaned"
 W2V_DIR       = "../Word2Vec/"
 SCBOW_DIR     = "../SiameseCBOW/"
@@ -40,11 +42,19 @@ W2V_RESULTS   = "W2V"
 SCBOW_RESULTS = "SCBOW"
 SKIP_RESULTS  = "SKIP"
 ELMO_RESULTS  = "ELMO"
-IDIOMATIC_EXT = "_i"
-LITERAL_EXT   = "_l"
+
+# Experiment Suffix
 EXP_EXT       = "_fixedness_cform"
+
+# File Extensions
 FILE_EXT      = ".csv"
 IMG_EXT       = ".png"
+
+# Features:
+USE_CFORM   = True
+USE_SYN_FIX = True
+USE_LEX_FIX = True
+USE_OVA_FIX = True
 
 # k-Means Parameters:
 N_CLUSTERS = 2
@@ -61,13 +71,12 @@ SHUFFLE   = True
 # Cluster Initialization
 RND_SEED = 42
 
-def gen_plot(feat, targ, pred, title_targ, title_pred, saveDir):
+def gen_plot(feat, targ, pred, title_targ, title_pred, saveDir, dispPlot=False):
     pca = PCA(n_components=2)
 
     principalComponents = pca.fit_transform(feat)
 
-    featDf = pd.DataFrame(data = principalComponents
-                 , columns = ['X', 'Y'])
+    featDf = pd.DataFrame(data = principalComponents, columns = ['X', 'Y'])
     targDf = pd.DataFrame(data = targ, columns=['target'])
     predDf = pd.DataFrame(data = pred, columns=['target'])
 
@@ -85,10 +94,10 @@ def gen_plot(feat, targ, pred, title_targ, title_pred, saveDir):
     colors = ['b', 'r']
     for target, color in zip(targets,colors):
         indicesToKeep = targ_finalDf['target'] == target
-        ax_targ.scatter(targ_finalDf.loc[indicesToKeep, 'X']
-                   , targ_finalDf.loc[indicesToKeep, 'Y']
-                   , c = color
-                   , s = 50)
+        ax_targ.scatter(targ_finalDf.loc[indicesToKeep, 'X'],
+                        targ_finalDf.loc[indicesToKeep, 'Y'],
+                        c = color,
+                        s = 10)
 
     ax_targ.legend(targets)
     ax_targ.grid()
@@ -102,219 +111,155 @@ def gen_plot(feat, targ, pred, title_targ, title_pred, saveDir):
     colors = ['b', 'r']
     for target, color in zip(targets,colors):
         indicesToKeep = pred_finalDf['target'] == target
-        ax_pred.scatter(pred_finalDf.loc[indicesToKeep, 'X']
-                   , targ_finalDf.loc[indicesToKeep, 'Y']
-                   , c = color
-                   , s = 50)
+        ax_pred.scatter(pred_finalDf.loc[indicesToKeep, 'X'],
+                        pred_finalDf.loc[indicesToKeep, 'Y'],
+                        c = color,
+                        s = 10)
 
     ax_pred.legend(targets)
     ax_pred.grid()
 
     plt.savefig(saveDir)
-    plt.show()
+
+    if(dispPlot):
+        plt.show()
+
+def saveClassifiedSentences(all_sent, all_targ, all_pred, fileDir):
+#    for sent, targ, pred in zip(all_sent, all_targ, all_pred):
+#        if(targ != pred):
+#            print("Sentence", sent, "| Target:", targ, "| Clustered As:", pred)
+
+    all_sent = all_sent.reshape((all_sent.size, 1))
+    all_targ = all_targ.reshape((all_targ.size, 1))
+    all_pred = all_pred.reshape((all_pred.size, 1))
+    data = np.append(all_sent, all_targ, axis=1)
+    data = np.append(data, all_pred, axis = 1)
+    pd.DataFrame(data = data, columns=['Sentence', 'Target', 'Prediction']).to_csv(fileDir, sep='\t')
 
 # -- EXTRACT DATASETS -- #
 # Extract all targets and remove those where classification is Q (unknown)
 targets = pd.read_csv(TARGETS_DIR, header=None, usecols=[0], sep=' ').values.flatten()
 indexes = np.where(targets != 'Q')
-targets_test = targets[indexes]
+
 targets_idiomatic = (targets[indexes] == 'I')
 targets_literal   = (targets[indexes] == 'L')
 
+# Original Sentences
+og_sent = np.genfromtxt(OG_SENT_DIR, delimiter="\t", dtype=None, encoding="utf_8")[indexes]
+
+# Sentence Embeddings
 features_w2v   = np.genfromtxt(W2V_DIR   + VECTORS_FILE, delimiter=',')[indexes]
 features_scbow = np.genfromtxt(SCBOW_DIR + VECTORS_FILE, delimiter=',')[indexes]
 features_skip  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE, delimiter=',')[indexes]
 features_elmo  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE, delimiter=',')[indexes]
 
-# -- CREATE FEATURE VECTORS -- #
-cForms = np.genfromtxt(CFORM_DIR, delimiter=',')[indexes]
-cForms = cForms.reshape((cForms.size, 1))
-synFix = np.genfromtxt(SYN_FIX_DIR, delimiter=',')[indexes]
-synFix = synFix.reshape((synFix.size, 1))
-lexFix = np.genfromtxt(LEX_FIX_DIR, delimiter=',')[indexes]
-lexFix = lexFix.reshape((lexFix.size, 1))
-ovaFix = np.genfromtxt(OVA_FIX_DIR, delimiter=',')[indexes]
-ovaFix = ovaFix.reshape((ovaFix.size, 1))
+# -- ADD FAZLY's METRICS -- #
+if(USE_CFORM):
+    cForms = np.genfromtxt(CFORM_DIR, delimiter=',')[indexes]
+    cForms = cForms.reshape((cForms.size, 1))
 
-features_fix = np.append(cForms, synFix, axis=1)
-features_fix = np.append(features_fix, lexFix, axis=1)
-features_fix = np.append(features_fix, ovaFix, axis=1)
+    features_w2v   = np.append(features_w2v,   cForms, axis=1)
+    features_scbow = np.append(features_scbow, cForms, axis=1)
+    features_skip  = np.append(features_skip,  cForms, axis=1)
+    features_elmo  = np.append(features_elmo,  cForms, axis=1)
 
-features_w2v_fix   = np.append(features_w2v,   features_fix, axis=1)
-features_scbow_fix = np.append(features_scbow, features_fix, axis=1) 
-features_skip_fix  = np.append(features_skip,  features_fix, axis=1)  
-features_elmo_fix  = np.append(features_elmo,  features_fix, axis=1)
+if(USE_SYN_FIX):
+    synFix = np.genfromtxt(SYN_FIX_DIR, delimiter=',')[indexes]
+    synFix = synFix.reshape((synFix.size, 1))
+
+    features_w2v   = np.append(features_w2v,   synFix, axis=1)
+    features_scbow = np.append(features_scbow, synFix, axis=1)
+    features_skip  = np.append(features_skip,  synFix, axis=1)
+    features_elmo  = np.append(features_elmo,  synFix, axis=1)
+
+if(USE_LEX_FIX):
+    lexFix = np.genfromtxt(LEX_FIX_DIR, delimiter=',')[indexes]
+    lexFix = lexFix.reshape((lexFix.size, 1))
+
+    features_w2v   = np.append(features_w2v,   lexFix, axis=1)
+    features_scbow = np.append(features_scbow, lexFix, axis=1)
+    features_skip  = np.append(features_skip,  lexFix, axis=1)
+    features_elmo  = np.append(features_elmo,  lexFix, axis=1)
+
+if(USE_OVA_FIX):
+    ovaFix = np.genfromtxt(OVA_FIX_DIR, delimiter=',')[indexes]
+    ovaFix = ovaFix.reshape((ovaFix.size, 1))
+
+    features_w2v   = np.append(features_w2v,   ovaFix, axis=1)
+    features_scbow = np.append(features_scbow, ovaFix, axis=1)
+    features_skip  = np.append(features_skip,  ovaFix, axis=1)
+    features_elmo  = np.append(features_elmo,  ovaFix, axis=1)
 
 # Split Sets:
-print(features_w2v_fix.shape, targets_idiomatic.shape)
-w2v_X_train, w2v_X_test, w2v_y_train, w2v_y_test         = train_test_split(features_w2v_fix,   targets_idiomatic, test_size=TEST_SIZE, shuffle=SHUFFLE, random_state=RND_STATE)
-scbow_X_train, scbow_X_test, scbow_y_train, scbow_y_test = train_test_split(features_scbow_fix, targets_idiomatic, test_size=TEST_SIZE, shuffle=SHUFFLE, random_state=RND_STATE)
-skip_X_train, skip_X_test, skip_y_train, skip_y_test     = train_test_split(features_skip_fix,  targets_idiomatic, test_size=TEST_SIZE, shuffle=SHUFFLE, random_state=RND_STATE)
-elmo_X_train, elmo_X_test, elmo_y_train, elmo_y_test     = train_test_split(features_elmo_fix,  targets_idiomatic, test_size=TEST_SIZE, shuffle=SHUFFLE, random_state=RND_STATE)
+sent_X, w2v_X, scbow_X, skip_X, elmo_X, y = shuffle(og_sent, features_w2v_fix, features_scbow_fix, features_skip_fix, features_elmo_fix, targets_idiomatic, random_state=RND_STATE)
 
 # -- Extract Random Centroids -- #
 # Initialize Cluster Vectors
-w2v_centroids   = np.zeros((N_CLUSTERS, w2v_X_train.shape[1]))
-scbow_centroids = np.zeros((N_CLUSTERS, scbow_X_train.shape[1]))
-skip_centroids  = np.zeros((N_CLUSTERS, skip_X_train.shape[1]))
-elmo_centroids  = np.zeros((N_CLUSTERS, elmo_X_train.shape[1]))
+w2v_centroids   = np.zeros((N_CLUSTERS, w2v_X.shape[1]))
+scbow_centroids = np.zeros((N_CLUSTERS, scbow_X.shape[1]))
+skip_centroids  = np.zeros((N_CLUSTERS, skip_X.shape[1]))
+elmo_centroids  = np.zeros((N_CLUSTERS, elmo_X.shape[1]))
 
 # Extract Centroids Indexes
 np.random.seed(RND_SEED)
-cent_i = np.random.choice(np.where(w2v_y_train == True)[0])
-cent_l = np.random.choice(np.where(w2v_y_train == False)[0])
+cent_i = np.random.choice(np.where(y == True)[0])
+cent_l = np.random.choice(np.where(y == False)[0])
 
 # Get Centroids
-w2v_centroids[0]   = w2v_X_train[cent_i]
-w2v_centroids[1]   = w2v_X_train[cent_l]
+w2v_centroids[0]   = w2v_X[cent_i]
+w2v_centroids[1]   = w2v_X[cent_l]
 
-scbow_centroids[0] = scbow_X_train[cent_i]
-scbow_centroids[1] = scbow_X_train[cent_l]
+scbow_centroids[0] = scbow_X[cent_i]
+scbow_centroids[1] = scbow_X[cent_l]
 
-skip_centroids[0]  = skip_X_train[cent_i]
-skip_centroids[1]  = skip_X_train[cent_l]
+skip_centroids[0]  = skip_X[cent_i]
+skip_centroids[1]  = skip_X[cent_l]
 
-elmo_centroids[0]  = elmo_X_train[cent_i]
-elmo_centroids[1]  = elmo_X_train[cent_l]
+elmo_centroids[0]  = elmo_X[cent_i]
+elmo_centroids[1]  = elmo_X[cent_l]
 
 # -- Train k-Means -- #
 
 print("<===================> Word2Vec <===================>")
 # - Run KMeans
-w2v_kMeans = KMeans(n_clusters=N_CLUSTERS, init=w2v_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(w2v_X_train)
+w2v_kMeans = KMeans(n_clusters=N_CLUSTERS, init=w2v_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(w2v_X)
 
-# - Predictions
-# Cluster Indexes:
-w2v_idx = w2v_kMeans.predict(w2v_centroids)
+# Display Clusters:
+w2v_clust_labels = (np.array(w2v_kMeans.labels_) == y[cent_i])
+gen_plot(w2v_X, y, w2v_clust_labels, "Original Word2Vec Labels", "k-Means Labels", RESULTS_DIR + W2V_RESULTS + EXP_EXT + IMG_EXT)
+saveClassifiedSentences(sent_X, y, w2v_clust_labels, RESULTS_DIR + W2V_RESULTS + EXP_EXT + FILE_EXT)
 
-if(w2v_idx[0] == w2v_idx[1]):
-    print("Both centroid initializers are in same Cluster")
-
-print("Idiomatic Centroid:", w2v_idx[0])
-print("Literal Centroid:", w2v_idx[1])
-w2v_pred_test = (w2v_kMeans.predict(w2v_X_test) == w2v_idx[0])
-
-correct = 0
-total   = 0
-pred_i  = 0
-pred_l  = 0
-for pred, real in zip(w2v_pred_test, w2v_y_test):
-    if(pred):
-        pred_i += 1
-    else:
-        pred_l += 1
-
-    if(pred == real):
-        correct += 1
-    total += 1
-
-print("Results:", classification_report(w2v_y_test, w2v_pred_test))
-print("Pred_i:", pred_i)
-print("Pred_l:", pred_l)
-
-gen_plot(w2v_X_test, w2v_y_test, w2v_pred_test, "W2V Targets", "W2V Predictions", RESULTS_DIR + W2V_RESULTS + EXP_EXT + IMG_EXT)
+print("Results:", classification_report(y, w2v_clust_labels))
 
 print("<=================> Siamese CBOW <=================>")
 # - Run KMeans
-scbow_kMeans = KMeans(n_clusters=N_CLUSTERS, init=scbow_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(scbow_X_train)
+scbow_kMeans = KMeans(n_clusters=N_CLUSTERS, init=scbow_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(w2v_X)
 
-# - Predictions
-# Cluster Indexes:
-scbow_idx = scbow_kMeans.predict(scbow_centroids)
+# Display Clusters:
+scbow_clust_labels = (np.array(scbow_kMeans.labels_) == y[cent_i])
+gen_plot(scbow_X, y, scbow_clust_labels, "Original Siamese CBOW Labels", "k-Means Labels", RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + IMG_EXT)
+saveClassifiedSentences(sent_X, y, scbow_clust_labels, RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + FILE_EXT)
 
-if(scbow_idx[0] == scbow_idx[1]):
-    print("Both centroid initializers are in same Cluster")
-
-print("Idiomatic Centroid:", scbow_idx[0])
-print("Literal Centroid:", scbow_idx[1])
-scbow_pred_test = (scbow_kMeans.predict(scbow_X_test) == scbow_idx[0])
-
-correct = 0
-total   = 0
-pred_i  = 0
-pred_l  = 0
-for pred, real in zip(scbow_pred_test, scbow_y_test):
-    if(pred):
-        pred_i += 1
-    else:
-        pred_l += 1
-
-    if(pred == real):
-        correct += 1
-    total += 1
-
-print("Results:", classification_report(scbow_y_test, scbow_pred_test))
-print("Pred_i:", pred_i)
-print("Pred_l:", pred_l)
-
-gen_plot(scbow_X_test, scbow_y_test, scbow_pred_test, "Siamese CBOW Targets", "Siamese CBOW Predictions", RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + IMG_EXT)
+print("Results:", classification_report(y, scbow_clust_labels))
 
 print("<================> Skip - Thoughts <===============>")
 # - Run KMeans
-skip_kMeans = KMeans(n_clusters=N_CLUSTERS, init=skip_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(skip_X_train)
+skip_kMeans = KMeans(n_clusters=N_CLUSTERS, init=skip_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(skip_X)
 
-# - Predictions
-# Cluster Indexes:
-skip_idx = skip_kMeans.predict(skip_centroids)
+# Display Clusters:
+skip_clust_labels = (np.array(skip_kMeans.labels_) == y[cent_i])
+gen_plot(skip_X, y, skip_clust_labels, "Original Skip-Thoughts Labels", "k-Means Labels", RESULTS_DIR + SKIP_RESULTS + EXP_EXT + IMG_EXT)
+saveClassifiedSentences(sent_X, y, skip_clust_labels, RESULTS_DIR + SKIP_RESULTS + EXP_EXT + FILE_EXT)
 
-if(skip_idx[0] == skip_idx[1]):
-    print("Both centroid initializers are in same Cluster")
-
-print("Idiomatic Centroid:", skip_idx[0])
-print("Literal Centroid:", skip_idx[1])
-skip_pred_test = (skip_kMeans.predict(skip_X_test) == skip_idx[0])
-
-correct = 0
-total   = 0
-pred_i  = 0
-pred_l  = 0
-for pred, real in zip(skip_pred_test, skip_y_test):
-    if(pred):
-        pred_i += 1
-    else:
-        pred_l += 1
-
-    if(pred == real):
-        correct += 1
-    total += 1
-
-print("Results:", classification_report(skip_y_test, skip_pred_test))
-print("Pred_i:", pred_i)
-print("Pred_l:", pred_l)
-
-gen_plot(skip_X_test, skip_y_test, skip_pred_test, "Skip-Thoughts Targets", "Skip-Thoughts Predictions", RESULTS_DIR + SKIP_RESULTS + EXP_EXT + IMG_EXT)
+print("Results:", classification_report(y, skip_clust_labels))
 
 print("<=====================> ELMo <=====================>")
 # - Run KMeans
-elmo_kMeans = KMeans(n_clusters=N_CLUSTERS, init=elmo_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(elmo_X_train)
+elmo_kMeans = KMeans(n_clusters=N_CLUSTERS, init=elmo_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(elmo_X)
 
-# - Predictions
-# Cluster Indexes:
-elmo_idx = elmo_kMeans.predict(elmo_centroids)
+# Display Clusters:
+elmo_clust_labels = (np.array(elmo_kMeans.labels_) == y[cent_i])
+gen_plot(elmo_X, y, elmo_clust_labels, "Original ELMo Labels", "k-Means Labels", RESULTS_DIR + ELMO_RESULTS + EXP_EXT + IMG_EXT)
+saveClassifiedSentences(sent_X, y, elmo_clust_labels, RESULTS_DIR + ELMO_RESULTS + EXP_EXT + FILE_EXT)
 
-if(elmo_idx[0] == elmo_idx[1]):
-    print("Both centroid initializers are in same Cluster")
-
-print("Idiomatic Centroid:", elmo_idx[0])
-print("Literal Centroid:", elmo_idx[1])
-elmo_pred_test = (elmo_kMeans.predict(elmo_X_test) == elmo_idx[0])
-
-correct = 0
-total   = 0
-pred_i  = 0
-pred_l  = 0
-for pred, real in zip(elmo_pred_test, elmo_y_test):
-    if(pred):
-        pred_i += 1
-    else:
-        pred_l += 1
-
-    if(pred == real):
-        correct += 1
-    total += 1
-
-print("Results:", classification_report(elmo_y_test, elmo_pred_test))
-print("Pred_i:", pred_i)
-print("Pred_l:", pred_l)
-
-gen_plot(elmo_X_test, elmo_y_test, elmo_pred_test, "ELMo Targets", "ELMo Predictions", RESULTS_DIR + ELMO_RESULTS + EXP_EXT + IMG_EXT)
+print("Results:", classification_report(y, elmo_clust_labels))
