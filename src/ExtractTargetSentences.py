@@ -12,13 +12,16 @@ import sys
 import pickle
 import numpy as np
 import pandas as pd
+
+import VNCPatternCounts
 from Util import CorpusExtraction
 from CForm import CForm
 from SynLexFixedness import SynLexFixedness
 
-CORPORA_PRE  = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"]
+CORPORA_PRE = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"]
 TARGETS_DIR = "./targets/English_VNC_Cook/VNC-Tokens_cleaned"
 SENT_DIR    = "./targets/Extracted_Sentences.txt" 
+SENTVNC_DIR = "./targets/Extracted_Sentences_VNC.txt" 
 CFORM_DIR   = "./targets/CForms.csv"
 SYN_FIX_DIR = "./targets/SynFix.csv"
 LEX_FIX_DIR = "./targets/LexFix.csv"
@@ -35,6 +38,9 @@ K        = 50
 ALPHA    = 0.6
 LOG_BASE = 2
 USE_LIN  = True
+
+# VNC Patterns Parameters
+MAX_WINDOW = 7
 
 # Load Corpora
 corpora      = {}
@@ -85,23 +91,30 @@ lexFix = np.zeros(len(vncTokens))
 synFix = np.zeros(len(vncTokens))
 ovaFix = np.zeros(len(vncTokens))
 
-# Determine CForms
-it = 0
-for sentenceLoc, sent in zip(vncTokens, sentences):
-    fileLoc = sentenceLoc[2].split(LOC_TOKEN)
-    sentNum = int(sentenceLoc[3])
+# Determine CForms, get Fixedness Metrics, and extract VNC Pattern Subtext
+with open(SENTVNC_DIR, "w+") as sentvnc_file:
+    it = 0
+    for sentenceLoc, sent in zip(vncTokens, sentences):
+        fileLoc = sentenceLoc[2].split(LOC_TOKEN)
+        sentNum = int(sentenceLoc[3])
 
-    vnc     = sentenceLoc[1].split(VNC_TOKEN)
-    posTags = corpora_tags[fileLoc[0]][fileLoc[2]][sentNum]
+        vnc     = sentenceLoc[1].split(VNC_TOKEN)
+        posTags = corpora_tags[fileLoc[0]][fileLoc[2]][sentNum]
 
-    if(cForm_model.IsCForm(vnc[0], vnc[1], sent, posTags)):
-        cForms[it] = 1
+        if(cForm_model.IsCForm(vnc[0], vnc[1], sent, posTags)):
+            cForms[it] = 1
 
-    lexFix[it] = pat_SynLexFix.Fixedness_Lex(vnc[0], vnc[1], vK=K, nK=K, logBase=LOG_BASE, useLin=USE_LIN)
-    synFix[it] = pat_SynLexFix.Fixedness_Syn(vnc[0], vnc[1], logBase=LOG_BASE)
-    ovaFix[it] = pat_SynLexFix.Fixedness_Overall(vnc[0], vnc[1], alpha=ALPHA, vK=K, nK=K, logBase=LOG_BASE, useLin=USE_LIN)
+        lexFix[it] = pat_SynLexFix.Fixedness_Lex(vnc[0], vnc[1], vK=K, nK=K, logBase=LOG_BASE, useLin=USE_LIN)
+        synFix[it] = pat_SynLexFix.Fixedness_Syn(vnc[0], vnc[1], logBase=LOG_BASE)
+        ovaFix[it] = pat_SynLexFix.Fixedness_Overall(vnc[0], vnc[1], alpha=ALPHA, vK=K, nK=K, logBase=LOG_BASE, useLin=USE_LIN)
 
-    it += 1
+        sentvnc_idx = VNCPatternCounts.ExtractPatternRangeFromSentence(sent, posTags, vnc, max_window=MAX_WINDOW)
+        sentvnc = sent[sentvnc_idx[0]:sentvnc_idx[1] + 1]
+
+        sentvnc_file.write(' '.join(sentvnc))
+        sentvnc_file.write('\n')
+
+        it += 1
 
 np.savetxt(CFORM_DIR  , cForms, delimiter=",")
 np.savetxt(LEX_FIX_DIR, lexFix, delimiter=",")

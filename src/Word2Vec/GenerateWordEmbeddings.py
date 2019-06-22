@@ -15,19 +15,24 @@ import pandas as pd
 from Util import CorpusExtraction
 from WordEmbeddings import Embeddings
 
-SENT_DIR  = "../targets/Extracted_Sentences.txt"
-EMBD_DIR  = "./embeddings.csv"
-MODEL_DIR = "./models/W2V_ver1.model"
+SENT_DIR    = "../targets/Extracted_Sentences.txt"
+SENTVNC_DIR = "../targets/Extracted_Sentences_VNC.txt"
+EMBD_DIR    = "./embeddings.csv"
+EMBDVNC_DIR = "./embeddings_VNC.csv"
+MODEL_DIR   = "./models/W2V_ver1.model"
 
 # Load Sentences
-sentences = np.genfromtxt(SENT_DIR, dtype='str', delimiter='\t')
+sentences = np.genfromtxt(SENT_DIR   , dtype='str', delimiter='\t')
+sents_vnc = np.genfromtxt(SENTVNC_DIR, dtype='str', delimiter='\t')
 
 # Load Model
 model = Embeddings()
 model.load(MODEL_DIR)
 
 # Generate Embeddings
-genEmbeddings = model.GenerateFeatMatrix(sentences)
+genEmbeddings    = model.GenerateFeatMatrix(sentences)
+genEmbeddingsVNC = model.GenerateFeatMatrix(sents_vnc)
 
 # Save Embeddings
-np.savetxt(EMBD_DIR, genEmbeddings, delimiter=',')
+np.savetxt(EMBD_DIR   , genEmbeddings   , delimiter=',')
+np.savetxt(EMBDVNC_DIR, genEmbeddingsVNC, delimiter=',')
