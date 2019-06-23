@@ -34,10 +34,6 @@ W2V_DIR          = "../Word2Vec/"
 SCBOW_DIR        = "../SiameseCBOW/"
 SKIP_DIR         = "../SkipThoughts/"
 ELMO_DIR         = "../ELMo/"
-CFORM_DIR        = "../targets/CForms.csv"
-SYN_FIX_DIR      = "../targets/SynFix.csv"
-LEX_FIX_DIR      = "../targets/LexFix.csv"
-OVA_FIX_DIR      = "../targets/OvaFix.csv"
 VECTORS_FILE     = "embeddings.csv"
 VECTORS_FILE_VNC = "embeddings_VNC.csv"
 RESULTS_DIR      = "./results/"
@@ -114,6 +110,8 @@ def gen_plot(feat, targ, pred, title_targ, title_pred, saveDir, dispPlot=False):
 
     if(dispPlot):
         plt.show()
+
+    plt.close()
 
 def saveClassifiedSentences(all_sent, all_cSim, all_targ, all_pred, fileDir):
 

@@ -124,6 +124,8 @@ def gen_plot(feat, targ, pred, title_targ, title_pred, saveDir, dispPlot=False):
     if(dispPlot):
         plt.show()
 
+    plt.close()
+
 def saveClassifiedSentences(all_sent, all_targ, all_pred, fileDir):
 #    for sent, targ, pred in zip(all_sent, all_targ, all_pred):
 #        if(targ != pred):

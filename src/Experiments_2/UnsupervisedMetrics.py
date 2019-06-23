@@ -20,6 +20,23 @@ def CosineSimilarity(vecsA, vecsB):
 
     return results
 
+def UnnamedMetric(cosSims, ovaFixs, beta=0.5):
+    if(cosSims.shape != ovaFixs.shape):
+        print("Sample vectors have different shapes:", cosSims.shape, ovaFixs.shape)
+        return None
+
+    if(beta > 1 or beta < 0):
+        print("Parameter beta must be in range 0 <= beta <= 1. Received value:", beta)
+        return None
+
+    results = np.zeros(cosSims.shape[0])
+
+    for idx in range(len(results)):
+        results[idx] = beta * (1 - cosSims[idx]) + (1 - beta) * ovaFixs[idx]
+
+    return results
+
+
 def ThresholdClassifier(values, T=0.5, Op='>'):
     classOp = None
     results = np.zeros(values.shape[0], dtype=bool)
