@@ -184,6 +184,8 @@ class CorpusExtraction:
             corpora = CorpusExtraction.LoadCorpora(corpora_name, suffix=suffix)
             for corpus in corpora:
                 for sentence in corpora[corpus]:
+                    for idx in range(len(sentence)):
+                        sentence[idx] = sentence[idx].lower()
                     yield sentence
 
 class CorpusEdition:

@@ -191,7 +191,7 @@ if(USE_OVA_FIX):
     features_elmo  = np.append(features_elmo,  ovaFix, axis=1)
 
 # Split Sets:
-sent_X, w2v_X, scbow_X, skip_X, elmo_X, y = shuffle(og_sent, features_w2v_fix, features_scbow_fix, features_skip_fix, features_elmo_fix, targets_idiomatic, random_state=RND_STATE)
+sent_X, w2v_X, scbow_X, skip_X, elmo_X, y = shuffle(og_sent, features_w2v, features_scbow, features_skip, features_elmo, targets_idiomatic, random_state=RND_STATE)
 
 # -- Extract Random Centroids -- #
 # Initialize Cluster Vectors

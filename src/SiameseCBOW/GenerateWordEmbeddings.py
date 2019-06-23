@@ -25,6 +25,11 @@ MODEL_DIR   = "./models/cosine_sharedWeights_adadelta_lr_1_noGradClip_epochs_2_b
 sentences = np.genfromtxt(SENT_DIR   , dtype='str', delimiter='\t')
 sents_vnc = np.genfromtxt(SENTVNC_DIR, dtype='str', delimiter='\t')
 
+# Set Sentences to Lowercase
+for sent_id in range(len(sentences)):
+    sentences[sent_id] = sentences[sent_id].lower()
+    sents_vnc[sent_id] = sents_vnc[sent_id].lower()
+
 # Load Model
 model = Embeddings(pretrainned=MODEL_DIR)
 

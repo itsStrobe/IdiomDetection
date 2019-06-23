@@ -29,6 +29,11 @@ sents_vnc = np.genfromtxt(SENTVNC_DIR, dtype='str', delimiter='\t')
 # Load Model
 model = Embeddings(hub_module=MODEL_DIR)
 
+# Set Sentences to Lowercase
+for sent_id in range(len(sentences)):
+    sentences[sent_id] = sentences[sent_id].lower()
+    sents_vnc[sent_id] = sents_vnc[sent_id].lower()
+
 # Generate Embeddings
 genEmbeddings    = np.zeros((sentences.shape[0], model.vec_dim))
 genEmbeddingsVNC = np.zeros((sents_vnc.shape[0], model.vec_dim))
