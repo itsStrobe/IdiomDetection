@@ -49,7 +49,7 @@ SCORING = ['accuracy', 'f1', 'precision', 'recall']
 # K-Fold Cross Validation Parameters:
 SPLITS    = 10
 TEST_SIZE = 0.1
-SEED      = 5
+SEED      = 42
 VERBOSE   = 4
 
 # -- EXTRACT DATASETS -- #

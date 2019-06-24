@@ -22,7 +22,6 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report
 from sklearn.utils import shuffle
-from sklearn.model_selection import ShuffleSplit, GridSearchCV, train_test_split
 from sklearn.decomposition import PCA
 
 import UnsupervisedMetrics
@@ -38,17 +37,20 @@ OVA_FIX_DIR      = "../targets/OvaFix.csv"
 VECTORS_FILE     = "embeddings.csv"
 VECTORS_FILE_VNC = "embeddings_VNC.csv"
 RESULTS_DIR      = "./results/"
+TEST_RESULTS_DIR = "test_params/"        
 W2V_RESULTS      = "W2V"
 SCBOW_RESULTS    = "SCBOW"
 SKIP_RESULTS     = "SKIP"
 ELMO_RESULTS     = "ELMO"
+BEST_RESULTS     = "BEST"
 
 # Experiment Suffix
-EXP_EXT       = "_unnamedMetric"
+EXP_EXT = "_unnamedMetric"
 
 # File Extensions
-FILE_EXT      = ".csv"
-IMG_EXT       = ".png"
+FILE_EXT = ".tsv"
+CSV_EXT  = ".csv"
+IMG_EXT  = ".png"
 
 # Unsupervised Parameters:
 UNM_MET_T  = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
@@ -59,6 +61,9 @@ BETA       = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 RND_STATE = 42
 TEST_SIZE = 0.3
 SHUFFLE   = True
+
+# Other Parameters
+SAVE_PLT = False
 
 def gen_plot(feat, targ, pred, title_targ, title_pred, saveDir, dispPlot=False):
     pca = PCA(n_components=2)
@@ -167,6 +172,34 @@ skip_cosSims = UnsupervisedMetrics.CosineSimilarity(skip_X, skip_X_VNC)
 # - Calculate Cosine Similarity - ELMo
 elmo_cosSims = UnsupervisedMetrics.CosineSimilarity(elmo_X, elmo_X_VNC)
 
+# Best Results Dictionary:
+best_params = {
+    'Idiomatic':{
+        'Model': "None",
+        'Parameters':{
+            'Beta':-1,
+            'Threshold': -1
+        },
+        'F1':-1
+    },
+    'Literal':{
+        'Model': "None",
+        'Parameters':{
+            'Beta':-1,
+            'Threshold': -1
+        },
+        'F1':-1
+    },
+    'Average':{
+        'Model': "None",
+        'Parameters':{
+            'Beta':-1,
+            'Threshold': -1
+        },
+        'F1':-1
+    }
+}
+
 for beta in BETA:
     for unm_met_t in UNM_MET_T:
         exp_ext = EXP_EXT + "_UNMMET_" + str(unm_met_t) + "_BETA_" + str(beta)
@@ -184,10 +217,31 @@ for beta in BETA:
         w2v_pred = UnsupervisedMetrics.ThresholdClassifier(w2v_unnamedMetric, T=unm_met_t, Op=UNM_MET_Op)
 
         # Display Classifications:
-        gen_plot(w2v_X, y, w2v_pred, "Original Word2Vec Labels", "Cosine Similarity Labels", RESULTS_DIR + W2V_RESULTS + exp_ext + IMG_EXT)
-        saveClassifiedSentences(sent_X, w2v_unnamedMetric, y, w2v_pred, RESULTS_DIR + W2V_RESULTS + exp_ext + FILE_EXT)
+        if(SAVE_PLT): gen_plot(w2v_X, y, w2v_pred, "Original Word2Vec Labels", "Cosine Similarity Labels", RESULTS_DIR + TEST_RESULTS_DIR + W2V_RESULTS + exp_ext + IMG_EXT)
+        saveClassifiedSentences(sent_X, w2v_unnamedMetric, y, w2v_pred, RESULTS_DIR + TEST_RESULTS_DIR + W2V_RESULTS + exp_ext + FILE_EXT)
 
         print("Results:", classification_report(y, w2v_pred))
+        results_w2v = pd.DataFrame.from_dict(classification_report(y, w2v_pred, output_dict=True))
+        results_w2v.to_csv(RESULTS_DIR + TEST_RESULTS_DIR + W2V_RESULTS + exp_ext + CSV_EXT)
+
+        # Store Best Parameters
+        if(results_w2v['True']['f1-score'] > best_params['Idiomatic']['F1']):
+            best_params['Idiomatic']['Model'] = "Word2Vec"
+            best_params['Idiomatic']['F1']    = results_w2v['True']['f1-score']
+            best_params['Idiomatic']['Parameters']['Beta']      = beta
+            best_params['Idiomatic']['Parameters']['Threshold'] = unm_met_t
+
+        if(results_w2v['False']['f1-score'] > best_params['Literal']['F1']):
+            best_params['Literal']['Model'] = "Word2Vec"
+            best_params['Literal']['F1']    = results_w2v['False']['f1-score']
+            best_params['Literal']['Parameters']['Beta']      = beta
+            best_params['Literal']['Parameters']['Threshold'] = unm_met_t
+
+        if((results_w2v['True']['f1-score'] + results_w2v['False']['f1-score'])/2 > best_params['Average']['F1']):
+            best_params['Average']['Model'] = "Siamese CBOW"
+            best_params['Average']['F1']    = (results_w2v['True']['f1-score'] + results_w2v['False']['f1-score'])/2
+            best_params['Average']['Parameters']['Beta']      = beta
+            best_params['Average']['Parameters']['Threshold'] = unm_met_t
 
         print("<=================> Siamese CBOW <=================>")
         # - Calculate Unnamed Metric
@@ -197,10 +251,31 @@ for beta in BETA:
         scbow_pred = UnsupervisedMetrics.ThresholdClassifier(scbow_unnamedMetric, T=unm_met_t, Op=UNM_MET_Op)
 
         # Display Classifications:
-        gen_plot(scbow_X, y, scbow_pred, "Original Siamese CBOW Labels", "Cosine Similarity Labels", RESULTS_DIR + SCBOW_RESULTS + exp_ext + IMG_EXT)
-        saveClassifiedSentences(sent_X, scbow_unnamedMetric, y, scbow_pred, RESULTS_DIR + SCBOW_RESULTS + exp_ext + FILE_EXT)
+        if(SAVE_PLT): gen_plot(scbow_X, y, scbow_pred, "Original Siamese CBOW Labels", "Cosine Similarity Labels", RESULTS_DIR + TEST_RESULTS_DIR + SCBOW_RESULTS + exp_ext + IMG_EXT)
+        saveClassifiedSentences(sent_X, scbow_unnamedMetric, y, scbow_pred, RESULTS_DIR + TEST_RESULTS_DIR + SCBOW_RESULTS + exp_ext + FILE_EXT)
 
         print("Results:", classification_report(y, scbow_pred))
+        results_scbow = pd.DataFrame.from_dict(classification_report(y, scbow_pred, output_dict=True))
+        results_scbow.to_csv(RESULTS_DIR + TEST_RESULTS_DIR + SCBOW_RESULTS + exp_ext + CSV_EXT)
+
+        # Store Best Parameters
+        if(results_scbow['True']['f1-score'] > best_params['Idiomatic']['F1']):
+            best_params['Idiomatic']['Model'] = "Siamese CBOW"
+            best_params['Idiomatic']['F1']    = results_scbow['True']['f1-score']
+            best_params['Idiomatic']['Parameters']['Beta']      = beta
+            best_params['Idiomatic']['Parameters']['Threshold'] = unm_met_t
+
+        if(results_scbow['False']['f1-score'] > best_params['Literal']['F1']):
+            best_params['Literal']['Model'] = "Siamese CBOW"
+            best_params['Literal']['F1']    = results_scbow['False']['f1-score']
+            best_params['Literal']['Parameters']['Beta']      = beta
+            best_params['Literal']['Parameters']['Threshold'] = unm_met_t
+
+        if((results_scbow['True']['f1-score'] + results_scbow['False']['f1-score'])/2 > best_params['Average']['F1']):
+            best_params['Average']['Model'] = "Siamese CBOW"
+            best_params['Average']['F1']    = (results_scbow['True']['f1-score'] + results_scbow['False']['f1-score'])/2
+            best_params['Average']['Parameters']['Beta']      = beta
+            best_params['Average']['Parameters']['Threshold'] = unm_met_t
 
         print("<================> Skip - Thoughts <===============>")
         # - Calculate Unnamed Metric
@@ -210,10 +285,31 @@ for beta in BETA:
         skip_pred = UnsupervisedMetrics.ThresholdClassifier(skip_unnamedMetric, T=unm_met_t, Op=UNM_MET_Op)
 
         # Display Classifications:
-        gen_plot(skip_X, y, skip_pred, "Original Skip-Thoughts Labels", "Cosine Similarity Labels", RESULTS_DIR + SKIP_RESULTS + exp_ext + IMG_EXT)
-        saveClassifiedSentences(sent_X, skip_unnamedMetric, y, skip_pred, RESULTS_DIR + SKIP_RESULTS + exp_ext + FILE_EXT)
+        if(SAVE_PLT): gen_plot(skip_X, y, skip_pred, "Original Skip-Thoughts Labels", "Cosine Similarity Labels", RESULTS_DIR + TEST_RESULTS_DIR + SKIP_RESULTS + exp_ext + IMG_EXT)
+        saveClassifiedSentences(sent_X, skip_unnamedMetric, y, skip_pred, RESULTS_DIR + TEST_RESULTS_DIR + SKIP_RESULTS + exp_ext + FILE_EXT)
 
         print("Results:", classification_report(y, skip_pred))
+        results_skip = pd.DataFrame.from_dict(classification_report(y, skip_pred, output_dict=True))
+        results_skip.to_csv(RESULTS_DIR + TEST_RESULTS_DIR + SKIP_RESULTS + exp_ext + CSV_EXT)
+
+        # Store Best Parameters
+        if(results_skip['True']['f1-score'] > best_params['Idiomatic']['F1']):
+            best_params['Idiomatic']['Model'] = "Skip-Thoughts"
+            best_params['Idiomatic']['F1']    = results_skip['True']['f1-score']
+            best_params['Idiomatic']['Parameters']['Beta']      = beta
+            best_params['Idiomatic']['Parameters']['Threshold'] = unm_met_t
+
+        if(results_skip['False']['f1-score'] > best_params['Literal']['F1']):
+            best_params['Literal']['Model'] = "Skip-Thoughts"
+            best_params['Literal']['F1']    = results_skip['False']['f1-score']
+            best_params['Literal']['Parameters']['Beta']      = beta
+            best_params['Literal']['Parameters']['Threshold'] = unm_met_t
+
+        if((results_skip['True']['f1-score'] + results_skip['False']['f1-score'])/2 > best_params['Average']['F1']):
+            best_params['Average']['Model'] = "Siamese CBOW"
+            best_params['Average']['F1']    = (results_skip['True']['f1-score'] + results_skip['False']['f1-score'])/2
+            best_params['Average']['Parameters']['Beta']      = beta
+            best_params['Average']['Parameters']['Threshold'] = unm_met_t
 
         print("<=====================> ELMo <=====================>")
         # - Calculate Unnamed Metric
@@ -223,7 +319,32 @@ for beta in BETA:
         elmo_pred = UnsupervisedMetrics.ThresholdClassifier(elmo_unnamedMetric, T=unm_met_t, Op=UNM_MET_Op)
 
         # Display Classifications:
-        gen_plot(elmo_X, y, elmo_pred, "Original ELMo Labels", "Cosine Similarity Labels", RESULTS_DIR + ELMO_RESULTS + exp_ext + IMG_EXT)
-        saveClassifiedSentences(sent_X, elmo_unnamedMetric, y, elmo_pred, RESULTS_DIR + ELMO_RESULTS + exp_ext + FILE_EXT)
+        if(SAVE_PLT): gen_plot(elmo_X, y, elmo_pred, "Original ELMo Labels", "Cosine Similarity Labels", RESULTS_DIR + TEST_RESULTS_DIR + ELMO_RESULTS + exp_ext + IMG_EXT)
+        saveClassifiedSentences(sent_X, elmo_unnamedMetric, y, elmo_pred, RESULTS_DIR + TEST_RESULTS_DIR + ELMO_RESULTS + exp_ext + FILE_EXT)
 
         print("Results:", classification_report(y, elmo_pred))
+        results_elmo = pd.DataFrame.from_dict(classification_report(y, elmo_pred, output_dict=True))
+        results_elmo.to_csv(RESULTS_DIR + TEST_RESULTS_DIR + ELMO_RESULTS + exp_ext + CSV_EXT)
+
+        # Store Best Parameters
+        if(results_elmo['True']['f1-score'] > best_params['Idiomatic']['F1']):
+            best_params['Idiomatic']['Model'] = "ELMo"
+            best_params['Idiomatic']['F1']    = results_elmo['True']['f1-score']
+            best_params['Idiomatic']['Parameters']['Beta']      = beta
+            best_params['Idiomatic']['Parameters']['Threshold'] = unm_met_t
+
+        if(results_elmo['False']['f1-score'] > best_params['Literal']['F1']):
+            best_params['Literal']['Model'] = "ELMo"
+            best_params['Literal']['F1']    = results_elmo['False']['f1-score']
+            best_params['Literal']['Parameters']['Beta']      = beta
+            best_params['Literal']['Parameters']['Threshold'] = unm_met_t
+
+        if((results_elmo['True']['f1-score'] + results_elmo['False']['f1-score'])/2 > best_params['Average']['F1']):
+            best_params['Average']['Model'] = "Siamese CBOW"
+            best_params['Average']['F1']    = (results_elmo['True']['f1-score'] + results_elmo['False']['f1-score'])/2
+            best_params['Average']['Parameters']['Beta']      = beta
+            best_params['Average']['Parameters']['Threshold'] = unm_met_t
+
+# Store Best Results
+best_params_pd = pd.DataFrame.from_dict(best_params)
+best_params_pd.to_csv(RESULTS_DIR + BEST_RESULTS + EXP_EXT + CSV_EXT)

@@ -22,7 +22,6 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report
 from sklearn.utils import shuffle
-from sklearn.model_selection import ShuffleSplit, GridSearchCV, train_test_split
 from sklearn.decomposition import PCA
 
 # Files and Directories:
@@ -44,11 +43,12 @@ SKIP_RESULTS  = "SKIP"
 ELMO_RESULTS  = "ELMO"
 
 # Experiment Suffix
-EXP_EXT       = "_fixedness_cform"
+EXP_EXT = "_fixedness_cform"
 
 # File Extensions
-FILE_EXT      = ".csv"
-IMG_EXT       = ".png"
+FILE_EXT = ".tsv"
+CSV_EXT  = ".csv"
+IMG_EXT  = ".png"
 
 # Features:
 USE_CFORM   = True
@@ -63,13 +63,14 @@ MAX_ITER   = 300
 N_JOBS     = -1
 VERBOSE    = 1
 
-# Split Parameters
+# Shuffle Parameters
 RND_STATE = 42
-TEST_SIZE = 0.3
-SHUFFLE   = True
 
 # Cluster Initialization
 RND_SEED = 42
+
+# Other Parameters
+SAVE_PLT = False
 
 def gen_plot(feat, targ, pred, title_targ, title_pred, saveDir, dispPlot=False):
     pca = PCA(n_components=2)
@@ -192,7 +193,7 @@ if(USE_OVA_FIX):
     features_skip  = np.append(features_skip,  ovaFix, axis=1)
     features_elmo  = np.append(features_elmo,  ovaFix, axis=1)
 
-# Split Sets:
+# Shuffle Sets:
 sent_X, w2v_X, scbow_X, skip_X, elmo_X, y = shuffle(og_sent, features_w2v, features_scbow, features_skip, features_elmo, targets_idiomatic, random_state=RND_STATE)
 
 # -- Extract Random Centroids -- #
@@ -228,21 +229,25 @@ w2v_kMeans = KMeans(n_clusters=N_CLUSTERS, init=w2v_centroids, n_init=N_INIT, n_
 
 # Display Clusters:
 w2v_clust_labels = (np.array(w2v_kMeans.labels_) == y[cent_i])
-gen_plot(w2v_X, y, w2v_clust_labels, "Original Word2Vec Labels", "k-Means Labels", RESULTS_DIR + W2V_RESULTS + EXP_EXT + IMG_EXT)
+if(SAVE_PLT): gen_plot(w2v_X, y, w2v_clust_labels, "Original Word2Vec Labels", "k-Means Labels", RESULTS_DIR + W2V_RESULTS + EXP_EXT + IMG_EXT)
 saveClassifiedSentences(sent_X, y, w2v_clust_labels, RESULTS_DIR + W2V_RESULTS + EXP_EXT + FILE_EXT)
 
 print("Results:", classification_report(y, w2v_clust_labels))
+results_w2v = pd.DataFrame.from_dict(classification_report(y, w2v_clust_labels, output_dict=True))
+results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + EXP_EXT  + CSV_EXT)
 
 print("<=================> Siamese CBOW <=================>")
 # - Run KMeans
-scbow_kMeans = KMeans(n_clusters=N_CLUSTERS, init=scbow_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(w2v_X)
+scbow_kMeans = KMeans(n_clusters=N_CLUSTERS, init=scbow_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(scbow_X)
 
 # Display Clusters:
 scbow_clust_labels = (np.array(scbow_kMeans.labels_) == y[cent_i])
-gen_plot(scbow_X, y, scbow_clust_labels, "Original Siamese CBOW Labels", "k-Means Labels", RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + IMG_EXT)
+if(SAVE_PLT): gen_plot(scbow_X, y, scbow_clust_labels, "Original Siamese CBOW Labels", "k-Means Labels", RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + IMG_EXT)
 saveClassifiedSentences(sent_X, y, scbow_clust_labels, RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + FILE_EXT)
 
 print("Results:", classification_report(y, scbow_clust_labels))
+results_scbow = pd.DataFrame.from_dict(classification_report(y, scbow_clust_labels, output_dict=True))
+results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + EXP_EXT  + CSV_EXT)
 
 print("<================> Skip - Thoughts <===============>")
 # - Run KMeans
@@ -250,10 +255,12 @@ skip_kMeans = KMeans(n_clusters=N_CLUSTERS, init=skip_centroids, n_init=N_INIT, 
 
 # Display Clusters:
 skip_clust_labels = (np.array(skip_kMeans.labels_) == y[cent_i])
-gen_plot(skip_X, y, skip_clust_labels, "Original Skip-Thoughts Labels", "k-Means Labels", RESULTS_DIR + SKIP_RESULTS + EXP_EXT + IMG_EXT)
+if(SAVE_PLT): gen_plot(skip_X, y, skip_clust_labels, "Original Skip-Thoughts Labels", "k-Means Labels", RESULTS_DIR + SKIP_RESULTS + EXP_EXT + IMG_EXT)
 saveClassifiedSentences(sent_X, y, skip_clust_labels, RESULTS_DIR + SKIP_RESULTS + EXP_EXT + FILE_EXT)
 
 print("Results:", classification_report(y, skip_clust_labels))
+results_skip = pd.DataFrame.from_dict(classification_report(y, skip_clust_labels, output_dict=True))
+results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + EXP_EXT  + CSV_EXT)
 
 print("<=====================> ELMo <=====================>")
 # - Run KMeans
@@ -261,7 +268,9 @@ elmo_kMeans = KMeans(n_clusters=N_CLUSTERS, init=elmo_centroids, n_init=N_INIT, 
 
 # Display Clusters:
 elmo_clust_labels = (np.array(elmo_kMeans.labels_) == y[cent_i])
-gen_plot(elmo_X, y, elmo_clust_labels, "Original ELMo Labels", "k-Means Labels", RESULTS_DIR + ELMO_RESULTS + EXP_EXT + IMG_EXT)
+if(SAVE_PLT): gen_plot(elmo_X, y, elmo_clust_labels, "Original ELMo Labels", "k-Means Labels", RESULTS_DIR + ELMO_RESULTS + EXP_EXT + IMG_EXT)
 saveClassifiedSentences(sent_X, y, elmo_clust_labels, RESULTS_DIR + ELMO_RESULTS + EXP_EXT + FILE_EXT)
 
 print("Results:", classification_report(y, elmo_clust_labels))
+results_elmo = pd.DataFrame.from_dict(classification_report(y, elmo_clust_labels, output_dict=True))
+results_elmo.to_csv(RESULTS_DIR + ELMO_RESULTS + EXP_EXT  + CSV_EXT)

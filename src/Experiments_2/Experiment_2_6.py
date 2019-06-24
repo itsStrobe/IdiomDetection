@@ -21,7 +21,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import DBSCAN
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report
-from sklearn.model_selection import ShuffleSplit, GridSearchCV, train_test_split
 from sklearn.decomposition import PCA
 
 # Files and Directories:
