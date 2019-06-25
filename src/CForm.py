@@ -12,6 +12,9 @@ import sys
 import pickle
 import numpy as np
 import pandas as pd
+from nltk.corpus import wordnet as wn
+from nltk.stem import WordNetLemmatizer
+
 import VNCPatternCounts
 
 MAX_WINDOW = 5
@@ -36,15 +39,18 @@ class CForm(object):
             pickle.dump(self.model, file, pickle.HIGHEST_PROTOCOL)
 
     def PatternZ_Score(self, verb, noun, pattern):
+        verb = self.lemm.lemmatize(verb, pos=wn.VERB)
+        noun = self.lemm.lemmatize(noun, pos=wn.NOUN)
+
         vnc = (verb, noun)
 
         if(self.model is None):
             print("Pattern Counts are not loaded.")
-            return cForms
+            return None
 
         if(vnc not in self.model):
-            print("VNC Not in Pattern Counts.")
-            return cForms
+            print("VNC Not in Pattern Counts.", vnc)
+            return None
 
         patterns = self.model[vnc]
 
@@ -69,8 +75,13 @@ class CForm(object):
     def IsCForm(self, verb, noun, sentence, posTags, T=None, max_window=MAX_WINDOW):
         cForms = self.GetCanonicalForms(verb, noun, T=T)
 
+        verb = self.lemm.lemmatize(verb, pos=wn.VERB)
+        noun = self.lemm.lemmatize(noun, pos=wn.NOUN)
+
         for pattern in VNCPatternCounts.ExtractPatternsFromSentence(sentence, posTags, max_window=max_window):
-            if((pattern[0] == verb) and (pattern[1] == noun) and (int(pattern[2]) in cForms)):
+            patVerb = self.lemm.lemmatize(pattern[0], pos=wn.VERB)
+            patNoun = self.lemm.lemmatize(pattern[1], pos=wn.NOUN)
+            if((patVerb == verb) and (patNoun == noun) and (int(pattern[2]) in cForms)):
                 return True
 
         return False
@@ -79,6 +90,7 @@ class CForm(object):
     def __init__(self, patternFileDir=None, modelDir=None, T=None):
         self.model = None
         self.T     = 1
+        self.lemm  = WordNetLemmatizer()
 
         if(modelDir is not None):
             self.LoadModel(modelDir)

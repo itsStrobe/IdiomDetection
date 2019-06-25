@@ -12,6 +12,8 @@ import sys
 import pickle
 import numpy as np
 import pandas as pd
+from nltk.corpus import wordnet as wn
+from nltk.stem import WordNetLemmatizer
 
 """
 Verb-Noun Patterns defined by Fazly et al. (2009)
@@ -40,11 +42,18 @@ DEM      -> {DT0}
 POSS     -> {DPS}
 PUNC     -> {PUL, PUN, PUQ, PUR}
 OTHER    -> U - {PUNC} # Check for this case after all other rules were rejected
-BE       -> {VBB, VBD, VBI, VBN, VBZ}
+BE       -> {VBB, VBD, VBG, VBI, VBN, VBZ}
 VERB_ACT -> {VBB, VBD, VBG, VBI, VBN, VBZ, VDB, VDD, VDG, VDI, VDN, VDZ, VHB, VHD, VHG, VHI, VHN, VHZ, VM0, VVB, VVD, VVG, VVI, VVN, VVZ}
 VERB_PASS-> {VBN, VDN, VHN, VVN} # Past participle tense of verbs
 NOUN_SG  -> {NN0, NN1}
 NOUN_PL  -> {NN0, NN2}
+
+EXTRA "AMBIGUOUS" TAGS:
+DEM      -> {DT0-CJT}
+VERB_ACT -> {VVB-NN1, VVD-AJ0, VVD-VVN, VVG-AJ0, VVN-AJ0, VVN-VVD, VVZ-NN2}
+VERB_PASS-> {VVN-AJ0, VVN-VVD}
+NOUN_SG  -> {NN1-AJ0, NN1-NP0, NN1-VVB, NN1-VVG, NP0-NN1, VVB-NN1, AJ0-NN1}
+NOUN_PL  -> {NN2-VVZ, VVZ-NN2}
 
 Notes:
 >NN0 is being taken in both SG and PL rules. For patterns that match in both singular/plural
@@ -55,16 +64,25 @@ Notes:
 
 # CONSTANTS
 A_AN_THE = {'AT0'} # A/AN and THE combined into single set since they share C5 Tag
-DEM      = {'DT0'}
+DEM      = {'DT0',
+            'DT0-CJT'}
 POSS     = {'DPS'}
-PUNC     = {'PUL', 'PUN', 'PUQ', 'PUR'}
-BE       = {'VBB', 'VBD', 'VBI', 'VBN', 'VBZ'}
-VERB_ACT = {'VBB', 'VBD', 'VBG', 'VBI', 'VBN', 'VBZ', 'VDB', 'VDD', 'VDG', 'VDI', 'VDN', 'VDZ', 'VHB', 'VHD', 'VHG', 'VHI', 'VHN', 'VHZ', 'VM0', 'VVB', 'VVD', 'VVG', 'VVI', 'VVN', 'VVZ'}
-VERB_PASS= {'VBN', 'VDN', 'VHN', 'VVN'}
-NOUN_SG  = {'NN0', 'NN1'}
-NOUN_PL  = {'NN0', 'NN2'}
+PUNC     = {'PUN'} # Removed PUQ, PUL, PUR
+BE       = {'VBB', 'VBD', 'VBG', 'VBI', 'VBN', 'VBZ'}
+VERB_ACT = {'VBB', 'VBD', 'VBG', 'VBI', 'VBN', 'VBZ', 'VDB', 'VDD', 'VDG', 'VDI', 'VDN', 'VDZ', 'VHB', 'VHD', 'VHG', 'VHI', 'VHN', 'VHZ', 'VM0', 'VVB', 'VVD', 'VVG', 'VVI', 'VVN', 'VVZ',
+            'VVB-NN1', 'VVD-AJ0', 'VVD-VVN', 'VVG-AJ0', 'VVN-AJ0', 'VVN-VVD', 'VVZ-NN2'}
+VERB_PASS= {'VBN', 'VDN', 'VHN', 'VVN',
+            'VVN-AJ0', 'VVN-VVD'}
+NOUN_SG  = {'NN0', 'NN1',
+            'NN1-AJ0', 'NN1-NP0', 'NN1-VVB', 'NN1-VVG', 'NP0-NN1', 'VVB-NN1', 'AJ0-NN1'}
+NOUN_PL  = {'NN0', 'NN2',
+            'NN2-VVZ', 'VVZ-NN2'}
 
-MAX_WINDOW = 5
+# Extra for conditions
+HAS      = {'VHB', 'VHD', 'VHG', 'VHI', 'VHN', 'VHZ'}
+VAL_PUNC = {'-', ','}
+
+MAX_WINDOW = 7
 
 # CLASS FUNCTIONS
 
@@ -85,65 +103,86 @@ Disambiguation for similar patterns that have differences in cardinality.
 def SimilarPatternDesambiguation(nounTag, pat_SG, pat_PL, verb, noun):
     patterns = []
 
-    if(nounTag in NOUN_SG and nounTag in NOUN_PL):
-        patterns.append([verb, noun, pat_SG])
-        patterns.append([verb, noun, pat_PL])
-        return patterns
     if(nounTag in NOUN_SG):
         patterns.append([verb, noun, pat_SG])
-        return patterns
+
     if(nounTag in NOUN_PL):
         patterns.append([verb, noun, pat_PL])
-        return patterns
+
+    return patterns
 
 """
 Finds the fitting patterns (1-10) for a VNC.
 """
-def FindPattern_1_10(verbPos, nounPos, sentence, posTags, max_window=MAX_WINDOW):
+def FindPattern_1_10(verbPos, nounPos, sentence, posTags, max_window=MAX_WINDOW, returnPos=False):
     patternLength = nounPos - verbPos
     patterns      = []
 
-    if(patternLength >= max_window):
-        return patterns # Outside set window
+    if(patternLength >= max_window or patternLength <= 0):
+        if(not returnPos):
+            return patterns # Outside set window
+        else:
+            return patterns, (None, None)
 
     # Check for patterns 1 and 6
     if(patternLength == 1):
-        return SimilarPatternDesambiguation(posTags[nounPos], '1', '6', sentence[verbPos], sentence[nounPos])
+        if(not returnPos):
+            return SimilarPatternDesambiguation(posTags[nounPos], '1', '6', sentence[verbPos], sentence[nounPos])
+        else:
+            return SimilarPatternDesambiguation(posTags[nounPos], '1', '6', sentence[verbPos], sentence[nounPos]), (verbPos, nounPos)
 
     # Check for punctuation marks that interrupt pattern
     # This solves the last condition for Pattern 10
-    for idx in range(verbPos, nounPos + 1):
-        if(posTags[idx] in PUNC):
-            return patterns
+    for idx in range(verbPos + 1, nounPos + 1):
+        if(posTags[idx] in PUNC and sentence[idx] not in VAL_PUNC):
+            if(not returnPos):
+                return patterns
+            else:
+                return patterns, (None, None)
 
     # Check for pattern 2, 3, and 7
-    for idx in range(verbPos, nounPos + 1):
+    for idx in range(verbPos + 1, nounPos + 1):
         if(posTags[idx] in A_AN_THE):
             if(sentence[idx] == 'a' or sentence[idx] == 'an'):
                 patterns.append([sentence[verbPos], sentence[nounPos], '2'])
-                return patterns
+                if(not returnPos):
+                    return patterns
+                else:
+                    return patterns, (verbPos, nounPos)
 
             if(sentence[idx] == 'the'):
-                return SimilarPatternDesambiguation(posTags[nounPos], '3', '7', sentence[verbPos], sentence[nounPos])
+                if(not returnPos):
+                    return SimilarPatternDesambiguation(posTags[nounPos], '3', '7', sentence[verbPos], sentence[nounPos])
+                else:
+                    return SimilarPatternDesambiguation(posTags[nounPos], '3', '7', sentence[verbPos], sentence[nounPos]), (verbPos, nounPos)
 
     # Check for pattern 4 and 8
-    for idx in range(verbPos, nounPos + 1):
+    for idx in range(verbPos + 1, nounPos + 1):
         if(posTags[idx] in DEM):
-            return SimilarPatternDesambiguation(posTags[nounPos], '4', '8', sentence[verbPos], sentence[nounPos])
+            if(not returnPos):
+                return SimilarPatternDesambiguation(posTags[nounPos], '4', '8', sentence[verbPos], sentence[nounPos])
+            else:
+                return SimilarPatternDesambiguation(posTags[nounPos], '4', '8', sentence[verbPos], sentence[nounPos]), (verbPos, nounPos)
 
     # Check for pattern 5 and 9
-    for idx in range(verbPos, nounPos + 1):
+    for idx in range(verbPos + 1, nounPos + 1):
         if(posTags[idx] in POSS):
-            return SimilarPatternDesambiguation(posTags[nounPos], '5', '9', sentence[verbPos], sentence[nounPos])
+            if(not returnPos):
+                return SimilarPatternDesambiguation(posTags[nounPos], '5', '9', sentence[verbPos], sentence[nounPos])
+            else:
+                return SimilarPatternDesambiguation(posTags[nounPos], '5', '9', sentence[verbPos], sentence[nounPos]), (verbPos, nounPos)
 
     # Check for pattern 10 - Since PUNCs were already checked, just return Pattern 10
     patterns.append([sentence[verbPos], sentence[nounPos], '10'])
-    return patterns
+    if(not returnPos):
+        return patterns
+    else:
+        return patterns, (verbPos, nounPos)
 
 
-def IsPuncInRange(range):
-    for elem in range:
-        if(elem in PUNC):
+def IsPuncInRange(tokRange, tagRange):
+    for tok, tag in zip(tokRange, tagRange):
+        if(tag in PUNC and tok not in VAL_PUNC):
             return True
 
     return False
@@ -159,25 +198,79 @@ def IsBeInRange(range):
 """
 Finds the fitting patterns (11) for a VNC.
 """
-def FindPattern_11(nounPos, sentence, posTags, max_window=MAX_WINDOW):
+def FindPattern_11(nounPos, sentence, posTags, max_window=MAX_WINDOW, returnPos=False):
     # Window smaller that required for Pattern 11 to occur.
     if(max_window < 3):
-        return []
+        if(not returnPos):
+            return []
+        else:
+            return [], (None, None)
 
-    if((nounPos + (max_window)) > len(sentence)):
+    max_window += 2
+
+    if((nounPos + max_window) > len(sentence)):
         rightEdge = len(sentence)
     else:
-        rightEdge = max_window      
+        rightEdge = nounPos + max_window      
 
     for verbPos in range(nounPos + 2, rightEdge):
         # PUNC breaks pattern
-        if(IsPuncInRange(posTags[(nounPos + 1):verbPos])):
-            return []
+        if(IsPuncInRange(sentence[(nounPos + 1):verbPos], posTags[(nounPos + 1):verbPos])):
+            if(not returnPos):
+                return []
+            else:
+                return [], (None, None)
 
-        if(posTags[verbPos] in VERB_PASS and IsBeInRange(posTags[(nounPos + 1):verbPos])):
-            return [[sentence[verbPos], sentence[nounPos], '11']]
+        if(posTags[verbPos] in VERB_PASS and posTags[verbPos] not in HAS and posTags and IsBeInRange(posTags[(nounPos + 1):verbPos])):
+            if(not returnPos):
+                return [[sentence[verbPos], sentence[nounPos], '11']]
+            else:
+                return [[sentence[verbPos], sentence[nounPos], '11']], (nounPos, verbPos)
 
-    return []
+    if(not returnPos):
+        return []
+    else:
+        return [], (None, None)
+
+def ExtractPatternRangeFromSentence(sentence, posTags, vnc, max_window=MAX_WINDOW):
+    if(isinstance(sentence, str)):
+        sentence = sentence.split()
+    if(isinstance(posTags, str)):
+        posTags = posTags.split()
+
+    lemm  = WordNetLemmatizer()
+
+    # Inconsistencies between Words and Tags - Ignore Sentence
+    if(len(sentence) != len(posTags)):
+        return None, None
+
+    for idx in range(len(sentence)):
+        sentence[idx] = sentence[idx].lower()
+
+    print(sentence)
+    print(posTags)
+
+    verb = vnc[0]
+    noun = vnc[1]
+
+    for idx in range(len(sentence)):
+        # Pattern 1-10
+        if(posTags[idx] in VERB_ACT and lemm.lemmatize(sentence[idx], pos=wn.VERB) == verb):
+            nextNoun = FindNextNoun(idx + 1, posTags)
+            while(nextNoun is not None and (nextNoun - idx) < max_window):
+                patterns, foundVNC = FindPattern_1_10(idx, nextNoun, sentence, posTags, max_window=max_window, returnPos=True)
+                if(foundVNC[0] is not None and lemm.lemmatize(sentence[foundVNC[0]], pos=wn.VERB) == verb and lemm.lemmatize(sentence[foundVNC[1]], pos=wn.NOUN) == noun):
+                    return foundVNC[0], foundVNC[1]
+
+                nextNoun = FindNextNoun(nextNoun + 1, posTags)
+
+        # Pattern 11
+        if((posTags[idx] in NOUN_SG or posTags[idx] in NOUN_PL) and lemm.lemmatize(sentence[idx], pos=wn.NOUN) == noun):
+            patterns, foundVNC = FindPattern_11(idx, sentence, posTags, max_window=max_window, returnPos=True)
+            if(foundVNC[0] is not None and lemm.lemmatize(sentence[foundVNC[1]], pos=wn.VERB) == verb and lemm.lemmatize(sentence[foundVNC[0]], pos=wn.NOUN) == noun):
+                return foundVNC[0], foundVNC[1]
+
+    return None, None
 
 """
 Given a Sentence and its sequence of POS Tags (C5 Format), it extracts the VNCs and Pattern numbers.
@@ -203,7 +296,7 @@ def ExtractPatternsFromSentence(sentence, posTags, max_window=MAX_WINDOW):
                 nextNoun = FindNextNoun(nextNoun + 1, posTags)
 
         # Pattern 11
-        if(posTags[idx] in NOUN_SG or posTags[idx] in NOUN_PL):
+        if((posTags[idx] in NOUN_SG) or (posTags[idx] in NOUN_PL)):
             patterns += FindPattern_11(idx, sentence, posTags, max_window=max_window)
 
     return patterns
