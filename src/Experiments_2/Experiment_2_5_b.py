@@ -202,7 +202,7 @@ best_params = {
 
 for beta in BETA:
     for unm_met_t in UNM_MET_T:
-        exp_ext = EXP_EXT + "_UNMMET_" + str(unm_met_t) + "_BETA_" + str(beta)
+        exp_ext = EXP_EXT + "_BETA_" + str(beta) + "_UNMMET_" + str(unm_met_t)
 
         print("====================================================")
         print("BETA:", beta)

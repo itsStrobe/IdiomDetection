@@ -43,7 +43,7 @@ SKIP_RESULTS  = "SKIP"
 ELMO_RESULTS  = "ELMO"
 
 # Experiment Suffix
-EXP_EXT = "_fixedness_cform"
+EXP_EXT = "_clust_fixedness_cform"
 
 # File Extensions
 FILE_EXT = ".tsv"

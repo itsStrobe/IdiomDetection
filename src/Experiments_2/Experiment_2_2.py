@@ -41,6 +41,9 @@ LITERAL_EXT   = "_l"
 FIX_EXT       = "_fix"
 FILE_EXT      = ".csv"
 
+# Experiment Suffix
+EXP_EXT = "_embFixMetSVM"
+
 # SVM Parameters: | Based on experiments by King and Cook (2018)
 PARAMS  = {'C':[0.01, 0.1, 1, 10, 100]}
 KERNEL  = 'linear'
@@ -91,104 +94,104 @@ svm_clf = svm.SVC(kernel=KERNEL, random_state=SEED)
 
 # -- WORD2VEC CROSSVALIDATION -- #
 print("<===================> Word2Vec <===================>")
-# WITHOUT CFORM
+# WITHOUT FAZLY'S METRICS
 # Idiomatic Detection
 grid_w2v    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_w2v     = grid_w2v.fit(features_w2v, targets_idiomatic)
 results_w2v = pd.DataFrame.from_dict(svm_w2v.cv_results_)
-results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + IDIOMATIC_EXT + FILE_EXT)
+results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + IDIOMATIC_EXT + EXP_EXT + FILE_EXT)
 # Literal Detection
 grid_w2v    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_w2v     = grid_w2v.fit(features_w2v, targets_literal)
 results_w2v = pd.DataFrame.from_dict(svm_w2v.cv_results_)
-results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + LITERAL_EXT + FILE_EXT)
+results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + LITERAL_EXT + EXP_EXT + FILE_EXT)
 
-# WITH CFORM
+# WITH FAZLY'S METRICS
 # Idiomatic Detection
 grid_w2v    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_w2v     = grid_w2v.fit(features_w2v_fix, targets_idiomatic)
 results_w2v = pd.DataFrame.from_dict(svm_w2v.cv_results_)
-results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + IDIOMATIC_EXT + FIX_EXT + FILE_EXT)
+results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + IDIOMATIC_EXT + FIX_EXT + EXP_EXT + FILE_EXT)
 # Literal Detection
 grid_w2v    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_w2v     = grid_w2v.fit(features_w2v_fix, targets_literal)
 results_w2v = pd.DataFrame.from_dict(svm_w2v.cv_results_)
-results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + LITERAL_EXT + FIX_EXT + FILE_EXT)
+results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + LITERAL_EXT + FIX_EXT + EXP_EXT + FILE_EXT)
 
 # -- SIAMESE CBOW CROSSVALIDATION -- #
 print("<=================> Siamese CBOW <=================>")
-# WITHOUT CFORM
+# WITHOUT FAZLY'S METRICS
 # Idiomatic Detection
 grid_scbow    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_scbow     = grid_scbow.fit(features_scbow, targets_idiomatic)
 results_scbow = pd.DataFrame.from_dict(svm_scbow.cv_results_)
-results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + IDIOMATIC_EXT + FILE_EXT)
+results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + IDIOMATIC_EXT + EXP_EXT + FILE_EXT)
 # Literal Detection
 grid_scbow    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_scbow     = grid_scbow.fit(features_scbow, targets_literal)
 results_scbow = pd.DataFrame.from_dict(svm_scbow.cv_results_)
-results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + LITERAL_EXT + FILE_EXT)
+results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + LITERAL_EXT + EXP_EXT + FILE_EXT)
 
-# WITH CFORM
+# WITH FAZLY'S METRICS
 # Idiomatic Detection
 grid_scbow    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_scbow     = grid_scbow.fit(features_scbow_fix, targets_idiomatic)
 results_scbow = pd.DataFrame.from_dict(svm_scbow.cv_results_)
-results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + IDIOMATIC_EXT + FIX_EXT + FILE_EXT)
+results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + IDIOMATIC_EXT + FIX_EXT + EXP_EXT + FILE_EXT)
 # Literal Detection
 grid_scbow    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_scbow     = grid_scbow.fit(features_scbow_fix, targets_literal)
 results_scbow = pd.DataFrame.from_dict(svm_scbow.cv_results_)
-results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + LITERAL_EXT + FIX_EXT + FILE_EXT)
+results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + LITERAL_EXT + FIX_EXT + EXP_EXT + FILE_EXT)
 
 # -- SKIP-THOUGHTS CROSSVALIDATION -- #
 print("<================> Skip - Thoughts <===============>")
-# WITHOUT CFORM
+# WITHOUT FAZLY'S METRICS
 # Idiomatic Detection
 grid_skip    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_skip     = grid_skip.fit(features_skip, targets_idiomatic)
 results_skip = pd.DataFrame.from_dict(svm_skip.cv_results_)
-results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + IDIOMATIC_EXT + FILE_EXT)
+results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + IDIOMATIC_EXT + EXP_EXT + FILE_EXT)
 # Literal Detection
 grid_skip    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_skip     = grid_skip.fit(features_skip, targets_literal)
 results_skip = pd.DataFrame.from_dict(svm_skip.cv_results_)
-results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + LITERAL_EXT + FILE_EXT)
+results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + LITERAL_EXT + EXP_EXT + FILE_EXT)
 
-# WITH CFORM
+# WITH FAZLY'S METRICS
 # Idiomatic Detection
 grid_skip    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_skip     = grid_skip.fit(features_skip_fix, targets_idiomatic)
 results_skip = pd.DataFrame.from_dict(svm_skip.cv_results_)
-results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + IDIOMATIC_EXT + FIX_EXT + FILE_EXT)
+results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + IDIOMATIC_EXT + FIX_EXT + EXP_EXT + FILE_EXT)
 # Literal Detection
 grid_skip    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_skip     = grid_skip.fit(features_skip_fix, targets_literal)
 results_skip = pd.DataFrame.from_dict(svm_skip.cv_results_)
-results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + LITERAL_EXT + FIX_EXT + FILE_EXT)
+results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + LITERAL_EXT + FIX_EXT + EXP_EXT + FILE_EXT)
 
 # -- ELMO CROSSVALIDATION -- #
 print("<=====================> ELMo <=====================>")
-# WITHOUT CFORM
+# WITHOUT FAZLY'S METRICS
 # Idiomatic Detection
 grid_elmo    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_elmo     = grid_elmo.fit(features_elmo, targets_idiomatic)
 results_skip = pd.DataFrame.from_dict(svm_elmo.cv_results_)
-results_skip.to_csv(RESULTS_DIR + ELMO_RESULTS + IDIOMATIC_EXT + FILE_EXT)
+results_skip.to_csv(RESULTS_DIR + ELMO_RESULTS + IDIOMATIC_EXT + EXP_EXT + FILE_EXT)
 # Literal Detection
 grid_elmo    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_elmo     = grid_elmo.fit(features_elmo, targets_literal)
 results_skip = pd.DataFrame.from_dict(svm_elmo.cv_results_)
-results_skip.to_csv(RESULTS_DIR + ELMO_RESULTS + LITERAL_EXT + FILE_EXT)
+results_skip.to_csv(RESULTS_DIR + ELMO_RESULTS + LITERAL_EXT + EXP_EXT + FILE_EXT)
 
-# WITH CFORM
+# WITH FAZLY'S METRICS
 # Idiomatic Detection
 grid_elmo    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_elmo     = grid_elmo.fit(features_elmo_fix, targets_idiomatic)
 results_skip = pd.DataFrame.from_dict(svm_elmo.cv_results_)
-results_skip.to_csv(RESULTS_DIR + ELMO_RESULTS + IDIOMATIC_EXT + FIX_EXT + FILE_EXT)
+results_skip.to_csv(RESULTS_DIR + ELMO_RESULTS + IDIOMATIC_EXT + FIX_EXT + EXP_EXT + FILE_EXT)
 # Literal Detection
 grid_elmo    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_elmo     = grid_elmo.fit(features_elmo_fix, targets_literal)
 results_skip = pd.DataFrame.from_dict(svm_elmo.cv_results_)
-results_skip.to_csv(RESULTS_DIR + ELMO_RESULTS + LITERAL_EXT + FIX_EXT + FILE_EXT)
+results_skip.to_csv(RESULTS_DIR + ELMO_RESULTS + LITERAL_EXT + FIX_EXT + EXP_EXT + FILE_EXT)

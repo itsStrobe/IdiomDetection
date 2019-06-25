@@ -29,6 +29,9 @@ IDIOMATIC_EXT = "_i"
 LITERAL_EXT   = "_l"
 FILE_EXT      = ".csv"
 
+# Experiment Suffix
+EXP_EXT = "_fixMetSVM"
+
 # SVM Parameters: | Based on experiments by King and Cook (2018)
 PARAMS  = {'C':[0.01, 0.1, 1, 10, 100]}
 KERNEL  = 'linear'
@@ -77,10 +80,10 @@ print("<===================> FIXEDNESS <===================>")
 grid_fix    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_fix     = grid_fix.fit(features_fix, targets_idiomatic)
 results_fix = pd.DataFrame.from_dict(svm_fix.cv_results_)
-results_fix.to_csv(RESULTS_DIR + FIX_RESULTS + IDIOMATIC_EXT + FILE_EXT)
+results_fix.to_csv(RESULTS_DIR + FIX_RESULTS + IDIOMATIC_EXT + EXP_EXT + FILE_EXT)
 # Literal Detection
 grid_fix    = GridSearchCV(estimator=svm_clf, param_grid=PARAMS, scoring=SCORING, n_jobs=-1, cv=cv, return_train_score=True, verbose=VERBOSE, refit=False)
 svm_fix     = grid_fix.fit(features_fix, targets_literal)
 results_fix = pd.DataFrame.from_dict(svm_fix.cv_results_)
-results_fix.to_csv(RESULTS_DIR + FIX_RESULTS + LITERAL_EXT + FILE_EXT)
+results_fix.to_csv(RESULTS_DIR + FIX_RESULTS + LITERAL_EXT + EXP_EXT + FILE_EXT)
 

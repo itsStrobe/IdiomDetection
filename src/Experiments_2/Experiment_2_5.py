@@ -53,7 +53,7 @@ IMG_EXT  = ".png"
 # Unsupervised Parameters:
 UNM_MET_T  = 0.7
 UNM_MET_Op = '>'
-BETA       = 0.5
+BETA       = 0.6
 
 # Split Parameters
 RND_STATE = 42
@@ -188,7 +188,7 @@ scbow_unnamedMetric = UnsupervisedMetrics.UnnamedMetric(scbow_cosSims, ova_X, be
 scbow_pred = UnsupervisedMetrics.ThresholdClassifier(scbow_unnamedMetric, T=UNM_MET_T, Op=UNM_MET_Op)
 
 # Display Classifications:
-if(SAVE_PLT): if(SAVE_PLT): gen_plot(scbow_X, y, scbow_pred, "Original Siamese CBOW Labels", "Cosine Similarity Labels", RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + IMG_EXT)
+if(SAVE_PLT): gen_plot(scbow_X, y, scbow_pred, "Original Siamese CBOW Labels", "Cosine Similarity Labels", RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + IMG_EXT)
 saveClassifiedSentences(sent_X, scbow_unnamedMetric, y, scbow_pred, RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + FILE_EXT)
 
 print("Results:", classification_report(y, scbow_pred))
