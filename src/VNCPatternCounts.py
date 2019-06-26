@@ -45,7 +45,7 @@ OTHER    -> U - {PUNC} # Check for this case after all other rules were rejected
 BE       -> {VBB, VBD, VBG, VBI, VBN, VBZ}
 VERB_ACT -> {VBB, VBD, VBG, VBI, VBN, VBZ, VDB, VDD, VDG, VDI, VDN, VDZ, VHB, VHD, VHG, VHI, VHN, VHZ, VM0, VVB, VVD, VVG, VVI, VVN, VVZ}
 VERB_PASS-> {VBN, VDN, VHN, VVN} # Past participle tense of verbs
-NOUN_SG  -> {NN0, NN1}
+NOUN_SG  -> {NN0, NN1, NP0}
 NOUN_PL  -> {NN0, NN2}
 
 EXTRA "AMBIGUOUS" TAGS:
@@ -73,7 +73,7 @@ VERB_ACT = {'VBB', 'VBD', 'VBG', 'VBI', 'VBN', 'VBZ', 'VDB', 'VDD', 'VDG', 'VDI'
             'VVB-NN1', 'VVD-AJ0', 'VVD-VVN', 'VVG-AJ0', 'VVN-AJ0', 'VVN-VVD', 'VVZ-NN2'}
 VERB_PASS= {'VBN', 'VDN', 'VHN', 'VVN',
             'VVN-AJ0', 'VVN-VVD'}
-NOUN_SG  = {'NN0', 'NN1',
+NOUN_SG  = {'NN0', 'NN1', 'NP0',
             'NN1-AJ0', 'NN1-NP0', 'NN1-VVB', 'NN1-VVG', 'NP0-NN1', 'VVB-NN1', 'AJ0-NN1'}
 NOUN_PL  = {'NN0', 'NN2',
             'NN2-VVZ', 'VVZ-NN2'}
