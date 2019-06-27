@@ -38,8 +38,8 @@ BE      ->  {be, been, being, am, are, is, was, were}
 C5 Tags:
 a/an     -> {AT0}
 the      -> {AT0}
-DEM      -> {DT0}
-POSS     -> {DPS}
+DET      -> {DT0, DTQ}
+POSS     -> {DPS, POS}
 PUNC     -> {PUL, PUN, PUQ, PUR}
 OTHER    -> U - {PUNC} # Check for this case after all other rules were rejected
 BE       -> {VBB, VBD, VBG, VBI, VBN, VBZ}
@@ -64,9 +64,9 @@ Notes:
 
 # CONSTANTS
 A_AN_THE = {'AT0'} # A/AN and THE combined into single set since they share C5 Tag
-DEM      = {'DT0',
+DET      = {'DT0', 'DTQ'
             'DT0-CJT'}
-POSS     = {'DPS'}
+POSS     = {'DPS', 'POS'}
 PUNC     = {'PUN'} # Removed PUQ, PUL, PUR
 BE       = {'VBB', 'VBD', 'VBG', 'VBI', 'VBN', 'VBZ'}
 VERB_ACT = {'VBB', 'VBD', 'VBG', 'VBI', 'VBN', 'VBZ', 'VDB', 'VDD', 'VDG', 'VDI', 'VDN', 'VDZ', 'VHB', 'VHD', 'VHG', 'VHI', 'VHN', 'VHZ', 'VM0', 'VVB', 'VVD', 'VVG', 'VVI', 'VVN', 'VVZ',
@@ -81,6 +81,7 @@ NOUN_PL  = {'NN0', 'NN2',
 # Extra for conditions
 HAS      = {'VHB', 'VHD', 'VHG', 'VHI', 'VHN', 'VHZ'}
 VAL_PUNC = {'-', ','}
+DEM_TOK  = {'this', 'that', 'these', 'those'}
 
 MAX_WINDOW = 7
 
@@ -124,13 +125,6 @@ def FindPattern_1_10(verbPos, nounPos, sentence, posTags, max_window=MAX_WINDOW,
         else:
             return patterns, (None, None)
 
-    # Check for patterns 1 and 6
-    if(patternLength == 1):
-        if(not returnPos):
-            return SimilarPatternDesambiguation(posTags[nounPos], '1', '6', sentence[verbPos], sentence[nounPos])
-        else:
-            return SimilarPatternDesambiguation(posTags[nounPos], '1', '6', sentence[verbPos], sentence[nounPos]), (verbPos, nounPos)
-
     # Check for punctuation marks that interrupt pattern
     # This solves the last condition for Pattern 10
     for idx in range(verbPos + 1, nounPos + 1):
@@ -158,7 +152,7 @@ def FindPattern_1_10(verbPos, nounPos, sentence, posTags, max_window=MAX_WINDOW,
 
     # Check for pattern 4 and 8
     for idx in range(verbPos + 1, nounPos + 1):
-        if(posTags[idx] in DEM):
+        if(posTags[idx] in DET and sentence[idx] in DEM_TOK):
             if(not returnPos):
                 return SimilarPatternDesambiguation(posTags[nounPos], '4', '8', sentence[verbPos], sentence[nounPos])
             else:
@@ -172,12 +166,20 @@ def FindPattern_1_10(verbPos, nounPos, sentence, posTags, max_window=MAX_WINDOW,
             else:
                 return SimilarPatternDesambiguation(posTags[nounPos], '5', '9', sentence[verbPos], sentence[nounPos]), (verbPos, nounPos)
 
-    # Check for pattern 10 - Since PUNCs were already checked, just return Pattern 10
-    patterns.append([sentence[verbPos], sentence[nounPos], '10'])
+    # Check for pattern 10
+    for idx in range(verbPos + 1, nounPos + 1):
+        if(posTags[idx] in DET and sentence[idx] not in DEM_TOK):
+            patterns.append([sentence[verbPos], sentence[nounPos], '10'])
+            if(not returnPos):
+                return patterns
+            else:
+                return patterns, (verbPos, nounPos)
+
+    # Check for pattern 1 - Since PUNCs were already checked, just return Pattern 1
     if(not returnPos):
-        return patterns
+        return SimilarPatternDesambiguation(posTags[nounPos], '1', '6', sentence[verbPos], sentence[nounPos])
     else:
-        return patterns, (verbPos, nounPos)
+        return SimilarPatternDesambiguation(posTags[nounPos], '1', '6', sentence[verbPos], sentence[nounPos]), (verbPos, nounPos)
 
 
 def IsPuncInRange(tokRange, tagRange):
