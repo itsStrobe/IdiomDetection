@@ -12,7 +12,6 @@ import sys
 import pickle
 import numpy as np
 import pandas as pd
-from Util import CorpusExtraction
 from WordEmbeddings import Embeddings
 
 SENT_DIR    = "../targets/Extracted_Sentences.txt"

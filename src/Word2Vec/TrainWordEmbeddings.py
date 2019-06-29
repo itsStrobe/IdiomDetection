@@ -9,9 +9,12 @@ import numpy as np
 from Util import CorpusExtraction
 from WordEmbeddings import Embeddings as W2V
 
+CORPORA_DIR  = "../data/"
 CORPORA_PRE  = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"]
+CORPORA_SUF  = ""
 MODEL_DIR    = "./models/"
 MODEL_SUFFIX = "_ver1.model"
+LOWERCASE    = True
 
 # Following values by King and Cook (2018)
 VEC_SIZE = 300
@@ -20,7 +23,7 @@ EPOCHS   = 5
 
 model = None
 
-CorporaIterator = [sent for sent in CorpusExtraction.IterateOverCorpora(CORPORA_PRE)]
+CorporaIterator = [sent for sent in CorpusExtraction.IterateOverCorpora(CORPORA_PRE, suffix=CORPORA_SUF, corporaDir=CORPORA_DIR, asLower=LOWERCASE)]
 
 ## VOCABULARY INITIALIZATION ##
 # Initializing Word2Vec's Vocabulary

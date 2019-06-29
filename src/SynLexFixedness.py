@@ -9,12 +9,13 @@
 import nltk
 import math
 import pickle
-import VNCPatternCounts
 import numpy as np
 from Word2Vec.WordEmbeddings import Embeddings as w2v
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet as wn
 from nltk.corpus import lin_thesaurus as lin
+
+import VNCPatternCounts
 
 # Download Lin's Thesaurus
 nltk.download('lin_thesaurus')

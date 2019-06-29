@@ -14,6 +14,11 @@ import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup as Soup
 
+ID_TAG    = 'n'
+POS_TAG   = 'c5'
+LEMMA_TAG = 'lemma'
+TEXT_TAGS = ['w']
+
 class CorpusExtraction:
 
     """
@@ -21,7 +26,7 @@ class CorpusExtraction:
     It has the posibility of also extracting the tags.
     """
     @staticmethod
-    def ExtractCorpus(inFileDir, outFileDir, getLemma=True, posFileDir=None, hasMW=False, tags=['w', 'c']):
+    def ExtractCorpus(inFileDir, outFileDir, getLemma=True, posFileDir=None, hasMW=False, tags=TEXT_TAGS):
         if(hasMW):
             print("Not implemented")
             raise NotImplementedError
@@ -47,6 +52,8 @@ class CorpusExtraction:
             with open(outFileDir, "w+", encoding="utf_8") as outFile:
                 fileSoup = Soup(inFile, 'xml')
                 sentTags = fileSoup.findAll('s')
+                print('-')
+                print(sentTags)
 
                 if(posFileDir != None):
                     with open(posFileDir, "w+", encoding="utf_8") as posFile:
@@ -57,11 +64,11 @@ class CorpusExtraction:
                             wordTags = sentTag.findAll(tags)
                             for wordTag in wordTags:
                                 if(wordTag.name == 'w' and getLemma):
-                                    sentence = sentence + wordTag['hw'].strip().replace(" ", "_") + " "
+                                    sentence = sentence + wordTag[LEMMA_TAG].strip().replace(" ", "_") + " "
                                 else:
                                     sentence = sentence + wordTag.text.strip().replace(" ", "_") + " "
 
-                                posTags = posTags + wordTag['c5'].strip() + " "
+                                posTags = posTags + wordTag[POS_TAG].strip() + " "
 
                             sentence = sentence.strip() + '\n'
                             posTags  = posTags.strip() + '\n'
@@ -74,7 +81,7 @@ class CorpusExtraction:
                         # Implement hasMW exception here:
                         for wordTag in sentTag.findAll(tags):
                             if(wordTag.name == 'w' and getLemma):
-                                sentence = sentence + wordTag['hw'].strip().replace(" ", "_") + " "
+                                sentence = sentence + wordTag[LEMMA_TAG].strip().replace(" ", "_") + " "
                             else:
                                 sentence = sentence + wordTag.text.strip().replace(" ", "_") + " "
 
@@ -86,7 +93,7 @@ class CorpusExtraction:
     Wrapper method for ExtractCorpus for iterating over the whole corpora.
     """
     @staticmethod
-    def ExtractCorpora(rootDir, outDirSuffix="_CleanText", posDirSuffix="_PosTags", getLemma=True, getPosTags=True, hasMW=False, tags=['w', 'c']):
+    def ExtractCorpora(rootDir, outDirSuffix="_CleanText", posDirSuffix="_PosTags", getLemma=True, getPosTags=True, hasMW=False, tags=TEXT_TAGS):
         for root, _, files in os.walk(rootDir):
             if files == []:
                 continue
@@ -107,8 +114,8 @@ class CorpusExtraction:
     Each list represents a tokenized sentence.
     """
     @staticmethod
-    def ReadCorpus(fileDir, asNumpy=True, indexed=False, posTags=False):
-        tags=['w', 'c']
+    def ReadCorpus(fileDir, asNumpy=True, indexed=False, posTags=False, lemmas=False):
+        tags=TEXT_TAGS
         tagRegexp = re.compile(r'<.*>')
         flatten = lambda l: [item for sublist in l for item in sublist]
         with open(fileDir, "r", encoding="utf_8") as corpus:
@@ -117,16 +124,20 @@ class CorpusExtraction:
             if(indexed):
                 sent = {}
                 for sentTag in sentTags:
-                    if(sentTag['n'].isdigit()):
-                        if(not posTags):
-                            sent[int(sentTag['n'])] = flatten([tag.text.split() for tag in sentTag.findAll(tags) if tagRegexp.search(str(tag))])
+                    if(sentTag[ID_TAG].isdigit()):
+                        if(posTags):
+                            sent[int(sentTag[ID_TAG])] = [wordTag[POS_TAG] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag))]
+                        elif(lemmas):
+                            sent[int(sentTag[ID_TAG])] = [wordTag[LEMMA_TAG] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag))]
                         else:
-                            sent[int(sentTag['n'])] = [wordTag['c5'] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag))]
+                            sent[int(sentTag[ID_TAG])] = flatten([tag.text.split() for tag in sentTag.findAll(tags) if tagRegexp.search(str(tag))])
             else:
-                if(not posTags):
-                    sent = [flatten([tag.text.split() for tag in sentTag.findAll(tags) if tagRegexp.search(str(tag))]) for sentTag in sentTags]
+                if(posTags):
+                    sent = [wordTag[POS_TAG] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag)) for sentTag in sentTags]
+                elif(lemmas):
+                    sent = [wordTag[LEMMA_TAG] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag)) for sentTag in sentTags]
                 else:
-                    sent = [wordTag['c5'] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag)) for sentTag in sentTags]
+                    sent = [flatten([tag.text.split() for tag in sentTag.findAll(tags) if tagRegexp.search(str(tag))])  for sentTag in sentTags]
 
                 if(asNumpy):
                     sent = np.array(sent)
@@ -137,8 +148,9 @@ class CorpusExtraction:
     Reads the Corpora in a given directory. Creates a map in which in it allocates each extracted corpus.
     """
     @staticmethod
-    def ReadCorpora(rootDir, indexed=False, posTags=False):
+    def ReadCorpora(rootDir, indexed=False, posTags=False, lemmas=False):
         corpora = {}
+        print(rootDir)
         for root, _, files in os.walk(rootDir):
             if files == []:
                 continue
@@ -148,7 +160,7 @@ class CorpusExtraction:
                 fileDir = os.path.join(root, corpus)
                 print(fileDir)
                 name, _ = os.path.splitext(corpus)
-                corpora[name] = CorpusExtraction.ReadCorpus(fileDir, indexed=indexed, posTags=posTags)
+                corpora[name] = CorpusExtraction.ReadCorpus(fileDir, indexed=indexed, posTags=posTags, lemmas=lemmas)
 
         return corpora
 
@@ -156,9 +168,9 @@ class CorpusExtraction:
     Saves a extracted corpora's Pos Tags into a pickle file for quick access.
     """
     @staticmethod
-    def SaveCorpora(rootDir, fileName, suffix='', indexed=False, posTags=False):
-        corporaName = './data/' + fileName + suffix + '.pkl'
-        corpora = CorpusExtraction.ReadCorpora(rootDir, indexed=indexed, posTags=posTags)
+    def SaveCorpora(rootDir, fileName, suffix='', indexed=False, posTags=False, lemmas=False, corporaDir='./data'):
+        corporaName = os.path.join(corporaDir, fileName + suffix + '.pkl')
+        corpora = CorpusExtraction.ReadCorpora(rootDir, indexed=indexed, posTags=posTags, lemmas=False)
 
         with open(corporaName, 'wb+') as file:
             pickle.dump(corpora, file, pickle.HIGHEST_PROTOCOL)
@@ -167,8 +179,8 @@ class CorpusExtraction:
     Loads a pre-saved corpora from a pickle file.
     """
     @staticmethod
-    def LoadCorpora(fileName, suffix=''):
-        corporaName = './data/' + fileName + suffix + '.pkl'
+    def LoadCorpora(fileName, suffix='', corporaDir="./data"):
+        corporaName = os.path.join(corporaDir, fileName + suffix + '.pkl')
 
         if(os.path.isfile(corporaName)):
             with open(corporaName, 'rb') as file:
@@ -178,14 +190,15 @@ class CorpusExtraction:
     Creates an iterator for reading a Corpora.
     """
     @staticmethod
-    def IterateOverCorpora(corporaDir, suffix=''):
-        for corpora_name in corporaDir:
+    def IterateOverCorpora(corporaPrefix, suffix='', corporaDir='./data/', asLower=False):
+        for corpora_name in corporaPrefix:
             print("Loading Corpora:", corpora_name)
-            corpora = CorpusExtraction.LoadCorpora(corpora_name, suffix=suffix)
+            corpora = CorpusExtraction.LoadCorpora(corpora_name, suffix=suffix, corporaDir=corporaDir)
             for corpus in corpora:
                 for sentence in corpora[corpus]:
-                    for idx in range(len(sentence)):
-                        sentence[idx] = sentence[idx].lower()
+                    if(asLower):
+                        for idx in range(len(sentence)):
+                            sentence[idx] = sentence[idx].lower()
                     yield sentence
 
 class CorpusEdition:

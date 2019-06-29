@@ -6,7 +6,6 @@
     Train Word Embedding Models with BNC XML Corpora and Store them for later use.
 """
 import numpy as np
-from Util import CorpusExtraction
 from WordEmbeddings import Embeddings as SkipThoughts
 
 model = None

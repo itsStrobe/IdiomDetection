@@ -9,8 +9,8 @@
 from CForm import CForm
 import VNCPatternCounts
 
-ROOT_COPORA   ="./Corpora/BNC XML/2554/download/Texts"
-TEXT_SUFFIX   = "_CleanText"
+ROOT_COPORA   ="./Corpora/BNC XML/2554/download/Texts_CleanXML"
+TEXT_SUFFIX   = "_CleanText_Lemma"
 TAGS_SUFFIX   = "_PosTags"
 ROOT_PATTERNS = "./Patterns"
 PAT_MODEL     = "./PatternCounts/PatternCounts_130619.pickle"

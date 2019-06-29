@@ -10,6 +10,7 @@ embeddings.csv
 embeddings_VNC.csv
 targets
 Pattern*
+VNICs
 
 # Virtuanenv Installs
 venv
