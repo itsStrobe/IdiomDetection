@@ -1,0 +1,686 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Fazly et al. (2009) Pattern Descriptions-->
+
+<!--
+    Verb - Active:
+    VBB|VBD|VBG|VBI|VBN|VBZ|VDB|VDD|VDG|VDI|VDN|VDZ|VHB|VHD|VHG|VHI|VHN|VHZ|VM0|VVB|VVD|VVG|VVI|VVN|VVZ|VVB-NN1|VVD-AJ0|VVD-VVN|VVG-AJ0|VVN-AJ0|VVN-VVD|VVZ-NN2
+
+    Verb - Passive:
+    VBN|VDN|VHN|VVN|VVN-AJ0|VVN-VVD
+
+    Verb - Be:
+    VBB|VBD|VBG|VBI|VBN|VBZ
+
+    Verb - Has:
+    VHB|VHD|VHG|VHI|VHN|VHZ
+
+    Noun - Singular:
+    NN0|NN1|NN1-AJ0|NN1-NP0|NN1-VVB|NN1-VVG|NP0-NN1|VVB-NN1|AJ0-NN1
+
+    Noun - Plural:
+    NN0|NN2|NN2-VVZ|VVZ-NN2
+
+    Possessive:
+    DPS|POS
+
+    the / an/a:
+    AT0
+
+    Demonstrative Pronoun:
+    DT0
+-->
+<patterns>
+    <!-- Pattern for matching a simple noun phrase. -->
+    <pat>
+        <either>
+            <!-- Pattern 1 -->
+            <pat>
+                <!--Active Verb-->
+                <w pos="V*" />
+
+                <!--Singular Noun-->
+                <pat>
+                    <either>
+                        <pat><w pos="N*"><neg pos="NN2" /><neg pos="NN2-VVZ" /></w></pat>
+                        <pat><w pos="VVB-NN1" /></pat>
+                        <pat><w pos="AJ0-NN1" /></pat>
+                    </either>
+                </pat>
+            </pat>
+
+            <!-- Pattern 6 -->
+            <pat>
+                <!--Active Verb-->
+                <w pos="V*" />
+
+                <!--Plural Noun-->
+                <pat>
+                    <either>
+                        <pat><w pos="NN2"     /></pat>
+                        <pat><w pos="NN2-VVZ" /></pat>
+                        <pat><w pos="VVZ-NN2" /></pat>
+                    </either>
+                </pat>
+            </pat>
+
+            <!-- Pattern 2 -->
+            <pat>
+                <!--Active Verb-->
+                <w pos="V*" />
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--det:a/an-->
+                <pat>
+                    <either>
+                        <pat><w lemma="a" pos="AT0"/></pat>
+                        <pat><w lemma="an" pos="AT0"/></pat>
+                    </either>
+                </pat>
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--Singular Noun-->
+                <pat>
+                    <either>
+                        <pat><w pos="N*"><neg pos="NN2" /><neg pos="NN2-VVZ" /></w></pat>
+                        <pat><w pos="VVB-NN1" /></pat>
+                        <pat><w pos="AJ0-NN1" /></pat>
+                    </either>
+                </pat>
+            </pat>
+
+            <!-- Pattern 3 -->
+            <pat>
+                <!--Active Verb-->
+                <w pos="V*" />
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--det:the-->
+                <pat>
+                    <either>
+                        <pat><w lemma="the" pos="AT0"/></pat>
+                    </either>
+                </pat>
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--Singular Noun-->
+                <pat>
+                    <either>
+                        <pat><w pos="N*"><neg pos="NN2" /><neg pos="NN2-VVZ" /></w></pat>
+                        <pat><w pos="VVB-NN1" /></pat>
+                        <pat><w pos="AJ0-NN1" /></pat>
+                    </either>
+                </pat>
+            </pat>
+
+            <!-- Pattern 7 -->
+            <pat>
+                <!--Active Verb-->
+                <w pos="V*" />
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--det:the-->
+                <pat>
+                    <either>
+                        <pat><w lemma="the" pos="AT0"/></pat>
+                    </either>
+                </pat>
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--Plural Noun-->
+                <pat>
+                    <either>
+                        <pat><w pos="NN2"     /></pat>
+                        <pat><w pos="NN2-VVZ" /></pat>
+                        <pat><w pos="VVZ-NN2" /></pat>
+                    </either>
+                </pat>
+            </pat>
+
+            <!-- Pattern 4 -->
+            <pat>
+                <!--Active Verb-->
+                <w pos="V*" />
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--det:DEM-->
+                <pat>
+                    <either>
+                        <pat><w pos="DT0" lemma="this" /></pat>
+                        <pat><w pos="DT0" lemma="that" /></pat>
+                        <pat><w pos="DT0" lemma="these"/></pat>
+                        <pat><w pos="DT0" lemma="those"/></pat>
+                    </either>
+                </pat>
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--Singular Noun-->
+                <pat>
+                    <either>
+                        <pat><w pos="N*"><neg pos="NN2" /><neg pos="NN2-VVZ" /></w></pat>
+                        <pat><w pos="VVB-NN1" /></pat>
+                        <pat><w pos="AJ0-NN1" /></pat>
+                    </either>
+                </pat>
+            </pat>
+
+            <!-- Pattern 8 -->
+            <pat>
+                <!--Active Verb-->
+                <w pos="V*" />
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--det:DEM-->
+                <pat>
+                    <either>
+                        <pat><w pos="DT0" lemma="this" /></pat>
+                        <pat><w pos="DT0" lemma="that" /></pat>
+                        <pat><w pos="DT0" lemma="these"/></pat>
+                        <pat><w pos="DT0" lemma="those"/></pat>
+                    </either>
+                </pat>
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--Plural Noun-->
+                <pat>
+                    <either>
+                        <pat><w pos="NN2"     /></pat>
+                        <pat><w pos="NN2-VVZ" /></pat>
+                        <pat><w pos="VVZ-NN2" /></pat>
+                    </either>
+                </pat>
+            </pat>
+
+            <!-- Pattern 5 -->
+            <pat>
+                <!--Active Verb-->
+                <w pos="V*" />
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--det:POS-->
+                <pat>
+                    <either>
+                        <pat><w pos="DPS"/></pat>
+                        <pat><w pos="POS"/></pat>
+                    </either>
+                </pat>
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--Singular Noun-->
+                <pat>
+                    <either>
+                        <pat><w pos="N*"><neg pos="NN2" /><neg pos="NN2-VVZ" /></w></pat>
+                        <pat><w pos="VVB-NN1" /></pat>
+                        <pat><w pos="AJ0-NN1" /></pat>
+                    </either>
+                </pat>
+            </pat>
+
+            <!-- Pattern 6 -->
+            <pat>
+                <!--Active Verb-->
+                <w pos="V*" />
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--det:POS-->
+                <pat>
+                    <either>
+                        <pat><w pos="DPS"/></pat>
+                        <pat><w pos="POS"/></pat>
+                    </either>
+                </pat>
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--Plural Noun-->
+                <pat>
+                    <either>
+                        <pat><w pos="NN2"     /></pat>
+                        <pat><w pos="NN2-VVZ" /></pat>
+                        <pat><w pos="VVZ-NN2" /></pat>
+                    </either>
+                </pat>
+            </pat>
+
+            <!-- Pattern 10 -->
+            <pat>
+                <!--Active Verb-->
+                <w pos="V*" />
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--det:OTHER-->
+                <pat>
+                    <either>
+                        <pat><w pos="DT0"><neg lemma="this" /> <neg lemma="that" /><neg lemma="these" /><neg lemma="those" /></w></pat>
+                        <pat><w pos="DTQ"/></pat>
+                    </either>
+                </pat>
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--Any Noun-->
+                <pat>
+                    <either>
+                        <pat><w pos="N*"      /></pat>
+                        <pat><w pos="VVB-NN1" /></pat>
+                        <pat><w pos="AJ0-NN1" /></pat>
+                        <pat><w pos="VVZ-NN2" /></pat>
+                    </either>
+                </pat>
+            </pat>
+
+            <!-- Pattern 11 -->
+            <pat>
+                <!--Any Noun-->
+                <pat>
+                    <either>
+                        <pat><w pos="N*"      /></pat>
+                        <pat><w pos="VVB-NN1" /></pat>
+                        <pat><w pos="AJ0-NN1" /></pat>
+                        <pat><w pos="VVZ-NN2" /></pat>
+                    </either>
+                </pat>
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--det:ANY-->
+
+                <!--AUXILIARY VERB-->
+                <pat ignore="true" repeat="{0,2}">
+                    <either>
+                        <pat><w pos="VHB" /></pat>
+                        <pat><w pos="VHD" /></pat>
+                        <pat><w pos="VHG" /></pat>
+                        <pat><w pos="VHI" /></pat>
+                        <pat><w pos="VHN" /></pat>
+                        <pat><w pos="VHZ" /></pat>
+                        <pat><w pos="VM0" /></pat>
+                    </either>
+                </pat>
+
+                <!--BE Verb-->
+                <pat ignore="true" repeat="{1,2}">
+                    <either>
+                        <pat><w pos="VBB" /></pat>
+                        <pat><w pos="VBD" /></pat>
+                        <pat><w pos="VBG" /></pat>
+                        <pat><w pos="VBI" /></pat>
+                        <pat><w pos="VBN" /></pat>
+                        <pat><w pos="VBZ" /></pat>
+                    </either>
+                </pat>
+
+                <!--Ignorable Tokens-->
+                <pat ignore="true">
+                    <pat repeat="*">
+                        <pat repeat="*"><w pos="A*" /></pat>
+                        <pat repeat="*"><w pos="C*" /></pat>
+                        <pat repeat="*"><w pos="N*" /></pat>
+                        <pat repeat="*"><w pos="O*" /></pat>
+                        <pat><w pos="PN*" /></pat>
+                        <pat><w pos="PR*" /></pat>
+                        <pat repeat="*">
+                            <w pos="PUL" />
+                            <w pos="PUR" />
+                        </pat>
+                        <pat repeat="*"><w pos="PUN"><neg lemma="." /><neg lemma="!" /><neg lemma="?" /><neg lemma=":" /><neg lemma=";" /></w></pat>
+                        <pat repeat="*"><w pos="T*" /></pat>
+                        <pat repeat="*"><w pos="U*" /></pat>
+                        <pat repeat="*"><w pos="X*" /></pat>
+                        <pat repeat="*"><w pos="Z*" /></pat>
+                    </pat>
+                </pat>
+
+                <!--Passive Verb-->
+                <pat>
+                    <either>
+                        <pat><w pos="VBN" /></pat>
+                        <pat><w pos="VDN" /></pat>
+                        <pat><w pos="VHN" /></pat>
+                        <pat><w pos="VVN" /></pat>
+                        <pat><w pos="VVN-AJ0" /></pat>
+                        <pat><w pos="VVN-VVD" /></pat>
+                    </either>
+                </pat>
+            </pat>
+
+        </either>
+    </pat>
+
+</patterns>
