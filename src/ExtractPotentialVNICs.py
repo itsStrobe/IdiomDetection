@@ -12,7 +12,7 @@ from SynLexFixedness import SynLexFixedness
 
 PAT_MODEL = "./PatternCounts/PatternCounts_130619.pickle"
 VNIC_DIR  = "./VNICs/PotentialVNICs.csv"
-FREQ_T    = 200
+FREQ_T    = 150
 
 # Initialize SynLexFixedness
 pat_SynLexFix = SynLexFixedness(modelDir=PAT_MODEL)

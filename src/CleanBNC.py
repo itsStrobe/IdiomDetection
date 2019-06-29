@@ -4,10 +4,23 @@ import re
 ROOT_DIR = "./Corpora/BNC XML/2554/download/Texts"
 OUT_SUF  = "_CleanXML"
 
-VAL_CHARS    = re.compile("[^ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ><]")
+ALPH_NUM   = "a-zA-Z0-9"
+ACCNT_TKNS = "À-ÿ"
+PUNC       = "\…\.\!\,\:\;\_\-\–\—\?\'\‘\’\′\″\""
+CLS_TKNS   = "\(\)\[\]\{\}"
+MATH_TKNS  = "=\+\*\%"
+GREEK_ALPH = "ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκΛλΜμΝνΞξΟοΠπΡρΣσςΤτΥυΦφΧχΨψΩω"
+CURR_TKNS  = "$£¥₩₽₾₺₴₹฿"
+SPCL_TKNS  = "\&\•\/\\@©™°"
+MATH_SPCL  = "½⅓⅔¼‌¾‌⅕⅖⅗⅘⅙⅚⅐⅛⅜⅝⅞⅑⅒⁰ⁱ¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ"
+
+TKN_CHARS = " " + ALPH_NUM + ACCNT_TKNS + PUNC + CLS_TKNS + MATH_TKNS + GREEK_ALPH + CURR_TKNS + SPCL_TKNS + MATH_SPCL
+XML_CHARS = "<>"
+
+VAL_CHARS    = re.compile("[^" + TOK_CHARS + XML_CHARS + "]")
 VAL_CHARS_re = "_"
 
-tag_1     = re.compile("<corr[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]+>")
+tag_1     = re.compile("<corr[" + TOK_CHARS + "]+>")
 tag_1_re  = ""
 
 tag_2     = re.compile("</corr>")
@@ -25,7 +38,7 @@ tag_5_re  = ""
 tag_6     = re.compile("</hi>")
 tag_6_re  = ""
 
-tag_7     = re.compile("<item[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_7     = re.compile("<item[" + TOK_CHARS + "]*>")
 tag_7_re  = ""
 
 tag_8     = re.compile("</item>")
@@ -37,7 +50,7 @@ tag_9_re  = ""
 tag_10     = re.compile("</label>")
 tag_10_re  = ""
 
-tag_11    = re.compile("<div[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_11    = re.compile("<div[" + TOK_CHARS + "]*>")
 tag_11_re = ""
 
 tag_12    = re.compile("</div>")
@@ -52,109 +65,109 @@ tag_14_re = ""
 tag_15    = re.compile("</wtext></bncDoc>")
 tag_15_re = ""
 
-tag_16    = re.compile("<pb[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_16    = re.compile("<pb[" + TOK_CHARS + "]*>")
 tag_16_re = ""
 
-tag_17    = re.compile("<gap[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_17    = re.compile("<gap[" + TOK_CHARS + "]*>")
 tag_17_re = ""
 
 tag_18    = re.compile("</gap>")
 tag_18_re = ""
 
-tag_19    = re.compile("<note[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_19    = re.compile("<note[" + TOK_CHARS + "]*>")
 tag_19_re = ""
 
 tag_20    = re.compile("</note>")
 tag_20_re = ""
 
-tag_21    = re.compile("<quote[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_21    = re.compile("<quote[" + TOK_CHARS + "]*>")
 tag_21_re = ""
 
 tag_22    = re.compile("</quote>")
 tag_22_re = ""
 
-tag_23    = re.compile("<stage[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_23    = re.compile("<stage[" + TOK_CHARS + "]*>")
 tag_23_re = ""
 
 tag_24    = re.compile("</stage>")
 tag_24_re = ""
 
-tag_25    = re.compile("<head[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_25    = re.compile("<head[" + TOK_CHARS + "]*>")
 tag_25_re = ""
 
 tag_26    = re.compile("</head>")
 tag_26_re = ""
 
-tag_27    = re.compile("<l[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_27    = re.compile("<l[" + TOK_CHARS + "]*>")
 tag_27_re = ""
 
 tag_28    = re.compile("</l>")
 tag_28_re = ""
 
-tag_29    = re.compile("<lg[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_29    = re.compile("<lg[" + TOK_CHARS + "]*>")
 tag_29_re = ""
 
 tag_30    = re.compile("</lg>")
 tag_30_re = ""
 
-tag_31    = re.compile("<sp[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_31    = re.compile("<sp[" + TOK_CHARS + "]*>")
 tag_31_re = ""
 
 tag_32    = re.compile("</sp>")
 tag_32_re = ""
 
-tag_33    = re.compile("<speaker[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_33    = re.compile("<speaker[" + TOK_CHARS + "]*>")
 tag_33_re = ""
 
 tag_34    = re.compile("</speaker>")
 tag_34_re = ""
 
-tag_35    = re.compile("<bibl[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_35    = re.compile("<bibl[" + TOK_CHARS + "]*>")
 tag_35_re = ""
 
 tag_36    = re.compile("</bibl>")
 tag_36_re = ""
 
-tag_37    = re.compile("<unclear[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_37    = re.compile("<unclear[" + TOK_CHARS + "]*>")
 tag_37_re = ""
 
 tag_38    = re.compile("</unclear>")
 tag_38_re = ""
 
-tag_39    = re.compile("<trunc[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_39    = re.compile("<trunc[" + TOK_CHARS + "]*>")
 tag_39_re = ""
 
 tag_40    = re.compile("</trunc>")
 tag_40_re = ""
 
-tag_41    = re.compile("<pause[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_41    = re.compile("<pause[" + TOK_CHARS + "]*>")
 tag_41_re = ""
 
 tag_42    = re.compile("</pause>")
 tag_42_re = ""
 
-tag_43    = re.compile("<event[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_43    = re.compile("<event[" + TOK_CHARS + "]*>")
 tag_43_re = ""
 
 tag_44    = re.compile("</event>")
 tag_44_re = ""
 
-tag_45    = re.compile("<u[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_45    = re.compile("<u[" + TOK_CHARS + "]*>")
 tag_45_re = ""
 
 tag_46    = re.compile("</u>")
 tag_46_re = ""
 
-tag_47    = re.compile("<vocal[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_47    = re.compile("<vocal[" + TOK_CHARS + "]*>")
 tag_47_re = ""
 
 tag_48    = re.compile("</vocal>")
 tag_48_re = ""
 
-tag_49    = re.compile("<align[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_49    = re.compile("<align[" + TOK_CHARS + "]*>")
 tag_49_re = ""
 
-tag_50    = re.compile("<shift[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]*>")
+tag_50    = re.compile("<shift[" + TOK_CHARS + "]*>")
 tag_50_re = ""
 
 tag_CM_0    = re.compile("<!--.*-->")
@@ -181,7 +194,7 @@ pat_4_re = "lemma="
 rep_1    = re.compile("^((</w>)?(</s>)?)+")
 rep_1_re = ""
 
-rep_2    = re.compile(" >[ _a-zA-ZÀ-ÿ0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\\\&\;\%@©™$£¥₩₽₾₺₴₹฿½¾¼²°αβδεΩµ]+$")
+rep_2    = re.compile(" >[" + TOK_CHARS + "]+$")
 rep_2_re = ">"
 
 rep_3    = re.compile("/>$")
@@ -190,10 +203,8 @@ rep_3_re = "/></s>"
 rep_4    = re.compile("</s>.+$")
 rep_4_re = "</s>"
 
-CORR_SENT = re.compile("^<s n=\"[0-9_]+\">.+</s>$")
+CORR_SENT = re.compile("^<s n=\"[0-9_]+\">[^" + TOK_CHARS + XML_CHARS + "]+</s>$")
 EMPTY     = re.compile("^$")
-
-# ( lemma=\"[ a-zA-Z0-9=\+\*\&\•\…\(\)\[\]\{\}\.\!\,\:\;\-\–\—\?\'\‘\’\′\″\"\/\&\;\%@Éâàéè]+\")?
 
 
 def CleanSent(sent):

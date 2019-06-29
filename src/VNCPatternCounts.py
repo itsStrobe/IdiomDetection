@@ -63,10 +63,10 @@ Notes:
 """
 
 # CONSTANTS
-A_AN_THE = {'AT0'} # A/AN and THE combined into single set since they share C5 Tag
+DET_ART  = {'AT0'} # A/AN and THE combined into single set since they share C5 Tag. Serves for other articles.
 DET      = {'DT0', 'DTQ'
             'DT0-CJT'}
-POSS     = {'DPS', 'POS'}
+POSS     = {'DPS'}
 PUNC     = {'PUN'} # Removed PUQ, PUL, PUR
 BE       = {'VBB', 'VBD', 'VBG', 'VBI', 'VBN', 'VBZ'}
 VERB_ACT = {'VBB', 'VBD', 'VBG', 'VBI', 'VBN', 'VBZ', 'VDB', 'VDD', 'VDG', 'VDI', 'VDN', 'VDZ', 'VHB', 'VHD', 'VHG', 'VHI', 'VHN', 'VHZ', 'VM0', 'VVB', 'VVD', 'VVG', 'VVI', 'VVN', 'VVZ',
@@ -136,7 +136,7 @@ def FindPattern_1_10(verbPos, nounPos, sentence, posTags, max_window=MAX_WINDOW,
 
     # Check for pattern 2, 3, and 7
     for idx in range(verbPos + 1, nounPos + 1):
-        if(posTags[idx] in A_AN_THE):
+        if(posTags[idx] in DET_ART):
             if(sentence[idx] == 'a' or sentence[idx] == 'an'):
                 patterns.append([sentence[verbPos], sentence[nounPos], '2'])
                 if(not returnPos):
@@ -152,7 +152,7 @@ def FindPattern_1_10(verbPos, nounPos, sentence, posTags, max_window=MAX_WINDOW,
 
     # Check for pattern 4 and 8
     for idx in range(verbPos + 1, nounPos + 1):
-        if(posTags[idx] in DET and sentence[idx] in DEM_TOK):
+        if(posTags[idx] in DET and sentence[idx] in DEM_TOKblu):
             if(not returnPos):
                 return SimilarPatternDesambiguation(posTags[nounPos], '4', '8', sentence[verbPos], sentence[nounPos])
             else:
@@ -168,7 +168,7 @@ def FindPattern_1_10(verbPos, nounPos, sentence, posTags, max_window=MAX_WINDOW,
 
     # Check for pattern 10
     for idx in range(verbPos + 1, nounPos + 1):
-        if(posTags[idx] in DET and sentence[idx] not in DEM_TOK):
+        if((posTags[idx] in DET or posTags[idx] in DET_ART) and (sentence[idx] not in DEM_TOK and sentence[idx] not in {'the', 'a', 'an'})):
             patterns.append([sentence[verbPos], sentence[nounPos], '10'])
             if(not returnPos):
                 return patterns
