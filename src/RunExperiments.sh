@@ -38,3 +38,19 @@ deactivate
 cd ..
 
 # ============================================================ #
+
+# Experiments 3
+cd Experiments_3
+. venv/bin/activate
+
+# Unsupervised - Cosine Similarity [Candidates]
+python3 Experiment_3_1.py
+
+# Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates]
+python3 Experiment_3_2.py
+python3 Experiment_3_2_b.py
+
+deactivate
+cd ..
+
+# ============================================================ #
