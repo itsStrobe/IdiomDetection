@@ -152,7 +152,7 @@ def FindPattern_1_10(verbPos, nounPos, sentence, posTags, max_window=MAX_WINDOW,
 
     # Check for pattern 4 and 8
     for idx in range(verbPos + 1, nounPos + 1):
-        if(posTags[idx] in DET and sentence[idx] in DEM_TOKblu):
+        if(posTags[idx] in DET and sentence[idx] in DEM_TOK):
             if(not returnPos):
                 return SimilarPatternDesambiguation(posTags[nounPos], '4', '8', sentence[verbPos], sentence[nounPos])
             else:
@@ -249,9 +249,6 @@ def ExtractPatternRangeFromSentence(sentence, posTags, vnc, max_window=MAX_WINDO
     for idx in range(len(sentence)):
         sentence[idx] = sentence[idx].lower()
 
-    print(sentence)
-    print(posTags)
-
     verb = vnc[0]
     noun = vnc[1]
 
@@ -335,7 +332,7 @@ def ExtractPatternsFromCorpora(corporaTextRootDir, outRootDir, cleanTextSuffix="
         if files == []:
             continue
 
-        print("Extracting Corpora in:", root)
+        print("Extracting Patterns in:", root)
         for corpus in files:
             inFileDir = os.path.join(root, corpus)
 

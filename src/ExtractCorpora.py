@@ -22,6 +22,7 @@ LEMMAS_SUF  = "_lemmas"
 for prefix in CORPORA_PRE:
     print("Extracting Corpora:", prefix)
     corpora = os.path.join(CORPORA_DIR, prefix)
+
     print("Extracting Original Sentences")
     CorpusExtraction.SaveCorpora(corpora, prefix)
     print("Extracting Original Sentences - Indexed")

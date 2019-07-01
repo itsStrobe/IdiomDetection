@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup as Soup
 ID_TAG    = 'n'
 POS_TAG   = 'c5'
 LEMMA_TAG = 'lemma'
-TEXT_TAGS = ['w']
+TEXT_TAGS = ['w', 'c']
 
 class CorpusExtraction:
 
@@ -52,8 +52,6 @@ class CorpusExtraction:
             with open(outFileDir, "w+", encoding="utf_8") as outFile:
                 fileSoup = Soup(inFile, 'xml')
                 sentTags = fileSoup.findAll('s')
-                print('-')
-                print(sentTags)
 
                 if(posFileDir != None):
                     with open(posFileDir, "w+", encoding="utf_8") as posFile:
@@ -116,7 +114,6 @@ class CorpusExtraction:
     @staticmethod
     def ReadCorpus(fileDir, asNumpy=True, indexed=False, posTags=False, lemmas=False):
         tags=TEXT_TAGS
-        tagRegexp = re.compile(r'<.*>')
         flatten = lambda l: [item for sublist in l for item in sublist]
         with open(fileDir, "r", encoding="utf_8") as corpus:
             corpusSoup = Soup(corpus, 'xml')
@@ -126,18 +123,30 @@ class CorpusExtraction:
                 for sentTag in sentTags:
                     if(sentTag[ID_TAG].isdigit()):
                         if(posTags):
-                            sent[int(sentTag[ID_TAG])] = [wordTag[POS_TAG] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag))]
+                            sent[int(sentTag[ID_TAG])] = [wordTag[POS_TAG] for wordTag in sentTag.findAll(tags)]
                         elif(lemmas):
-                            sent[int(sentTag[ID_TAG])] = [wordTag[LEMMA_TAG] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag))]
+                            lem = []
+                            for wordTag in sentTag.findAll(tags):
+                                if(wordTag.name == 'w'):
+                                    lem.append(wordTag[LEMMA_TAG])
+                                else:
+                                    lem.append(wordTag.text.strip())
+                            sent[int(sentTag[ID_TAG])] = lem
                         else:
-                            sent[int(sentTag[ID_TAG])] = flatten([tag.text.split() for tag in sentTag.findAll(tags) if tagRegexp.search(str(tag))])
+                            sent[int(sentTag[ID_TAG])] = flatten([wordTag.text.split() for wordTag in sentTag.findAll(tags)])
             else:
                 if(posTags):
-                    sent = [wordTag[POS_TAG] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag)) for sentTag in sentTags]
+                    sent = [wordTag[POS_TAG] for wordTag in sentTag.findAll(tags) for sentTag in sentTags]
                 elif(lemmas):
-                    sent = [wordTag[LEMMA_TAG] for wordTag in sentTag.findAll(tags) if tagRegexp.search(str(wordTag)) for sentTag in sentTags]
+                    lem = []
+                    for wordTag in sentTag.findAll(tags):
+                        if(wordTag.name == 'w'):
+                            lem.append(wordTag[LEMMA_TAG])
+                        else:
+                            lem.append(wordTag.text.strip())
+                    sent[int(sentTag[ID_TAG])] = lem
                 else:
-                    sent = [flatten([tag.text.split() for tag in sentTag.findAll(tags) if tagRegexp.search(str(tag))])  for sentTag in sentTags]
+                    sent = [flatten([wordTag.text.split() for wordTag in sentTag.findAll(tags)]) for sentTag in sentTags]
 
                 if(asNumpy):
                     sent = np.array(sent)
@@ -150,7 +159,6 @@ class CorpusExtraction:
     @staticmethod
     def ReadCorpora(rootDir, indexed=False, posTags=False, lemmas=False):
         corpora = {}
-        print(rootDir)
         for root, _, files in os.walk(rootDir):
             if files == []:
                 continue
@@ -170,7 +178,7 @@ class CorpusExtraction:
     @staticmethod
     def SaveCorpora(rootDir, fileName, suffix='', indexed=False, posTags=False, lemmas=False, corporaDir='./data'):
         corporaName = os.path.join(corporaDir, fileName + suffix + '.pkl')
-        corpora = CorpusExtraction.ReadCorpora(rootDir, indexed=indexed, posTags=posTags, lemmas=False)
+        corpora = CorpusExtraction.ReadCorpora(rootDir, indexed=indexed, posTags=posTags, lemmas=lemmas)
 
         with open(corporaName, 'wb+') as file:
             pickle.dump(corpora, file, pickle.HIGHEST_PROTOCOL)
