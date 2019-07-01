@@ -7,3 +7,4 @@ python3 ExtractPatternsInCorpora.py
 
 python3 ExtractPotentialVNICs.py
 python3 ExtractVNICsInstances.py
+python3 ExtractTargetSentences.py

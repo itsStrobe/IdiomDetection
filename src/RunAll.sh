@@ -1,7 +1,7 @@
 
 # ./PrepareData.sh
 
-# ./FindVNICs.sh
+./FindVNICs.sh
 
 ./TrainAndGenerateEmbeddings.sh
 

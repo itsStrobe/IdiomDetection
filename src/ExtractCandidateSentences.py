@@ -1,9 +1,9 @@
 """
     File:   ExtractTargetSentences
     Author: Jose Juan Zavala Iglesias
-    Date:   29/05/2019
+    Date:   01/07/2019
 
-    Extract the target sentences for the VNC dataset.
+    Extract the target sentences for the VNC Candidates Dataset.
 """
 
 import os
@@ -18,13 +18,13 @@ from Util import CorpusExtraction
 from CForm import CForm
 from SynLexFixedness import SynLexFixedness
 
-TARG_DIR       = "./targets/English_VNC_Cook/VNC-Tokens_cleaned"
-SENT_DIR       = "./targets/Extracted_Sentences.txt" 
-SENTVNC_DIR    = "./targets/Extracted_Sentences_VNC.txt" 
-CFORM_DIR      = "./targets/CForms.csv"
-SYN_FIX_DIR    = "./targets/SynFix.csv"
-LEX_FIX_DIR    = "./targets/LexFix.csv"
-OVA_FIX_DIR    = "./targets/OvaFix.csv"
+TARG_CD_DIR    = "./targets/VNC-Tokens_candidates"
+SENT_CD_DIR    = "./targets/Extracted_Sentences_cand.txt"
+SENTVNC_CD_DIR = "./targets/Extracted_Sentences_VNC_cand.txt"
+CFORM__CD_DIR  = "./targets/CForms_cand.csv"
+SYN_FIX_CD_DIR = "./targets/SynFix_cand.csv"
+LEX_FIX_CD_DIR = "./targets/LexFix_cand.csv"
+OVA_FIX_CD_DIR = "./targets/OvaFix_cand.csv"
 
 # Other Parameters
 CORPORA_PRE = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"]
@@ -58,21 +58,21 @@ cForm_model = CForm(modelDir=PAT_MODEL)
 pat_SynLexFix = SynLexFixedness(modelDir=PAT_MODEL, w2vModelDir=W2V_MODEL, K=K)
 
 # Load VNC Tokens Dataset
-vncTokens      = np.genfromtxt(TARG_DIR   , dtype='str', delimiter=' ')
+vncTokens_cand = np.genfromtxt(TARG_CD_DIR, dtype='str', delimiter=' ')
 
-# ============= Original VNC Tokens Dataset ============= #
+# ============ Candidates VNC Tokens Dataset ============ #
 # Initialize Array
-sentences = []
+sentences_cand = []
 
-# Extract Sentences - VNC-Tokens
-with open(SENT_DIR, "w+") as sent_file:
-    for sentenceLoc in vncTokens:
+# Extract Sentences - VNC-Candidates
+with open(SENT_CD_DIR, "w+") as sent_file:
+    for sentenceLoc in vncTokens_cand:
         fileLoc = sentenceLoc[2].split(LOC_TOKEN)
         sentNum = int(sentenceLoc[3])
 
         sent = corpora[fileLoc[0]][fileLoc[2]][sentNum]
 
-        sentences.append(sent)
+        sentences_cand.append(sent)
 
         sent_file.write(' '.join(sent))
         sent_file.write('\n')
@@ -90,19 +90,19 @@ for prefix in CORPORA_PRE:
 # ======================================================= #
 # ======================================================= #
 
-# ============= Original VNC Tokens Dataset ============= #
+# ============ Candidates VNC Tokens Dataset ============ #
 # Initialize CForms Vector
-cForms = np.zeros(len(vncTokens))
+cForms = np.zeros(len(vncTokens_cand))
 
 # Initilize Fixedness Vectors
-lexFix = np.zeros(len(vncTokens))
-synFix = np.zeros(len(vncTokens))
-ovaFix = np.zeros(len(vncTokens))
+lexFix = np.zeros(len(vncTokens_cand))
+synFix = np.zeros(len(vncTokens_cand))
+ovaFix = np.zeros(len(vncTokens_cand))
 
 # Determine CForms, get Fixedness Metrics, and extract VNC Pattern Subtext
-with open(SENTVNC_DIR, "w+") as sentvnc_file:
+with open(SENTVNC_CD_DIR, "w+") as sentvnc_file:
     it = 0
-    for sentenceLoc, sent in zip(vncTokens, sentences):
+    for sentenceLoc, sent in zip(vncTokens_cand, sentences_cand):
         fileLoc = sentenceLoc[2].split(LOC_TOKEN)
         sentNum = int(sentenceLoc[3])
 
@@ -124,7 +124,7 @@ with open(SENTVNC_DIR, "w+") as sentvnc_file:
 
         it += 1
 
-np.savetxt(CFORM_DIR  , cForms, delimiter=",")
-np.savetxt(LEX_FIX_DIR, lexFix, delimiter=",")
-np.savetxt(SYN_FIX_DIR, synFix, delimiter=",")
-np.savetxt(OVA_FIX_DIR, ovaFix, delimiter=",")
+np.savetxt(CFORM__CD_DIR , cForms, delimiter=",")
+np.savetxt(SYN_FIX_CD_DIR, lexFix, delimiter=",")
+np.savetxt(LEX_FIX_CD_DIR, synFix, delimiter=",")
+np.savetxt(OVA_FIX_CD_DIR, ovaFix, delimiter=",")
