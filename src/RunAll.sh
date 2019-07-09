@@ -1,5 +1,10 @@
+#!/bin/bash
+# Complete Run.
+# Only run PrepareData.sh if absolutely necessary.
 
-# ./PrepareData.sh
+echo "RunAll.sh"
+
+./PrepareData.sh
 
 ./FindVNICs.sh
 

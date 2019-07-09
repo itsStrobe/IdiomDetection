@@ -34,7 +34,7 @@ tag_3_re  = ""
 tag_4     = re.compile("</p>")
 tag_4_re  = ""
 
-tag_5     = re.compile("<hi[a-zA-Z\"= ]+>")
+tag_5     = re.compile("<hi[a-zA-Z\"= ]*>")
 tag_5_re  = ""
 
 tag_6     = re.compile("</hi>")
@@ -181,7 +181,7 @@ tag_CM_1_re = ""
 tag_CM_2    = re.compile("^.*-->")
 tag_CM_2_re = ""
 
-pat_1    = re.compile("<mw c5=\"[A-Z0-9]+\">")
+pat_1    = re.compile("<mw c5=\"[A-Z0-9-]+\">")
 pat_1_re = ""
 
 pat_2    = re.compile("</mw>")

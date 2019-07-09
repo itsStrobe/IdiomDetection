@@ -6,8 +6,7 @@ __pychache__
 Corpora*
 data
 models
-embeddings.csv
-embeddings_VNC.csv
+embeddings*
 targets
 Pattern*
 VNICs

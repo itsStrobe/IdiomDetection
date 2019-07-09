@@ -23,14 +23,14 @@ CFORM_DIR     = "../targets/CForms.csv"
 SYN_FIX_DIR   = "../targets/SynFix.csv"
 LEX_FIX_DIR   = "../targets/LexFix.csv"
 OVA_FIX_DIR   = "../targets/OvaFix.csv"
-RESULTS_DIR   = "./results/"
 FIX_RESULTS   = "FIXEDNESS"
 IDIOMATIC_EXT = "_i"
 LITERAL_EXT   = "_l"
 FILE_EXT      = ".csv"
 
-# Experiment Suffix
-EXP_EXT = "_fixMetSVM"
+# Experiment Dirs
+RESULTS_DIR = "./results/Experiment_2_1/"
+EXP_EXT     = "_fixMetSVM"
 
 # SVM Parameters: | Based on experiments by King and Cook (2018)
 PARAMS  = {'C':[0.01, 0.1, 1, 10, 100]}
@@ -42,6 +42,14 @@ SPLITS    = 10
 TEST_SIZE = 0.1
 SEED      = 42
 VERBOSE   = 4
+
+# Create Results Dir
+if not os.path.exists(os.path.dirname(RESULTS_DIR)):
+    try:
+        os.makedirs(os.path.dirname(RESULTS_DIR))
+    except OSError as exc: # Guard against race condition
+        if exc.errno != errno.EEXIST:
+            raise
 
 # -- EXTRACT DATASETS -- #
 # Extract all targets and remove those where classification is Q (unknown)

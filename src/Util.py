@@ -198,16 +198,27 @@ class CorpusExtraction:
     Creates an iterator for reading a Corpora.
     """
     @staticmethod
-    def IterateOverCorpora(corporaPrefix, suffix='', corporaDir='./data/', asLower=False):
-        for corpora_name in corporaPrefix:
-            print("Loading Corpora:", corpora_name)
-            corpora = CorpusExtraction.LoadCorpora(corpora_name, suffix=suffix, corporaDir=corporaDir)
-            for corpus in corpora:
-                for sentence in corpora[corpus]:
-                    if(asLower):
-                        for idx in range(len(sentence)):
-                            sentence[idx] = sentence[idx].lower()
-                    yield sentence
+    def IterateOverCorpora(corporaPrefix, suffix='', corporaDir='./data/', asLower=False, indexed=False):
+        if(indexed):
+            for corpora_name in corporaPrefix:
+                print("Loading Corpora:", corpora_name)
+                corpora = CorpusExtraction.LoadCorpora(corpora_name, suffix=suffix, corporaDir=corporaDir)
+                for corpus in corpora:
+                    for idx in corpora[corpus]:
+                        if(asLower):
+                            for word_idx in range(len(corpora[corpus][idx])):
+                                corpora[corpus][idx][word_idx] = corpora[corpus][idx][word_idx].lower()
+                        yield corpora[corpus][idx]
+        else:
+            for corpora_name in corporaPrefix:
+                print("Loading Corpora:", corpora_name)
+                corpora = CorpusExtraction.LoadCorpora(corpora_name, suffix=suffix, corporaDir=corporaDir)
+                for corpus in corpora:
+                    for sentence in corpora[corpus]:
+                        if(asLower):
+                            for idx in range(len(sentence)):
+                                sentence[idx] = sentence[idx].lower()
+                        yield sentence
 
 class CorpusEdition:
     """

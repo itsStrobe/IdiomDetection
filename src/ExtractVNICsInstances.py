@@ -13,7 +13,7 @@ POSTAGS_SUF   = "_posTags"
 LOC_TOKEN     = "/"
 VNC_TOKEN     = "_"
 
-TOP_N      = 5
+TOP_N      = 20
 MAX_WINDOW = 7
 
 def GetVNCsSet(verbs, nouns):
@@ -65,6 +65,7 @@ vnics_senId = np.full(instances, -1)
 FindInstances(CORPORA_PRE, vnics_token, vnics_loc, vnics_senId, instances)
 
 vnics = pd.DataFrame(index=range(instances), data={'Class': vnics_class, 'VNC': vnics_token, 'Corpus': vnics_loc, 'Sent ID': vnics_senId})
+vnics = vnics[vnics.VNC != 'generic_vnic_instance_placeholder'] # Some instances occur in sentences without a proper ID, so they can't be added to the dataset.
 vnics.sort_values(['VNC'], inplace=True)
 
 vnics.to_csv(path_or_buf=VNIC_LOC_FILE, sep=' ', header=False, index=False)

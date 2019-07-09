@@ -14,10 +14,11 @@ import numpy as np
 import pandas as pd
 from WordEmbeddings import Embeddings
 
-SENT_DIR    = "../targets/Extracted_Sentences.txt"
-SENTVNC_DIR = "../targets/Extracted_Sentences_VNC.txt"
-EMBD_DIR    = "./embeddings.csv"
-EMBDVNC_DIR = "./embeddings_VNC.csv"
+# Tokens Directories
+SENT_DIR    = ["../targets/Extracted_Sentences.txt"    , "../targets/Extracted_Sentences_lemm.txt"    , "../targets/Extracted_Sentences_cand.txt"    , "../targets/Extracted_Sentences_lemm_cand.txt"]
+SENTVNC_DIR = ["../targets/Extracted_Sentences_VNC.txt", "../targets/Extracted_Sentences_VNC_lemm.txt", "../targets/Extracted_Sentences_VNC_cand.txt", "../targets/Extracted_Sentences_VNC_lemm_cand.txt"]
+EMBD_DIR    = ["./embeddings.csv"                      , "./embeddings_lemm.csv"                      , "./embeddings_cand.csv"                      , "./embeddings_lemm_cand.csv"]
+EMBDVNC_DIR = ["./embeddings_VNC.csv"                  , "./embeddings_VNC_lemm.csv"                  , "./embeddings_VNC_cand.csv"                  , "./embeddings_VNC_lemm_cand.csv"]
 
 # Model Parameters
 MODEL_DIR   = "./models/cosine_sharedWeights_adadelta_lr_1_noGradClip_epochs_2_batch_100_neg_2_voc_65536x300_noReg_lc_noPreInit_vocab_65535.end_of_epoch_2.pickle"
@@ -25,40 +26,30 @@ MODEL_DIR   = "./models/cosine_sharedWeights_adadelta_lr_1_noGradClip_epochs_2_b
 # Load Model
 model = Embeddings(pretrainned=MODEL_DIR)
 
-# ============= Original VNC Tokens Dataset ============= #
+# ======================================================= #
 
-# Load Sentences
-sentences = np.genfromtxt(SENT_DIR   , dtype='str', delimiter='\t')
-sents_vnc = np.genfromtxt(SENTVNC_DIR, dtype='str', delimiter='\t')
+for sent_dir, sentvnc_dir, embd_dir, embdvnc_dir in zip(SENT_DIR, SENTVNC_DIR, EMBD_DIR, EMBDVNC_DIR):
+    print("Generating Embeddings:", embd_dir, embdvnc_dir)
 
-# Set Sentences to Lowercase
-for sent_id in range(len(sentences)):
-    sentences[sent_id] = sentences[sent_id].lower()
-    sents_vnc[sent_id] = sents_vnc[sent_id].lower()
+    # Load Sentences
+    sentences = np.genfromtxt(sent_dir   , dtype='str', delimiter='\t')
+    sents_vnc = np.genfromtxt(sentvnc_dir, dtype='str', delimiter='\t')
 
-# Generate Embeddings
-genEmbeddings    = model.GenerateFeatMatrix(sentences)
-genEmbeddingsVNC = model.GenerateFeatMatrix(sents_vnc)
+    # Set Sentences to Lowercase
+    for sent_id in range(len(sentences)):
+        sentences[sent_id] = sentences[sent_id].lower()
+        sents_vnc[sent_id] = sents_vnc[sent_id].lower()
 
-# Save Embeddings
-np.savetxt(EMBD_DIR   , genEmbeddings   , delimiter=',')
-np.savetxt(EMBDVNC_DIR, genEmbeddingsVNC, delimiter=',')
+    print("Generating Embeddings...")
 
-# ============ Candidates VNC Tokens Dataset ============ #
+    # Generate Embeddings
+    genEmbeddings    = model.GenerateFeatMatrix(sentences)
+    genEmbeddingsVNC = model.GenerateFeatMatrix(sents_vnc)
 
-# Load Sentences
-sentences = np.genfromtxt(SENT_CD_DIR   , dtype='str', delimiter='\t')
-sents_vnc = np.genfromtxt(SENTVNC_CD_DIR, dtype='str', delimiter='\t')
+    print("Saving...")
 
-# Set Sentences to Lowercase
-for sent_id in range(len(sentences)):
-    sentences[sent_id] = sentences[sent_id].lower()
-    sents_vnc[sent_id] = sents_vnc[sent_id].lower()
+    # Save Embeddings
+    np.savetxt(embd_dir   , genEmbeddings   , delimiter=',')
+    np.savetxt(embdvnc_dir, genEmbeddingsVNC, delimiter=',')
 
-# Generate Embeddings
-genEmbeddings    = model.GenerateFeatMatrix(sentences)
-genEmbeddingsVNC = model.GenerateFeatMatrix(sents_vnc)
-
-# Save Embeddings
-np.savetxt(EMBD_CD_DIR   , genEmbeddings   , delimiter=',')
-np.savetxt(EMBDVNC_CD_DIR, genEmbeddingsVNC, delimiter=',')
+# ======================================================= #

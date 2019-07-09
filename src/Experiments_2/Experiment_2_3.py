@@ -36,14 +36,14 @@ SYN_FIX_DIR   = "../targets/SynFix.csv"
 LEX_FIX_DIR   = "../targets/LexFix.csv"
 OVA_FIX_DIR   = "../targets/OvaFix.csv"
 VECTORS_FILE  = "embeddings.csv"
-RESULTS_DIR   = "./results/"
 W2V_RESULTS   = "W2V"
 SCBOW_RESULTS = "SCBOW"
 SKIP_RESULTS  = "SKIP"
 ELMO_RESULTS  = "ELMO"
 
-# Experiment Suffix
-EXP_EXT = "_clust_fixedness_cform"
+# Experiment Dirs
+RESULTS_DIR = "./results/Experiment_2_3/"
+EXP_EXT     = "_clust_fixedness_cform"
 
 # File Extensions
 FILE_EXT = ".tsv"
@@ -138,6 +138,14 @@ def saveClassifiedSentences(all_sent, all_targ, all_pred, fileDir):
     data = np.append(all_sent, all_targ, axis=1)
     data = np.append(data, all_pred, axis = 1)
     pd.DataFrame(data = data, columns=['Sentence', 'Target', 'Prediction']).to_csv(fileDir, sep='\t')
+
+# Create Results Dir
+if not os.path.exists(os.path.dirname(RESULTS_DIR)):
+    try:
+        os.makedirs(os.path.dirname(RESULTS_DIR))
+    except OSError as exc: # Guard against race condition
+        if exc.errno != errno.EEXIST:
+            raise
 
 # -- EXTRACT DATASETS -- #
 # Extract all targets and remove those where classification is Q (unknown)

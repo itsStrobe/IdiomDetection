@@ -1,4 +1,7 @@
 #!/bin/bash
+# Train Models with Corpora and Generate Embeddings for VNC-Dataset and VNC-Candidates
+
+echo "TrainAndGenerateEmbeddings.sh"
 
 # ============================================================ #
 
@@ -6,7 +9,10 @@
 cd ./Word2Vec
 . venv/bin/activate
 
-python3 TrainWordEmbeddings.py
+echo "Training Word2Vec"
+#python3 TrainWordEmbeddings.py
+
+echo "Generating Word2Vec Embeddings"
 python3 GenerateWordEmbeddings.py
 
 deactivate
@@ -18,7 +24,10 @@ cd ..
 cd ./SiameseCBOW
 . venv/bin/activate
 
-python TrainWordEmbeddings.py
+echo "Training SiameseCBOW"
+#python TrainWordEmbeddings.py
+
+echo "Generating SiameseCBOW Embeddings"
 python GenerateWordEmbeddings.py
 
 deactivate
@@ -30,7 +39,10 @@ cd ..
 cd ./SkipThoughts
 . venv/bin/activate
 
-python TrainWordEmbeddings.py
+echo "Training Skip-Thoughts"
+#python TrainWordEmbeddings.py
+
+echo "Generating Skip-Thoughts Embeddings"
 python GenerateWordEmbeddings.py
 
 deactivate
@@ -42,7 +54,10 @@ cd ..
 cd ./ELMo
 . venv/bin/activate
 
-python3 TrainWordEmbeddings.py
+echo "Training ELMo"
+#python3 TrainWordEmbeddings.py
+
+echo "Generating ELMo Embeddings"
 python3 GenerateWordEmbeddings.py
 
 deactivate

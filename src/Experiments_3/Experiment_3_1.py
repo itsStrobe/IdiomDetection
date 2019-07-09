@@ -36,14 +36,14 @@ ELMO_DIR         = "../ELMo/"
 OVA_FIX_DIR      = "../targets/OvaFix_cand.csv"
 VECTORS_FILE     = "embeddings_cand.csv"
 VECTORS_FILE_VNC = "embeddings_VNC_cand.csv"
-RESULTS_DIR      = "./results/"
 W2V_RESULTS      = "W2V"
 SCBOW_RESULTS    = "SCBOW"
 SKIP_RESULTS     = "SKIP"
 ELMO_RESULTS     = "ELMO"
 
-# Experiment Suffix
-EXP_EXT = "_cosineSimilarity"
+# Experiment Dirs
+RESULTS_DIR = "./results/Experiment_3_1/"
+EXP_EXT     = "_cosineSimilarity"
 
 # File Extensions
 FILE_EXT = ".tsv"
@@ -115,42 +115,43 @@ def gen_plot(feat, targ, pred, title_targ, title_pred, saveDir, dispPlot=False):
 
     plt.close()
 
-def saveClassifiedSentences(all_sent, all_cSim, all_targ, all_pred, fileDir):
+def saveClassifiedSentences(all_sent, all_cSim, all_pred, fileDir):
 
     all_sent = all_sent.reshape((all_sent.size, 1))
     all_cSim = all_cSim.reshape((all_cSim.size, 1))
-    all_targ = all_targ.reshape((all_targ.size, 1))
     all_pred = all_pred.reshape((all_pred.size, 1))
     data = np.append(all_sent, all_cSim, axis=1)
-    data = np.append(data, all_targ, axis = 1)
     data = np.append(data, all_pred, axis = 1)
-    pd.DataFrame(data = data, columns=['Sentence', 'Cos Similarity', 'Target', 'Prediction']).to_csv(fileDir, sep='\t')
+    pd.DataFrame(data = data, columns=['Sentence', 'Unsupervised Metric', 'Classification']).to_csv(fileDir, sep='\t')
+
+# Create Results Dir
+if not os.path.exists(os.path.dirname(RESULTS_DIR)):
+    try:
+        os.makedirs(os.path.dirname(RESULTS_DIR))
+    except OSError as exc: # Guard against race condition
+        if exc.errno != errno.EEXIST:
+            raise
 
 # -- EXTRACT DATASETS -- #
-# Extract all targets and remove those where classification is Q (unknown)
 targets = pd.read_csv(TARGETS_DIR, header=None, usecols=[0], sep=' ').values.flatten()
-indexes = np.where(targets != 'Q')
-
-targets_idiomatic = (targets[indexes] == 'I')
-targets_literal   = (targets[indexes] == 'L')
 
 # Original Sentences
-og_sent = np.genfromtxt(OG_SENT_DIR, delimiter="\t", dtype=None, encoding="utf_8")[indexes]
+og_sent = np.genfromtxt(OG_SENT_DIR, delimiter="\t", dtype=None, encoding="utf_8")
 
 # Sentence Embeddings
-features_w2v   = np.genfromtxt(W2V_DIR   + VECTORS_FILE, delimiter=',')[indexes]
-features_scbow = np.genfromtxt(SCBOW_DIR + VECTORS_FILE, delimiter=',')[indexes]
-features_skip  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE, delimiter=',')[indexes]
-features_elmo  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE, delimiter=',')[indexes]
+features_w2v   = np.genfromtxt(W2V_DIR   + VECTORS_FILE, delimiter=',')
+features_scbow = np.genfromtxt(SCBOW_DIR + VECTORS_FILE, delimiter=',')
+features_skip  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE, delimiter=',')
+features_elmo  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE, delimiter=',')
 
 # VNC Embeddings
-features_w2v_VNC   = np.genfromtxt(W2V_DIR   + VECTORS_FILE_VNC, delimiter=',')[indexes]
-features_scbow_VNC = np.genfromtxt(SCBOW_DIR + VECTORS_FILE_VNC, delimiter=',')[indexes]
-features_skip_VNC  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE_VNC, delimiter=',')[indexes]
-features_elmo_VNC  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE_VNC, delimiter=',')[indexes]
+features_w2v_VNC   = np.genfromtxt(W2V_DIR   + VECTORS_FILE_VNC, delimiter=',')
+features_scbow_VNC = np.genfromtxt(SCBOW_DIR + VECTORS_FILE_VNC, delimiter=',')
+features_skip_VNC  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE_VNC, delimiter=',')
+features_elmo_VNC  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE_VNC, delimiter=',')
 
 # Shuffle Sets:
-sent_X, w2v_X, w2v_X_VNC, scbow_X, scbow_X_VNC, skip_X, skip_X_VNC, elmo_X, elmo_X_VNC, y = shuffle(og_sent, features_w2v, features_w2v_VNC, features_scbow, features_scbow_VNC, features_skip, features_skip_VNC, features_elmo, features_elmo_VNC, targets_idiomatic, random_state=RND_STATE)
+sent_X, w2v_X, w2v_X_VNC, scbow_X, scbow_X_VNC, skip_X, skip_X_VNC, elmo_X, elmo_X_VNC = shuffle(og_sent, features_w2v, features_w2v_VNC, features_scbow, features_scbow_VNC, features_skip, features_skip_VNC, features_elmo, features_elmo_VNC, random_state=RND_STATE)
 
 
 print("<===================> Word2Vec <===================>")
@@ -162,11 +163,7 @@ w2v_pred = UnsupervisedMetrics.ThresholdClassifier(w2v_cosSims, T=COS_DIST_T, Op
 
 # Display Classifications:
 if(SAVE_PLT): gen_plot(w2v_X, y, w2v_pred, "Original Word2Vec Labels", "Cosine Similarity Labels", RESULTS_DIR + W2V_RESULTS + EXP_EXT + IMG_EXT)
-saveClassifiedSentences(sent_X, w2v_cosSims, y, w2v_pred, RESULTS_DIR + W2V_RESULTS + EXP_EXT + FILE_EXT)
-
-print("Results:", classification_report(y, w2v_pred))
-results_w2v = pd.DataFrame.from_dict(classification_report(y, w2v_pred, output_dict=True))
-results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + EXP_EXT + CSV_EXT)
+saveClassifiedSentences(sent_X, w2v_cosSims, w2v_pred, RESULTS_DIR + W2V_RESULTS + EXP_EXT + FILE_EXT)
 
 print("<=================> Siamese CBOW <=================>")
 # - Calculate Cosine Similarity
@@ -177,11 +174,7 @@ scbow_pred = UnsupervisedMetrics.ThresholdClassifier(scbow_cosSims, T=COS_DIST_T
 
 # Display Classifications:
 if(SAVE_PLT): gen_plot(scbow_X, y, scbow_pred, "Original Siamese CBOW Labels", "Cosine Similarity Labels", RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + IMG_EXT)
-saveClassifiedSentences(sent_X, scbow_cosSims, y, scbow_pred, RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + FILE_EXT)
-
-print("Results:", classification_report(y, scbow_pred))
-results_scbow = pd.DataFrame.from_dict(classification_report(y, scbow_pred, output_dict=True))
-results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + CSV_EXT)
+saveClassifiedSentences(sent_X, scbow_cosSims, scbow_pred, RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + FILE_EXT)
 
 print("<================> Skip - Thoughts <===============>")
 # - Calculate Cosine Similarity
@@ -192,11 +185,7 @@ skip_pred = UnsupervisedMetrics.ThresholdClassifier(skip_cosSims, T=COS_DIST_T, 
 
 # Display Classifications:
 if(SAVE_PLT): gen_plot(skip_X, y, skip_pred, "Original Skip-Thoughts Labels", "Cosine Similarity Labels", RESULTS_DIR + SKIP_RESULTS + EXP_EXT + IMG_EXT)
-saveClassifiedSentences(sent_X, skip_cosSims, y, skip_pred, RESULTS_DIR + SKIP_RESULTS + EXP_EXT + FILE_EXT)
-
-print("Results:", classification_report(y, skip_pred))
-results_skip = pd.DataFrame.from_dict(classification_report(y, skip_pred, output_dict=True))
-results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + EXP_EXT + CSV_EXT)
+saveClassifiedSentences(sent_X, skip_cosSims, skip_pred, RESULTS_DIR + SKIP_RESULTS + EXP_EXT + FILE_EXT)
 
 print("<=====================> ELMo <=====================>")
 # - Calculate Cosine Similarity
@@ -207,8 +196,4 @@ elmo_pred = UnsupervisedMetrics.ThresholdClassifier(elmo_cosSims, T=COS_DIST_T, 
 
 # Display Classifications:
 if(SAVE_PLT): gen_plot(elmo_X, y, elmo_pred, "Original ELMo Labels", "Cosine Similarity Labels", RESULTS_DIR + ELMO_RESULTS + EXP_EXT + IMG_EXT)
-saveClassifiedSentences(sent_X, elmo_cosSims, y, elmo_pred, RESULTS_DIR + ELMO_RESULTS + EXP_EXT + FILE_EXT)
-
-print("Results:", classification_report(y, elmo_pred))
-results_elmo = pd.DataFrame.from_dict(classification_report(y, elmo_pred, output_dict=True))
-results_elmo.to_csv(RESULTS_DIR + ELMO_RESULTS + EXP_EXT + CSV_EXT)
+saveClassifiedSentences(sent_X, elmo_cosSims, elmo_pred, RESULTS_DIR + ELMO_RESULTS + EXP_EXT + FILE_EXT)
