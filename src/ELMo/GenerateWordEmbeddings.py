@@ -12,47 +12,66 @@ import sys
 import pickle
 import numpy as np
 import pandas as pd
-from Util import CorpusExtraction
 from WordEmbeddings import Embeddings
 
-SENT_DIR    = "../targets/Extracted_Sentences.txt"
-SENTVNC_DIR = "../targets/Extracted_Sentences_VNC.txt"
-EMBD_DIR    = "./embeddings.csv"
-EMBDVNC_DIR = "./embeddings_VNC.csv"
-MODEL_DIR   = "https://tfhub.dev/google/elmo/2"
-BATCH_SIZE  = 300
+# Tokens Directories
+SENT_DIR    = ["../targets/Extracted_Sentences.txt"    , "../targets/Extracted_Sentences_lemm.txt"    , "../targets/Extracted_Sentences_cand.txt"    , "../targets/Extracted_Sentences_lemm_cand.txt"]
+SENTVNC_DIR = ["../targets/Extracted_Sentences_VNC.txt", "../targets/Extracted_Sentences_VNC_lemm.txt", "../targets/Extracted_Sentences_VNC_cand.txt", "../targets/Extracted_Sentences_VNC_lemm_cand.txt"]
+EMBD_DIR    = ["./embeddings.csv"                      , "./embeddings_lemm.csv"                      , "./embeddings_cand.csv"                      , "./embeddings_lemm_cand.csv"]
+EMBDVNC_DIR = ["./embeddings_VNC.csv"                  , "./embeddings_VNC_lemm.csv"                  , "./embeddings_VNC_cand.csv"                  , "./embeddings_VNC_lemm_cand.csv"]
 
-# Load Sentences
-sentences = np.genfromtxt(SENT_DIR, dtype='str', delimiter='\t')
-sents_vnc = np.genfromtxt(SENTVNC_DIR, dtype='str', delimiter='\t')
+# Tokens Directories
+SENT_DIR    = ["../targets/Extracted_Sentences_lemm_cand.txt"]
+SENTVNC_DIR = ["../targets/Extracted_Sentences_VNC_lemm_cand.txt"]
+EMBD_DIR    = ["./embeddings_lemm_cand.csv"]
+EMBDVNC_DIR = ["./embeddings_VNC_lemm_cand.csv"]
+
+# Model Parameters
+MODEL_DIR   = "https://tfhub.dev/google/elmo/2"
+BATCH_SIZE  = 200
 
 # Load Model
 model = Embeddings(hub_module=MODEL_DIR)
 
-# Set Sentences to Lowercase
-for sent_id in range(len(sentences)):
-    sentences[sent_id] = sentences[sent_id].lower()
-    sents_vnc[sent_id] = sents_vnc[sent_id].lower()
+# ======================================================= #
 
-# Generate Embeddings
-genEmbeddings    = np.zeros((sentences.shape[0], model.vec_dim))
-genEmbeddingsVNC = np.zeros((sents_vnc.shape[0], model.vec_dim))
+for sent_dir, sentvnc_dir, embd_dir, embdvnc_dir in zip(SENT_DIR, SENTVNC_DIR, EMBD_DIR, EMBDVNC_DIR):
+    print("Generating Embeddings:", embd_dir, embdvnc_dir)
 
-batch_count = 0
-num_sent    = sentences.shape[0]
+    # Load Sentences
+    sentences = np.genfromtxt(sent_dir   , dtype='str', delimiter='\t')
+    sents_vnc = np.genfromtxt(sentvnc_dir, dtype='str', delimiter='\t')
 
-while batch_count*BATCH_SIZE < num_sent:
-    print("Batch #", batch_count)
-    start = batch_count*BATCH_SIZE
-    end   = start + BATCH_SIZE
-    if(end < num_sent):
-        genEmbeddings[start : end]    = model.GenerateFeatMatrix(sentences[start : end])
-        genEmbeddingsVNC[start : end] = model.GenerateFeatMatrix(sents_vnc[start : end])
-    else:
-        genEmbeddings[start : ]    = model.GenerateFeatMatrix(sentences[start : ])
-        genEmbeddingsVNC[start : ] = model.GenerateFeatMatrix(sents_vnc[start : ])
-    batch_count += 1
+    # Set Sentences to Lowercase
+    for sent_id in range(len(sentences)):
+        sentences[sent_id] = sentences[sent_id].lower()
+        sents_vnc[sent_id] = sents_vnc[sent_id].lower()
 
-# Save Embeddings
-np.savetxt(EMBD_DIR   , genEmbeddings   , delimiter=',')
-np.savetxt(EMBDVNC_DIR, genEmbeddingsVNC, delimiter=',')
+    print("Generating Embeddings...")
+
+    # Generate Embeddings
+    genEmbeddings    = np.zeros((sentences.shape[0], model.vec_dim))
+    genEmbeddingsVNC = np.zeros((sents_vnc.shape[0], model.vec_dim))
+
+    batch_count = 0
+    num_sent    = sentences.shape[0]
+
+    while batch_count*BATCH_SIZE < num_sent:
+        print("Batch #", batch_count)
+        start = batch_count*BATCH_SIZE
+        end   = start + BATCH_SIZE
+        if(end < num_sent):
+            genEmbeddings[start : end]    = model.GenerateFeatMatrix(sentences[start : end])
+            genEmbeddingsVNC[start : end] = model.GenerateFeatMatrix(sents_vnc[start : end])
+        else:
+            genEmbeddings[start : ]    = model.GenerateFeatMatrix(sentences[start : ])
+            genEmbeddingsVNC[start : ] = model.GenerateFeatMatrix(sents_vnc[start : ])
+        batch_count += 1
+
+    print("Saving...")
+
+    # Save Embeddings
+    np.savetxt(embd_dir   , genEmbeddings   , delimiter=',')
+    np.savetxt(embdvnc_dir, genEmbeddingsVNC, delimiter=',')
+
+# ======================================================= #

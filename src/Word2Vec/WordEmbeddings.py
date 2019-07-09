@@ -42,12 +42,12 @@ class Embeddings:
     def GenerateFeatVector(self, sentence, vec_size = VEC_SIZE):
         if(self.model is None):
             print("Model not loading. Terminating Process.")
-            return np.zeros(vec_size)
+            return np.zeros((1, vec_size))
         
-        featVector = np.empty((0, vec_size))
+        featVector = np.zeros((len(sentence), vec_size))
 
-        for word in sentence:
-            featVector = np.append(featVector, [self.model.wv[word]], axis=0)
+        for it in range(len(sentence)):
+            featVector[it] = self.model.wv[sentence[it]]
 
         return np.average(featVector, axis=0).reshape(1, vec_size)
 

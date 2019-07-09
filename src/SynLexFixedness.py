@@ -9,12 +9,13 @@
 import nltk
 import math
 import pickle
-import VNCPatternCounts
 import numpy as np
 from Word2Vec.WordEmbeddings import Embeddings as w2v
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet as wn
 from nltk.corpus import lin_thesaurus as lin
+
+import VNCPatternCounts
 
 # Download Lin's Thesaurus
 nltk.download('lin_thesaurus')
@@ -143,7 +144,7 @@ class SynLexFixedness(object):
         self.verbCounts = verbCounts
         self.patCounts  = patCounts
 
-    def PMI(self, verb, noun, logBase=LOG_BASE):
+    def PMI(self, verb, noun, logBase=LOG_BASE, verbose=False):
         if(self.model is None):
             print("VNC Model not loaded")
             return None
@@ -160,15 +161,15 @@ class SynLexFixedness(object):
         # f( * , N_t) -> self.nounCounts[noun]
 
         if verb not in self.verbCounts:
-            print("Verb <" + verb + "> not in Model")
+            if(verbose): print("Verb <" + verb + "> not in Model")
             return 0
 
         if noun not in self.nounCounts:
-            print("Noun <" + noun + "> not in Model")
+            if(verbose): print("Noun <" + noun + "> not in Model")
             return 0
 
         if (verb, noun) not in self.model:
-            print("VNC <"+ verb + ", " + noun +"> not in Model")
+            if(verbose): print("VNC <"+ verb + ", " + noun +"> not in Model")
             return 0
         
         return math.log(((len(self.model) * self.model[(verb, noun)][0]) / (self.verbCounts[verb] * self.nounCounts[noun])), logBase)

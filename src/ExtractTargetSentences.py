@@ -18,17 +18,22 @@ from Util import CorpusExtraction
 from CForm import CForm
 from SynLexFixedness import SynLexFixedness
 
+TARG_DIR         = "./targets/English_VNC_Cook/VNC-Tokens_cleaned"
+SENT_DIR         = "./targets/Extracted_Sentences.txt"
+SENT_LEMM_DIR    = "./targets/Extracted_Sentences_lemm.txt" 
+SENTVNC_DIR      = "./targets/Extracted_Sentences_VNC.txt"
+SENTVNC_LEMM_DIR = "./targets/Extracted_Sentences_VNC_lemm.txt" 
+CFORM_DIR        = "./targets/CForms.csv"
+SYN_FIX_DIR      = "./targets/SynFix.csv"
+LEX_FIX_DIR      = "./targets/LexFix.csv"
+OVA_FIX_DIR      = "./targets/OvaFix.csv"
+
+# Other Parameters
 CORPORA_PRE = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"]
-TARGETS_DIR = "./targets/English_VNC_Cook/VNC-Tokens_cleaned"
-SENT_DIR    = "./targets/Extracted_Sentences.txt" 
-SENTVNC_DIR = "./targets/Extracted_Sentences_VNC.txt" 
-CFORM_DIR   = "./targets/CForms.csv"
-SYN_FIX_DIR = "./targets/SynFix.csv"
-LEX_FIX_DIR = "./targets/LexFix.csv"
-OVA_FIX_DIR = "./targets/OvaFix.csv"
 PAT_MODEL   = "./PatternCounts/PatternCounts_130619.pickle"
 W2V_MODEL   = None # "./Word2Vec/models/W2V_ver1.model"
 INDEXED_SUF = "_idx"
+LEMMAS_SUF  = "_lemmas"
 POSTAGS_SUF = "_posTags"
 LOC_TOKEN   = "/"
 VNC_TOKEN   = "_"
@@ -42,20 +47,27 @@ USE_LIN  = True
 # VNC Patterns Parameters
 MAX_WINDOW = 7
 
+# Initialize CForm Model
+cForm_model = CForm(modelDir=PAT_MODEL)
+
+# Initialize SynLexFixedness
+pat_SynLexFix = SynLexFixedness(modelDir=PAT_MODEL, w2vModelDir=W2V_MODEL, K=K)
+
+# Load VNC Tokens Dataset
+vncTokens = np.genfromtxt(TARG_DIR   , dtype='str', delimiter=' ')
+
+# ============= Original VNC Tokens Dataset ============= #
+
 # Load Corpora
-corpora      = {}
-corpora_tags = {}
+corpora = {}
 for prefix in CORPORA_PRE:
     print("Loading Corpora Sentences:", prefix)
     corpora[prefix] = CorpusExtraction.LoadCorpora(prefix, suffix=INDEXED_SUF)
 
-# Load VNC Tokens Dataset
-vncTokens = np.genfromtxt(TARGETS_DIR, dtype='str', delimiter=' ')
-
 # Initialize Array
 sentences = []
 
-# Extract Sentences
+# Extract Sentences - VNC-Tokens
 with open(SENT_DIR, "w+") as sent_file:
     for sentenceLoc in vncTokens:
         fileLoc = sentenceLoc[2].split(LOC_TOKEN)
@@ -68,21 +80,48 @@ with open(SENT_DIR, "w+") as sent_file:
         sent_file.write(' '.join(sent))
         sent_file.write('\n')
 
-# ===================================================== #
-
 # Free Memory
 corpora = None
 
+# ======================================================= #
+
+# Load Lemmatized Corpora
+corpora_lemm = {}
+for prefix in CORPORA_PRE:
+    print("Loading Corpora Sentences:", prefix)
+    corpora_lemm[prefix] = CorpusExtraction.LoadCorpora(prefix, suffix=LEMMAS_SUF)
+
+# Initialize Lemmatized Array
+sentences_lemm = []
+
+# Extract Sentences - VNC-Tokens
+with open(SENT_LEMM_DIR, "w+") as sent_file:
+    for sentenceLoc in vncTokens:
+        fileLoc = sentenceLoc[2].split(LOC_TOKEN)
+        sentNum = int(sentenceLoc[3])
+
+        sent = corpora_lemm[fileLoc[0]][fileLoc[2]][sentNum]
+
+        sentences_lemm.append(sent)
+
+        sent_file.write(' '.join(sent))
+        sent_file.write('\n')
+
+# Free Memory
+corpora_lemm = None
+
+# ======================================================= #
+# ======================================================= #
+
+corpora_tags = {}
 for prefix in CORPORA_PRE:
     print("Loading Corpora Pos Tags:", prefix)
     corpora_tags[prefix] = CorpusExtraction.LoadCorpora(prefix, suffix=POSTAGS_SUF)
 
-# Initialize CForm Model
-cForm_model = CForm(modelDir=PAT_MODEL)
+# ======================================================= #
+# ======================================================= #
 
-# Initialize SynLexFixedness
-pat_SynLexFix = SynLexFixedness(modelDir=PAT_MODEL, w2vModelDir=W2V_MODEL, K=K)
-
+# ============= Original VNC Tokens Dataset ============= #
 # Initialize CForms Vector
 cForms = np.zeros(len(vncTokens))
 
@@ -93,28 +132,33 @@ ovaFix = np.zeros(len(vncTokens))
 
 # Determine CForms, get Fixedness Metrics, and extract VNC Pattern Subtext
 with open(SENTVNC_DIR, "w+") as sentvnc_file:
-    it = 0
-    for sentenceLoc, sent in zip(vncTokens, sentences):
-        fileLoc = sentenceLoc[2].split(LOC_TOKEN)
-        sentNum = int(sentenceLoc[3])
+    with open(SENTVNC_LEMM_DIR, "w+") as sentvnc_lemm_file:
+        it = 0
+        for sentenceLoc, sent, sent_lemm in zip(vncTokens, sentences, sentences_lemm):
+            fileLoc = sentenceLoc[2].split(LOC_TOKEN)
+            sentNum = int(sentenceLoc[3])
 
-        vnc     = sentenceLoc[1].split(VNC_TOKEN)
-        posTags = corpora_tags[fileLoc[0]][fileLoc[2]][sentNum]
+            vnc     = sentenceLoc[1].split(VNC_TOKEN)
+            posTags = corpora_tags[fileLoc[0]][fileLoc[2]][sentNum]
 
-        if(cForm_model.IsCForm(vnc[0], vnc[1], sent, posTags)):
-            cForms[it] = 1
+            if(cForm_model.IsCForm(vnc[0], vnc[1], sent, posTags)):
+                cForms[it] = 1
 
-        lexFix[it] = pat_SynLexFix.Fixedness_Lex(vnc[0], vnc[1], vK=K, nK=K, logBase=LOG_BASE, useLin=USE_LIN)
-        synFix[it] = pat_SynLexFix.Fixedness_Syn(vnc[0], vnc[1], logBase=LOG_BASE)
-        ovaFix[it] = pat_SynLexFix.Fixedness_Overall(vnc[0], vnc[1], alpha=ALPHA, vK=K, nK=K, logBase=LOG_BASE, useLin=USE_LIN)
+            lexFix[it] = pat_SynLexFix.Fixedness_Lex(vnc[0], vnc[1], vK=K, nK=K, logBase=LOG_BASE, useLin=USE_LIN)
+            synFix[it] = pat_SynLexFix.Fixedness_Syn(vnc[0], vnc[1], logBase=LOG_BASE)
+            ovaFix[it] = pat_SynLexFix.Fixedness_Overall(vnc[0], vnc[1], alpha=ALPHA, vK=K, nK=K, logBase=LOG_BASE, useLin=USE_LIN)
 
-        sentvnc_idx = VNCPatternCounts.ExtractPatternRangeFromSentence(sent, posTags, vnc, max_window=MAX_WINDOW)
-        sentvnc = sent[sentvnc_idx[0]:sentvnc_idx[1] + 1]
+            sentvnc_idx = VNCPatternCounts.ExtractPatternRangeFromSentence(sent_lemm, posTags, vnc, max_window=MAX_WINDOW)
 
-        sentvnc_file.write(' '.join(sentvnc))
-        sentvnc_file.write('\n')
+            sentvnc = sent[sentvnc_idx[0]:sentvnc_idx[1] + 1]
+            sentvnc_file.write(' '.join(sentvnc))
+            sentvnc_file.write('\n')
 
-        it += 1
+            sentvnc_lemm = sent_lemm[sentvnc_idx[0]:sentvnc_idx[1] + 1]
+            sentvnc_lemm_file.write(' '.join(sentvnc_lemm))
+            sentvnc_lemm_file.write('\n')
+
+            it += 1
 
 np.savetxt(CFORM_DIR  , cForms, delimiter=",")
 np.savetxt(LEX_FIX_DIR, lexFix, delimiter=",")
