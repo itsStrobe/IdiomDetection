@@ -9,7 +9,7 @@
 from CForm import CForm
 import VNCPatternCounts
 
-ROOT_COPORA   ="./Corpora/BNC XML/2554/download/Texts_CleanXML"
+CORPORA_DIR   ="./Corpora/BNC XML/2554/download/Texts_CleanXML"
 TEXT_SUFFIX   = "_CleanText_Lemma"
 TAGS_SUFFIX   = "_PosTags"
 ROOT_PATTERNS = "./Patterns"
@@ -17,7 +17,7 @@ PAT_MODEL     = "./PatternCounts/PatternCounts_130619.pickle"
 
 MAX_WINDOW = 7
 
-VNCPatternCounts.ExtractPatternsFromCorpora(ROOT_COPORA, ROOT_PATTERNS, cleanTextSuffix=TEXT_SUFFIX, posTagsTextSuffix=TAGS_SUFFIX, max_window=MAX_WINDOW)
+VNCPatternCounts.ExtractPatternsFromCorpora(CORPORA_DIR, ROOT_PATTERNS, cleanTextSuffix=TEXT_SUFFIX, posTagsTextSuffix=TAGS_SUFFIX, max_window=MAX_WINDOW)
 
 cForm_model = CForm(patternFileDir=ROOT_PATTERNS)
 cForm_model.SaveModel(PAT_MODEL)

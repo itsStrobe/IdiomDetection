@@ -15,4 +15,4 @@ echo "Extracting Potential VNICs Instanecs from Corpora"
 python3 ExtractVNICsInstances.py
 
 echo "Extracting Potential VNICs Sentences from Corpora"
-python3 ExtractCandidateSentences.py
+python3 ExtractCandidateSentences.py --NORM_FIX --USE_LIN

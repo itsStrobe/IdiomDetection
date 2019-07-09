@@ -1,6 +1,17 @@
 import os
 import re
 import time
+import argparse
+
+# ------------- ARGS ------------- #
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--corpDir", "--corpora_dir", type=str, help="Root directory in which Corpora files can be found.")
+parser.add_argument("--outSuf", "--corpora_output_dir_suffix", type=str, help="Suffix to be appended to the output directory.")
+
+args = parser.parse_args()
+# ------------- ARGS ------------- #
+
 
 ROOT_DIR = "./Corpora/BNC XML/2554/download/Texts"
 OUT_SUF  = "_CleanXML"
@@ -313,6 +324,7 @@ def CleanBNCCorpus(inFileDir, outFileDir):
             print("Elapsed Time:", toc - tic)
 
 def main():
+
     outFileDir = ROOT_DIR + OUT_SUF
 
     # Create New File Directory
@@ -335,4 +347,11 @@ def main():
             CleanBNCCorpus(inFileDir, outFileDir)
 
 if __name__ == "__main__":
+    
+    if(args.corpDir):
+        ROOT_DIR = args.corpDir
+
+    if(args.outSuf):
+        OUT_SUF = args.outSuf
+
     main()
