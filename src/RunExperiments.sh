@@ -31,8 +31,14 @@ echo "Experient 2-1 : SVM - CForm + Fazly's Fixedness Metrics"
 python3 Experiment_2_1.py
 
 # King and Cook Experiments - SVM - Embeddings + CForm + Fazly's Fixedness Metrics
+echo "Experient 2-2 : King and Cook Experiments - SVM - Embeddings + CForm"
+python3 Experiment_2_2.py --VECTORS_FILE "embeddings.csv" --RESULTS_DIR "./results/Experiment_2_2/CForm/" --USE_CFORM
 echo "Experient 2-2 : King and Cook Experiments - SVM - Embeddings + CForm + Fazly's Fixedness Metrics"
-python3 Experiment_2_2.py
+python3 Experiment_2_2.py -VECTORS_FILE "embeddings.csv" --RESULTS_DIR "./results/Experiment_2_2/CForm_Fix/" --USE_CFORM --USE_SYN_FIX --USE_LEX_FIX --USE_OVA_FIX
+echo "Experient 2-2 : King and Cook Experiments - SVM - Embeddings Lemmatized + CForm"
+python3 Experiment_2_2.py -VECTORS_FILE "embeddings_lemm.csv" --RESULTS_DIR "./results/Experiment_2_2/CForm_Lemm/" --USE_CFORM
+echo "Experient 2-2 : King and Cook Experiments - SVM - Embeddings Lemmatized + CForm + Fazly's Fixedness Metrics"
+python3 Experiment_2_2.py -VECTORS_FILE "embeddings_lemm.csv" --RESULTS_DIR "./results/Experiment_2_2/CForm_Fix_Lemm/" --USE_CFORM --USE_SYN_FIX --USE_LEX_FIX --USE_OVA_FIX
 
 # Clustering Proposal - k-Means - Embeddings + CForm + Fazly's Fixedness Metrics
 echo "Experient 2-3 : Clustering Proposal - k-Means - Embeddings + CForm + Fazly's Fixedness Metrics"
