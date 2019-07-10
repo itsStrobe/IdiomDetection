@@ -13,7 +13,7 @@ echo "Experiments 1"
 
 # King and Cook Experiments - SVM - Embeddings + CForm
 echo "Experient 1-1 : King and Cook Experiments - SVM - Embeddings + CForm"
-python3 Experiment.py
+# python3 Experiment.py
 
 deactivate
 cd ..

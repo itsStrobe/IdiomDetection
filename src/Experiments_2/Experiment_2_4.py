@@ -53,9 +53,6 @@ IMG_EXT  = ".png"
 COS_DIST_T  = 0.6
 COS_DIST_Op = '<'
 
-# Shuffle Parameters
-RND_STATE = 42
-
 # Other Parameters
 SAVE_PLT = False
 
@@ -157,7 +154,7 @@ features_skip_VNC  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE_VNC, delimiter=',')[
 features_elmo_VNC  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE_VNC, delimiter=',')[indexes]
 
 # Shuffle Sets:
-sent_X, w2v_X, w2v_X_VNC, scbow_X, scbow_X_VNC, skip_X, skip_X_VNC, elmo_X, elmo_X_VNC, y = shuffle(og_sent, features_w2v, features_w2v_VNC, features_scbow, features_scbow_VNC, features_skip, features_skip_VNC, features_elmo, features_elmo_VNC, targets_idiomatic, random_state=RND_STATE)
+sent_X, w2v_X, w2v_X_VNC, scbow_X, scbow_X_VNC, skip_X, skip_X_VNC, elmo_X, elmo_X_VNC, y = og_sent, features_w2v, features_w2v_VNC, features_scbow, features_scbow_VNC, features_skip, features_skip_VNC, features_elmo, features_elmo_VNC, targets_idiomatic
 
 
 print("<===================> Word2Vec <===================>")

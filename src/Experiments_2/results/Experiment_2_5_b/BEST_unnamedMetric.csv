@@ -1,4 +1,4 @@
 ,Idiomatic,Literal,Average
-F1,0.8760027504011001,0.4584795321637427,0.6241708028312243
-Model,ELMo,Word2Vec,Siamese CBOW
-Parameters,"{'Beta': 0.9, 'Threshold': 0.3}","{'Beta': 0.9, 'Threshold': 0.6}","{'Beta': 0.8, 'Threshold': 0.6}"
+F1,0.8762035763411279,0.4529032258064516,0.6233492599827535
+Model,Word2Vec,Word2Vec,Siamese CBOW
+Parameters,"{'Beta': 0.6, 'Threshold': 0.1}","{'Beta': 0.5, 'Threshold': 0.4}","{'Beta': 0.8, 'Threshold': 0.4}"

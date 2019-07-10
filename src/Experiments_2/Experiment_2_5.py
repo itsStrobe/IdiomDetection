@@ -55,11 +55,6 @@ UNM_MET_T  = 0.7
 UNM_MET_Op = '>'
 BETA       = 0.6
 
-# Split Parameters
-RND_STATE = 42
-TEST_SIZE = 0.3
-SHUFFLE   = True
-
 # Other Parameters
 SAVE_PLT = False
 
@@ -164,7 +159,7 @@ features_elmo_VNC  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE_VNC, delimiter=',')[
 features_OVA = np.genfromtxt(OVA_FIX_DIR, delimiter=',')[indexes]
 
 # Split Sets:
-sent_X, w2v_X, w2v_X_VNC, scbow_X, scbow_X_VNC, skip_X, skip_X_VNC, elmo_X, elmo_X_VNC, ova_X, y = shuffle(og_sent, features_w2v, features_w2v_VNC, features_scbow, features_scbow_VNC, features_skip, features_skip_VNC, features_elmo, features_elmo_VNC, features_OVA, targets_idiomatic, random_state=RND_STATE)
+sent_X, w2v_X, w2v_X_VNC, scbow_X, scbow_X_VNC, skip_X, skip_X_VNC, elmo_X, elmo_X_VNC, ova_X, y = og_sent, features_w2v, features_w2v_VNC, features_scbow, features_scbow_VNC, features_skip, features_skip_VNC, features_elmo, features_elmo_VNC, features_OVA, targets_idiomatic
 
 
 print("<===================> Word2Vec <===================>")

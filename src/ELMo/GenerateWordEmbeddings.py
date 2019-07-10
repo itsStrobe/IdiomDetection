@@ -20,12 +20,6 @@ SENTVNC_DIR = ["../targets/Extracted_Sentences_VNC.txt", "../targets/Extracted_S
 EMBD_DIR    = ["./embeddings.csv"                      , "./embeddings_lemm.csv"                      , "./embeddings_cand.csv"                      , "./embeddings_lemm_cand.csv"]
 EMBDVNC_DIR = ["./embeddings_VNC.csv"                  , "./embeddings_VNC_lemm.csv"                  , "./embeddings_VNC_cand.csv"                  , "./embeddings_VNC_lemm_cand.csv"]
 
-# Tokens Directories
-SENT_DIR    = ["../targets/Extracted_Sentences_lemm_cand.txt"]
-SENTVNC_DIR = ["../targets/Extracted_Sentences_VNC_lemm_cand.txt"]
-EMBD_DIR    = ["./embeddings_lemm_cand.csv"]
-EMBDVNC_DIR = ["./embeddings_VNC_lemm_cand.csv"]
-
 # Model Parameters
 MODEL_DIR   = "https://tfhub.dev/google/elmo/2"
 BATCH_SIZE  = 200
