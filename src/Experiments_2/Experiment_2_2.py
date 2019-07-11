@@ -42,8 +42,8 @@ parser.add_argument("--IDIOMATIC_EXT" , "--idiomatic_results_suffix"          , 
 parser.add_argument("--LITERAL_EXT"   , "--literal_results_suffix"            , type=str, help="Filename Extension for Literal Test Results.")
 parser.add_argument("--FILE_EXT"      , "--output_file_extension"             , type=str, help="File Extension for Output Files.")
 
-parser.add_argument("--RESULTS_DIR" , "--results_directory"      , type=str, help="Results Directory.")
-parser.add_argument("--EXP_EXT"     , "--experiment_suffix"      , type=str, help="Experiments Name Extension.")
+parser.add_argument("--RESULTS_DIR" , "--results_directory" , type=str, help="Results Directory.")
+parser.add_argument("--EXP_EXT"     , "--experiment_suffix" , type=str, help="Experiments Name Extension.")
 
 parser.add_argument("--USE_CFORM"   , help="Use flag to indicate if CForm Feature Should Be Added.", action="store_true")
 parser.add_argument("--USE_SYN_FIX" , help="Use flag to indicate if Syntactic Fixedness Feature Should Be Added.", action="store_true")
@@ -74,7 +74,7 @@ FILE_EXT      = ".csv"
 
 # Experiment Dirs
 RESULTS_DIR = "./results/Experiment_2_2/"
-EXP_EXT     = "_SVM"
+EXP_EXT     = ""
 
 # Features:
 USE_CFORM   = False

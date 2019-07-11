@@ -42,7 +42,7 @@ parser.add_argument("--ELMO_RESULTS"  , "--elmo_results_file_prefix"          , 
 parser.add_argument("--FILE_EXT"      , "--output_file_extension"             , type=str, help="File Extension for Output Files.")
 
 parser.add_argument("--MODELS_DIR" , "--models_directory" , type=str, help="Models Directory.")
-parser.add_argument("--MODEL_EXT"  , "--model_extension"   , type=str, help="Model Name Extension.")
+parser.add_argument("--MODEL_EXT"  , "--model_extension"  , type=str, help="Model Name Extension.")
 
 parser.add_argument("--USE_CFORM"   , help="Use flag to indicate if CForm Feature Should Be Added."               , action="store_true")
 parser.add_argument("--USE_SYN_FIX" , help="Use flag to indicate if Syntactic Fixedness Feature Should Be Added." , action="store_true")
