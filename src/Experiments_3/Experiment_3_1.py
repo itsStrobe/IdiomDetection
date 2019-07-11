@@ -171,14 +171,16 @@ def gen_plot(feat, targ, pred, title_targ, title_pred, saveDir, dispPlot=False):
 
     plt.close()
 
-def saveClassifiedSentences(all_sent, all_cSim, all_pred, fileDir):
+def saveClassifiedSentences(all_sent, all_cSim, all_pred, all_gold, fileDir):
 
     all_sent = all_sent.reshape((all_sent.size, 1))
     all_cSim = all_cSim.reshape((all_cSim.size, 1))
     all_pred = all_pred.reshape((all_pred.size, 1))
+    all_gold = all_gold.reshape((all_gold.size, 1))
     data = np.append(all_sent, all_cSim, axis=1)
     data = np.append(data, all_pred, axis = 1)
-    pd.DataFrame(data = data, columns=['Sentence', 'Unsupervised Metric', 'Classification']).to_csv(fileDir, sep='\t')
+    data = np.append(data, all_gold, axis = 1)
+    pd.DataFrame(data = data, columns=['Sentence', 'Unsupervised Metric', 'Classification', 'Gold Standard']).to_csv(fileDir, sep='\t')
 
 def main():
     # Create Results Dir
@@ -272,7 +274,7 @@ def main():
 
     # Display Classifications:
     if(SAVE_PLT): gen_plot(w2v_X, y, w2v_pred, "Original Word2Vec Labels", "Cosine Similarity Labels", RESULTS_DIR + W2V_RESULTS + EXP_EXT + IMG_EXT)
-    saveClassifiedSentences(sent_X, w2v_cosSims, w2v_pred, RESULTS_DIR + W2V_RESULTS + EXP_EXT + FILE_EXT)
+    saveClassifiedSentences(sent_X, w2v_cosSims, w2v_pred, y, RESULTS_DIR + W2V_RESULTS + EXP_EXT + FILE_EXT)
 
     # Classification Report with SVM Classification as Gold Standard
     print("Results:", classification_report(y, w2v_pred))
@@ -297,7 +299,7 @@ def main():
 
     # Display Classifications:
     if(SAVE_PLT): gen_plot(scbow_X, y, scbow_pred, "Original Siamese CBOW Labels", "Cosine Similarity Labels", RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + IMG_EXT)
-    saveClassifiedSentences(sent_X, scbow_cosSims, scbow_pred, RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + FILE_EXT)
+    saveClassifiedSentences(sent_X, scbow_cosSims, scbow_pred, y, RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + FILE_EXT)
 
     # Classification Report with SVM Classification as Gold Standard
     print("Results:", classification_report(y, scbow_pred))
@@ -322,7 +324,7 @@ def main():
 
     # Display Classifications:
     if(SAVE_PLT): gen_plot(skip_X, y, skip_pred, "Original Skip-Thoughts Labels", "Cosine Similarity Labels", RESULTS_DIR + SKIP_RESULTS + EXP_EXT + IMG_EXT)
-    saveClassifiedSentences(sent_X, skip_cosSims, skip_pred, RESULTS_DIR + SKIP_RESULTS + EXP_EXT + FILE_EXT)
+    saveClassifiedSentences(sent_X, skip_cosSims, skip_pred, y, RESULTS_DIR + SKIP_RESULTS + EXP_EXT + FILE_EXT)
 
     # Classification Report with SVM Classification as Gold Standard
     print("Results:", classification_report(y, skip_pred))
@@ -347,7 +349,7 @@ def main():
 
     # Display Classifications:
     if(SAVE_PLT): gen_plot(elmo_X, y, elmo_pred, "Original ELMo Labels", "Cosine Similarity Labels", RESULTS_DIR + ELMO_RESULTS + EXP_EXT + IMG_EXT)
-    saveClassifiedSentences(sent_X, elmo_cosSims, elmo_pred, RESULTS_DIR + ELMO_RESULTS + EXP_EXT + FILE_EXT)
+    saveClassifiedSentences(sent_X, elmo_cosSims, elmo_pred, y, RESULTS_DIR + ELMO_RESULTS + EXP_EXT + FILE_EXT)
 
     # Classification Report with SVM Classification as Gold Standard
     print("Results:", classification_report(y, elmo_pred))
