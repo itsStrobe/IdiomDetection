@@ -83,7 +83,7 @@ class CorpusExtraction:
                             else:
                                 sentence = sentence + wordTag.text.strip().replace(" ", "_") + " "
 
-                        sentence = sentence.strip()
+                        sentence = sentence.strip() + '\n'
 
                         outFile.write(sentence)
 

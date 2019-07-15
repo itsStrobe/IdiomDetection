@@ -7,7 +7,12 @@ echo "TrainAndGenerateEmbeddings.sh"
 
 # Word2Vec
 cd ./Word2Vec
-. venv/bin/activate
+
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python3 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+python3 -c "import nltk; nltk.download()"
+################################
 
 echo "Training Word2Vec"
 #python3 TrainWordEmbeddings.py
@@ -22,7 +27,12 @@ cd ..
 
 # Siamese CBOW
 cd ./SiameseCBOW
-. venv/bin/activate
+
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python3 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+python3 -c "import nltk; nltk.download()"
+################################
 
 echo "Training SiameseCBOW"
 #python TrainWordEmbeddings.py
@@ -37,10 +47,15 @@ cd ..
 
 # Skip-Thoughts
 cd ./SkipThoughts
-. venv/bin/activate
+
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python3 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+python3 -c "import nltk; nltk.download()"
+################################
 
 echo "Training Skip-Thoughts"
-#python TrainWordEmbeddings.py
+python TrainWordEmbeddings.py
 
 echo "Generating Skip-Thoughts Embeddings"
 python GenerateWordEmbeddings.py
@@ -52,10 +67,15 @@ cd ..
 
 # ELMo
 cd ./ELMo
-. venv/bin/activate
+
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python3 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+python3 -c "import nltk; nltk.download()"
+################################
 
 echo "Training ELMo"
-#python3 TrainWordEmbeddings.py
+python3 TrainWordEmbeddings.py
 
 echo "Generating ELMo Embeddings"
 python3 GenerateWordEmbeddings.py

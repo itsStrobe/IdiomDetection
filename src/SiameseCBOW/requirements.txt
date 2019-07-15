@@ -1,0 +1,7 @@
+numpy
+pandas
+bs4
+gensim
+theano==0.7.0
+lasagne==0.1
+

@@ -8,7 +8,12 @@ echo "RunExperiments.sh"
 
 # Experiments 1
 cd Experiments_1
-. venv/bin/activate
+
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python3 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+python3 -c "import nltk; nltk.download()"
+################################
 
 echo "Experiments 1"
 
@@ -24,7 +29,12 @@ cd ..
 
 # Experiments 2
 cd Experiments_2
-. venv/bin/activate
+
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python3 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+python3 -c "import nltk; nltk.download()"
+################################
 
 echo "Experiments 2"
 
@@ -76,7 +86,12 @@ cd ..
 
 # Experiments 3
 cd Experiments_3
-. venv/bin/activate
+
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python3 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+python3 -c "import nltk; nltk.download()"
+################################
 
 echo "Experiments 3"
 
