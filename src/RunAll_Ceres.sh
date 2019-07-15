@@ -17,7 +17,7 @@ echo "RunAll.sh"
 # - VIRTUAL EVIRONMENT SETUP - #
 virtualenv -p python36 venv && source venv/bin/activate
 pip3 install -r requirements.txt
-python36 -c "import nltk; nltk.download()"
+python36 -c "import nltk; nltk.download('wordnet')"
 ################################
 
 echo "PrepareData.sh"
