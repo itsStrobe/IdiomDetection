@@ -1,6 +1,12 @@
 #!/bin/bash
-# Complete Run.
-# Only run PrepareData.sh if absolutely necessary.
+# FILE: RunAll.sh 
+#
+#$ -cwd
+#$ -j y
+#$ -S /bin/bash
+#$ -q gpu.q
+#$ -l gpu=1
+source /usr/local/gpuallocation.sh
 
 echo "RunAll.sh"
 

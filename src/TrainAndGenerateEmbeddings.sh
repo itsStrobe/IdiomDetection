@@ -11,7 +11,6 @@ cd ./Word2Vec
 # - VIRTUAL EVIRONMENT SETUP - #
 virtualenv -p python3 venv && source venv/bin/activate
 pip3 install -r requirements.txt
-python3 -c "import nltk; nltk.download()"
 ################################
 
 echo "Training Word2Vec"
@@ -31,7 +30,6 @@ cd ./SiameseCBOW
 # - VIRTUAL EVIRONMENT SETUP - #
 virtualenv -p python3 venv && source venv/bin/activate
 pip3 install -r requirements.txt
-python3 -c "import nltk; nltk.download()"
 ################################
 
 echo "Training SiameseCBOW"
@@ -51,7 +49,6 @@ cd ./SkipThoughts
 # - VIRTUAL EVIRONMENT SETUP - #
 virtualenv -p python3 venv && source venv/bin/activate
 pip3 install -r requirements.txt
-python3 -c "import nltk; nltk.download()"
 ################################
 
 echo "Training Skip-Thoughts"
@@ -71,7 +68,6 @@ cd ./ELMo
 # - VIRTUAL EVIRONMENT SETUP - #
 virtualenv -p python3 venv && source venv/bin/activate
 pip3 install -r requirements.txt
-python3 -c "import nltk; nltk.download()"
 ################################
 
 echo "Training ELMo"
