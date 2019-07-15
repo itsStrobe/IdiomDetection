@@ -11,6 +11,7 @@ import progressbar
 from SynLexFixedness import SynLexFixedness
 
 PAT_MODEL     = "./PatternCounts/PatternCounts_130619.pickle"
+W2V_MODEL     = None # "./Word2Vec/models/W2V_ver1_lemm.model"
 VNIC_DIR_PMI  = "./VNICs/PotentialVNICs_PMI.csv"
 VNIC_DIR_LEX  = "./VNICs/PotentialVNICs_LEX.csv"
 VNIC_DIR_SYN  = "./VNICs/PotentialVNICs_SYN.csv"
@@ -19,12 +20,14 @@ VNIC_DIR_OVA  = "./VNICs/PotentialVNICs_OVA.csv"
 # Frequency Threshold for Instances
 FREQ_T = 150
 
-# Fixedness Parameters
-ALPHA = 0.6
-K     = 50
+# Syntactical and Lexical Fixedness Parameters
+K        = 50
+ALPHA    = 0.6
+LOG_BASE = 2
+USE_LIN  = False
 
 # Initialize SynLexFixedness
-pat_SynLexFix = SynLexFixedness(modelDir=PAT_MODEL)
+pat_SynLexFix = SynLexFixedness(modelDir=PAT_MODEL, w2vModelDir=W2V_MODEL, K=K)
 vncs_n = len(pat_SynLexFix.model)
 
 verb_np = np.full(vncs_n, 'generic_verb_instance')
@@ -44,9 +47,9 @@ for vnc in pat_SynLexFix.model:
     noun_np[it] = vnc[1]
     if(pat_SynLexFix.model[vnc][0] >= FREQ_T):
         pmis_np[it] = pat_SynLexFix.PMI(vnc[0], vnc[1])
-        lexF_np[it] = pat_SynLexFix.Fixedness_Lex(vnc[0], vnc[1], vK=K, nK=K)
-        synF_np[it] = pat_SynLexFix.Fixedness_Syn(vnc[0], vnc[1])
-        ovaF_np[it] = pat_SynLexFix.Fixedness_Overall(vnc[0], vnc[1], alpha=ALPHA, vK=K, nK=K)
+        lexF_np[it] = pat_SynLexFix.Fixedness_Lex(vnc[0], vnc[1], vK=K, nK=K, logBase=LOG_BASE, useLin=USE_LIN)
+        synF_np[it] = pat_SynLexFix.Fixedness_Syn(vnc[0], vnc[1], logBase=LOG_BASE)
+        ovaF_np[it] = pat_SynLexFix.Fixedness_Overall(vnc[0], vnc[1], alpha=ALPHA, vK=K, nK=K, logBase=LOG_BASE, useLin=USE_LIN)
     freq_np[it] = pat_SynLexFix.model[vnc][0]
 
     it += 1
