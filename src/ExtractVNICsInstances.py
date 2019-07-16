@@ -13,8 +13,9 @@ POSTAGS_SUF   = "_posTags"
 LOC_TOKEN     = "/"
 VNC_TOKEN     = "_"
 
-TOP_N      = 20
-MAX_WINDOW = 7
+TOP_N        = 20
+MAX_WINDOW   = 7
+MAX_SENT_LEN = 80
 
 def GetVNCsSet(verbs, nouns):
     vncs = []
@@ -36,9 +37,11 @@ def FindInstances(corpora_list, tok, loc, sId, inst_n, loc_tok=LOC_TOKEN, vnc_to
             for s_n in corpora_txt[corpus]:
                 pats = set([(pat[0], pat[1]) for pat in VNCPatternCounts.ExtractPatternsFromSentence(corpora_txt[corpus][s_n], corpora_pos[corpus][s_n], max_window=MAX_WINDOW) if (pat[0], pat[1]) in vnics_set])
                 for pat in pats:
-                    vnics_token[it] = pat[0] + vnc_tok + pat[1]
-                    vnics_loc[it]   = corp_loc
-                    vnics_senId[it] = s_n
+                    # Only add instance if sentence length is smaller than a threshold - ELMo Overflow.
+                    if(len(corpora_txt[corpus[s_n]]) < MAX_SENT_LEN):
+                        vnics_token[it] = pat[0] + vnc_tok + pat[1]
+                        vnics_loc[it]   = corp_loc
+                        vnics_senId[it] = s_n
                     it += 1
                     if(it >= inst_n):
                         prog.update(it)

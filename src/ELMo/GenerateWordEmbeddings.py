@@ -22,7 +22,7 @@ EMBDVNC_DIR = ["./embeddings_VNC.csv"                  , "./embeddings_VNC_lemm.
 
 # Model Parameters
 MODEL_DIR   = "https://tfhub.dev/google/elmo/2"
-BATCH_SIZE  = 200
+BATCH_SIZE  = 300
 
 # Load Model
 model = Embeddings(hub_module=MODEL_DIR)
