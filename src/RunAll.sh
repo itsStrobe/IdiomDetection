@@ -12,8 +12,10 @@ echo "RunAll.sh"
 
 ./PrepareData.sh
 
+./TrainEmbeddings.sh
+
 ./FindVNICs.sh
 
-./TrainAndGenerateEmbeddings.sh
+./GenerateEmbeddings.sh
 
 ./RunExperiments.sh

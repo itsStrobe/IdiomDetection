@@ -4,3 +4,4 @@ nltk
 progressbar2
 bs4
 lxml
+gensim

@@ -8,7 +8,7 @@
 #$ -l gpu=1
 source /usr/local/gpuallocation.sh
 
-echo "RunAll.sh"
+echo "RunAll_Ceres.sh"
 
 #==========================================================#
 #----------------------------------------------------------#
@@ -34,11 +34,91 @@ python36 ExtractTextAndTags.py
 echo "Extract Instances of VNC-Dataset from Corpora"
 python36 ExtractTargetSentences.py
 
+deactivate
+
+#==========================================================#
+#----------------------------------------------------------#
+#__________________________________________________________#
+
+echo "TrainEmbeddings.sh"
+
+# ============================================================ #
+
+# Word2Vec
+cd ./Word2Vec
+
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python3 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+################################
+
+echo "Training Word2Vec"
+python3 TrainWordEmbeddings.py
+
+cp -r ./models/ ../
+
+deactivate
+cd ..
+
+# ============================================================ #
+
+# Siamese CBOW
+cd ./SiameseCBOW
+
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python3 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+################################
+
+echo "Training SiameseCBOW"
+python TrainWordEmbeddings.py
+
+deactivate
+cd ..
+
+# ============================================================ #
+
+# Skip-Thoughts
+cd ./SkipThoughts
+
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python3 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+################################
+
+echo "Training Skip-Thoughts"
+python TrainWordEmbeddings.py
+
+deactivate
+cd ..
+
+# ============================================================ #
+
+# ELMo
+cd ./ELMo
+
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python3 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+################################
+
+echo "Training ELMo"
+python3 TrainWordEmbeddings.py
+
+deactivate
+cd ..
+
 #==========================================================#
 #----------------------------------------------------------#
 #__________________________________________________________#
 
 echo "FindVNICs.sh"
+
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python36 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+python36 -c "import nltk; nltk.download('wordnet')"
+################################
 
 echo "Extracting Patterns from Corpora"
 python36 ExtractPatternsInCorpora.py
@@ -60,7 +140,7 @@ deactivate
 #----------------------------------------------------------#
 #__________________________________________________________#
 
-echo "TrainAndGenerateEmbeddings.sh"
+echo "GenerateEmbeddings.sh"
 
 # ============================================================ #
 
@@ -68,15 +148,12 @@ echo "TrainAndGenerateEmbeddings.sh"
 cd ./Word2Vec
 
 # - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python36 venv && source venv/bin/activate
+virtualenv -p python3 venv && source venv/bin/activate
 pip3 install -r requirements.txt
-################################
-
-echo "Training Word2Vec"
-#python36 TrainWordEmbeddings.py
+################################\
 
 echo "Generating Word2Vec Embeddings"
-python36 GenerateWordEmbeddings.py
+python3 GenerateWordEmbeddings.py
 
 deactivate
 cd ..
@@ -87,12 +164,9 @@ cd ..
 cd ./SiameseCBOW
 
 # - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python36 venv && source venv/bin/activate
+virtualenv -p python3 venv && source venv/bin/activate
 pip3 install -r requirements.txt
 ################################
-
-echo "Training SiameseCBOW"
-#python TrainWordEmbeddings.py
 
 echo "Generating SiameseCBOW Embeddings"
 python GenerateWordEmbeddings.py
@@ -106,12 +180,9 @@ cd ..
 cd ./SkipThoughts
 
 # - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python36 venv && source venv/bin/activate
+virtualenv -p python3 venv && source venv/bin/activate
 pip3 install -r requirements.txt
 ################################
-
-echo "Training Skip-Thoughts"
-python TrainWordEmbeddings.py
 
 echo "Generating Skip-Thoughts Embeddings"
 python GenerateWordEmbeddings.py
@@ -125,15 +196,12 @@ cd ..
 cd ./ELMo
 
 # - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python36 venv && source venv/bin/activate
+virtualenv -p python3 venv && source venv/bin/activate
 pip3 install -r requirements.txt
 ################################
 
-echo "Training ELMo"
-python36 TrainWordEmbeddings.py
-
 echo "Generating ELMo Embeddings"
-python36 GenerateWordEmbeddings.py
+python3 GenerateWordEmbeddings.py
 
 deactivate
 cd ..
@@ -205,7 +273,7 @@ echo "Experiments 1"
 
 # King and Cook Experiments - SVM - Embeddings + CForm
 echo "Experient 1-1 : King and Cook Experiments - SVM - Embeddings + CForm"
-# python36 Experiment.py
+python36 Experiment.py
 
 deactivate
 cd ..
