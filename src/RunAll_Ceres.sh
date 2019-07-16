@@ -167,7 +167,7 @@ cd ./SiameseCBOW
 # - VIRTUAL EVIRONMENT SETUP - #
 virtualenv -p python venv && source venv/bin/activate
 pip install -r requirements.txt
-python36 -c "import nltk; nltk.download('punkt')"
+python -c "import nltk; nltk.download('punkt')"
 ################################
 
 echo "Generating SiameseCBOW Embeddings"
