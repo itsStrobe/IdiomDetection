@@ -68,6 +68,7 @@ echo "TrainEmbeddings.sh"
 # # - VIRTUAL EVIRONMENT SETUP - #
 # virtualenv -p python venv && source venv/bin/activate
 # pip install -r requirements.txt
+# python36 -c "import nltk; nltk.download('punkt')"
 # ################################
 # 
 # echo "Training SiameseCBOW"
@@ -114,27 +115,27 @@ echo "TrainEmbeddings.sh"
 
 echo "FindVNICs.sh"
 
-# - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python36 venv && source venv/bin/activate
-pip3 install -r requirements.txt
-python36 -c "import nltk; nltk.download('wordnet')"
-################################
-
-echo "Extracting Patterns from Corpora"
-python36 ExtractPatternsInCorpora.py
-
-# Extract the Potential VNICs based on PMI
-
-echo "Extracting Potential VNICs from Corpora"
-python36 ExtractPotentialVNICs.py
-
-echo "Extracting Potential VNICs Instances from Corpora"
-python36 ExtractVNICsInstances.py
-
-echo "Extracting Potential VNICs Sentences from Corpora"
-python36 ExtractCandidateSentences.py --NORM_FIX --USE_LIN
-
-deactivate
+# # - VIRTUAL EVIRONMENT SETUP - #
+# virtualenv -p python36 venv && source venv/bin/activate
+# pip3 install -r requirements.txt
+# python36 -c "import nltk; nltk.download('wordnet')"
+# ################################
+# 
+# echo "Extracting Patterns from Corpora"
+# python36 ExtractPatternsInCorpora.py
+# 
+# # Extract the Potential VNICs based on PMI
+# 
+# echo "Extracting Potential VNICs from Corpora"
+# python36 ExtractPotentialVNICs.py
+# 
+# echo "Extracting Potential VNICs Instances from Corpora"
+# python36 ExtractVNICsInstances.py
+# 
+# echo "Extracting Potential VNICs Sentences from Corpora"
+# python36 ExtractCandidateSentences.py --NORM_FIX --USE_LIN
+# 
+# deactivate
 
 #==========================================================#
 #----------------------------------------------------------#
@@ -166,6 +167,7 @@ cd ./SiameseCBOW
 # - VIRTUAL EVIRONMENT SETUP - #
 virtualenv -p python venv && source venv/bin/activate
 pip install -r requirements.txt
+python36 -c "import nltk; nltk.download('punkt')"
 ################################
 
 echo "Generating SiameseCBOW Embeddings"
