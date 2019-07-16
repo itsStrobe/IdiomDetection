@@ -95,8 +95,8 @@ echo "TrainEmbeddings.sh"
 # ============================================================ #
 
 # ELMo
-cd ./ELMo
-
+# cd ./ELMo
+# 
 # - VIRTUAL EVIRONMENT SETUP - #
 # virtualenv -p python36 venv && source venv/bin/activate
 # pip3 install -r requirements.txt
