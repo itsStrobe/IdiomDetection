@@ -45,8 +45,8 @@ parser.add_argument("--SCBOW_RESULTS"    , "--scbow_results_file_prefix"        
 parser.add_argument("--SKIP_RESULTS"     , "--skip-thoughts_results_file_prefix" , type=str, help="Location of the Output File Containing the Cross-Validation Results for Skip-Thoughts's SVM.")
 parser.add_argument("--ELMO_RESULTS"     , "--elmo_results_file_prefix"          , type=str, help="Location of the Output File Containing the Cross-Validation Results for ELMo's SVM.")
 
-parser.add_argument("--RESULTS_DIR" , "--results_directory"     , type=str, help="Results Directory.")
-parser.add_argument("--EXP_EXT"     , "--experiment_extension"  , type=str, help="Experiment Name Extension.")
+parser.add_argument("--RESULTS_DIR" , "--results_directory"    , type=str, help="Results Directory.")
+parser.add_argument("--EXP_EXT"     , "--experiment_extension" , type=str, help="Experiment Name Extension.")
 
 parser.add_argument("--SVM_W2V"   , "--w2v_svm_model_directory"           , type=str, help="Word2Vec SVM Model Location")
 parser.add_argument("--SVM_SCBOW" , "--scbow_svm_model_directory"         , type=str, help="Siamese CBOW SVM Model Location")
@@ -93,10 +93,10 @@ RESULTS_DIR = "./results/Experiment_3_1/"
 EXP_EXT     = "_cosineSimilarity"
 
 # SVM Classifiers Directories:
-SVM_W2V   = "../SVM_Models/W2V_svm.model"
-SVM_SCBOW = "../SVM_Models/SCBOW_svm.model"
-SVM_SKIP  = "../SVM_Models/SKIP_svm.model"
-SVM_ELMO  = "../SVM_Models/ELMO_svm.model"
+SVM_W2V   = "../SVM_Models/W2V_clean.model"
+SVM_SCBOW = "../SVM_Models/SCBOW_clean.model"
+SVM_SKIP  = "../SVM_Models/SKIP_clean.model"
+SVM_ELMO  = "../SVM_Models/ELMO_clean.model"
 
 # SVM Classifiers Features:
 USE_CFORM   = False

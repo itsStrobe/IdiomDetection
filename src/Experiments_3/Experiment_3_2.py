@@ -94,10 +94,10 @@ RESULTS_DIR = "./results/Experiment_3_2/"
 EXP_EXT     = "_unnamedMetric"
 
 # SVM Classifiers Directories:
-SVM_W2V   = "../SVM_Models/W2V_svm.model"
-SVM_SCBOW = "../SVM_Models/SCBOW_svm.model"
-SVM_SKIP  = "../SVM_Models/SKIP_svm.model"
-SVM_ELMO  = "../SVM_Models/ELMO_svm.model"
+SVM_W2V   = "../SVM_Models/W2V_clean.model"
+SVM_SCBOW = "../SVM_Models/SCBOW_clean.model"
+SVM_SKIP  = "../SVM_Models/SKIP_clean.model"
+SVM_ELMO  = "../SVM_Models/ELMO_clean.model"
 
 # SVM Classifiers Features:
 USE_CFORM   = False

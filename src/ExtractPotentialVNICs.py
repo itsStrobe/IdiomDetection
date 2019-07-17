@@ -10,12 +10,12 @@ import progressbar
 
 from SynLexFixedness import SynLexFixedness
 
-PAT_MODEL     = "./PatternCounts/PatternCounts_130619.pickle"
-W2V_MODEL     = "./Word2Vec/models/W2V_ver1_lemm.model"
 VNIC_DIR_PMI  = "./VNICs/PotentialVNICs_PMI.csv"
 VNIC_DIR_LEX  = "./VNICs/PotentialVNICs_LEX.csv"
 VNIC_DIR_SYN  = "./VNICs/PotentialVNICs_SYN.csv"
 VNIC_DIR_OVA  = "./VNICs/PotentialVNICs_OVA.csv"
+PAT_MODEL     = "./PatternCounts/PatternCounts_130619.pickle"
+W2V_MODEL     = "./Word2Vec/models/W2V_ver1_lemm.model"
 
 # Frequency Threshold for Instances
 FREQ_T = 150

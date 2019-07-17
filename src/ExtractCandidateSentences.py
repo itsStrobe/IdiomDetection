@@ -31,6 +31,8 @@ parser.add_argument("--CFORM_CD_DIR"        , "--canonical_forms"               
 parser.add_argument("--SYN_FIX_CD_DIR"      , "--syntactical_fixedness"          , type=str, help="Location of the File Indicating the Syntactical Fixedness of the Candidates.")
 parser.add_argument("--LEX_FIX_CD_DIR"      , "--lexical_fixedness"              , type=str, help="Location of the File Indicating the Lexical Fixedness of the Candidates.")
 parser.add_argument("--OVA_FIX_CD_DIR"      , "--overall_fixedness"              , type=str, help="Location of the File Indicating the Overall Fixedness of the Candidates.")
+parser.add_argument("--PAT_MODEL"           , "--pattern_counts_model"           , type=str, help="Location of the File Containing the Pattern Counts Model.")
+parser.add_argument("--W2V_MODEL"           , "--word2vec_model"                 , type=str, help="Location of the File Containing the Word2Vec Model for Lexical Fixedness Calculation.")
 
 parser.add_argument("--K"      , "--lexical_fixedness_k"    , type=int  , help="K Parameters for Number of Similar Verb/Nouns for Lexical Fixedness Calculation.")
 parser.add_argument("--ALPHA"  , "--overall_fixedness_alpha", type=float, help="ALPHA Parameter for Overall Fixedness Calculation.")
@@ -52,11 +54,11 @@ CFORM_CD_DIR        = "./targets/CForms_cand.csv"
 SYN_FIX_CD_DIR      = "./targets/SynFix_cand.csv"
 LEX_FIX_CD_DIR      = "./targets/LexFix_cand.csv"
 OVA_FIX_CD_DIR      = "./targets/OvaFix_cand.csv"
+PAT_MODEL           = "./PatternCounts/PatternCounts_130619.pickle"
+W2V_MODEL           = "./Word2Vec/models/W2V_ver1_lemm.model"
 
 # Other Parameters
 CORPORA_PRE = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"]
-PAT_MODEL   = "./PatternCounts/PatternCounts_130619.pickle"
-W2V_MODEL   = "./Word2Vec/models/W2V_ver1_lemm.model"
 INDEXED_SUF = "_idx"
 LEMMAS_SUF  = "_lemmas"
 POSTAGS_SUF = "_posTags"
@@ -219,6 +221,10 @@ if __name__ == '__main__':
         LEX_FIX_CD_DIR = args.LEX_FIX_CD_DIR
     if(args.OVA_FIX_CD_DIR):
         OVA_FIX_CD_DIR = args.OVA_FIX_CD_DIR
+    if(args.PAT_MODEL):
+        PAT_MODEL = args.PAT_MODEL
+    if(args.W2V_MODEL):
+        W2V_MODEL = args.W2V_MODEL
 
     if(args.K):
         K = args.K
