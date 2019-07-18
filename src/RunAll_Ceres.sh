@@ -115,12 +115,12 @@ echo "TrainEmbeddings.sh"
 
 echo "FindVNICs.sh"
 
-# # - VIRTUAL EVIRONMENT SETUP - #
-# virtualenv -p python36 venv && source venv/bin/activate
-# pip3 install -r requirements.txt
-# python36 -c "import nltk; nltk.download('wordnet')"
-# ################################
-# 
+# - VIRTUAL EVIRONMENT SETUP - #
+virtualenv -p python36 venv && source venv/bin/activate
+pip3 install -r requirements.txt
+python36 -c "import nltk; nltk.download('wordnet')"
+################################
+ 
 echo "Extracting Patterns from Corpora"
 python36 ExtractPatternsInCorpora.py
 
@@ -153,7 +153,7 @@ python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candid
     --SYN_FIX_CD_DIR "./targets/SynFix_cand_PMI.csv" \
     --LEX_FIX_CD_DIR "./targets/LexFix_cand_PMI.csv" \
     --OVA_FIX_CD_DIR "./targets/OvaFix_cand_PMI.csv" \
-    --K 50 --ALPHA 0.6 --LOG_BASE 2 --MAX_WINDOW 7
+    --K 50 --ALPHA 0.6 --MAX_WINDOW 7
 
 python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candidates_LEX" \
     --SENT_CD_DIR         "./targets/Extracted_Sentences_cand_LEX.txt" \
@@ -164,7 +164,7 @@ python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candid
     --SYN_FIX_CD_DIR "./targets/SynFix_cand_LEX.csv" \
     --LEX_FIX_CD_DIR "./targets/LexFix_cand_LEX.csv" \
     --OVA_FIX_CD_DIR "./targets/OvaFix_cand_LEX.csv" \
-    --K 50 --ALPHA 0.6 --LOG_BASE 2 --MAX_WINDOW 7
+    --K 50 --ALPHA 0.6 --MAX_WINDOW 7
 
 python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candidates_SYN" \
     --SENT_CD_DIR         "./targets/Extracted_Sentences_cand_SYN.txt" \
@@ -175,7 +175,7 @@ python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candid
     --SYN_FIX_CD_DIR "./targets/SynFix_cand_SYN.csv" \
     --LEX_FIX_CD_DIR "./targets/LexFix_cand_SYN.csv" \
     --OVA_FIX_CD_DIR "./targets/OvaFix_cand_SYN.csv" \
-    --K 50 --ALPHA 0.6 --LOG_BASE 2 --MAX_WINDOW 7
+    --K 50 --ALPHA 0.6 --MAX_WINDOW 7
 
 python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candidates_OVA" \
     --SENT_CD_DIR         "./targets/Extracted_Sentences_cand_OVA.txt" \
@@ -186,7 +186,7 @@ python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candid
     --SYN_FIX_CD_DIR "./targets/SynFix_cand_OVA.csv" \
     --LEX_FIX_CD_DIR "./targets/LexFix_cand_OVA.csv" \
     --OVA_FIX_CD_DIR "./targets/OvaFix_cand_OVA.csv" \
-    --K 50 --ALPHA 0.6 --LOG_BASE 2 --MAX_WINDOW 7
+    --K 50 --ALPHA 0.6 --MAX_WINDOW 7
 
 deactivate
 
