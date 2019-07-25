@@ -219,7 +219,7 @@ def main():
 
     # -- ADD FAZLY's METRICS -- #
     if(USE_CFORM):
-        cForms = np.genfromtxt(CFORM_DIR, delimiter=',')[indexes]
+        cForms = np.genfromtxt(CFORM_DIR, delimiter=',')
         cForms = cForms.reshape((cForms.size, 1))
 
         features_w2v_SVM   = np.append(features_w2v_SVM,   cForms, axis=1)
@@ -228,7 +228,7 @@ def main():
         features_elmo_SVM  = np.append(features_elmo_SVM,  cForms, axis=1)
 
     if(USE_SYN_FIX):
-        synFix = np.genfromtxt(SYN_FIX_DIR, delimiter=',')[indexes]
+        synFix = np.genfromtxt(SYN_FIX_DIR, delimiter=',')
         synFix = synFix.reshape((synFix.size, 1))
 
         features_w2v_SVM   = np.append(features_w2v_SVM,   synFix, axis=1)
@@ -237,7 +237,7 @@ def main():
         features_elmo_SVM  = np.append(features_elmo_SVM,  synFix, axis=1)
 
     if(USE_LEX_FIX):
-        lexFix = np.genfromtxt(LEX_FIX_DIR, delimiter=',')[indexes]
+        lexFix = np.genfromtxt(LEX_FIX_DIR, delimiter=',')
         lexFix = lexFix.reshape((lexFix.size, 1))
 
         features_w2v_SVM   = np.append(features_w2v_SVM,   lexFix, axis=1)
@@ -246,7 +246,7 @@ def main():
         features_elmo_SVM  = np.append(features_elmo_SVM,  lexFix, axis=1)
 
     if(USE_OVA_FIX):
-        ovaFix = np.genfromtxt(OVA_FIX_DIR, delimiter=',')[indexes]
+        ovaFix = np.genfromtxt(OVA_FIX_DIR, delimiter=',')
         ovaFix = ovaFix.reshape((ovaFix.size, 1))
 
         features_w2v_SVM   = np.append(features_w2v_SVM,   ovaFix, axis=1)

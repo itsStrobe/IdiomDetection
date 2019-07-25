@@ -55,9 +55,9 @@ def FindInstances(corpora_list, tok, loc, sId, inst_n, loc_tok=LOC_TOKEN, vnc_to
                 for pat in pats:
                     # Only add instance if sentence length is smaller than a threshold - ELMo Overflow.
                     if(len(corpora_txt[corpus[s_n]]) < MAX_SENT_LEN):
-                        vnics_token[it] = pat[0] + vnc_tok + pat[1]
-                        vnics_loc[it]   = corp_loc
-                        vnics_senId[it] = s_n
+                        tok[it] = pat[0] + vnc_tok + pat[1]
+                        loc[it] = corp_loc
+                        sId[it] = s_n
                     it += 1
                     if(it >= inst_n):
                         prog.update(it)
