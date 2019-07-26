@@ -638,7 +638,7 @@ echo "Experiments 3"
 
 # Unsupervised - Cosine Similarity [Candidates]
 echo "Experient 3-1 : Unsupervised - Cosine Similarity [Candidates] - PMI Candidates"
-python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_PMI.csv" --VECTORS_FILE_VNC "embeddings_cand_PMI_VNC.csv" --RESULTS_DIR "./results/Experiment_3_1/PMI_Clean/" \
+python36 Experiment_3_1.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_PMI.txt" --VECTORS_FILE "embeddings_cand_PMI.csv" --VECTORS_FILE_VNC "embeddings_cand_PMI_VNC.csv" --RESULTS_DIR "./results/Experiment_3_1/PMI_Clean/" \
     --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
@@ -648,7 +648,7 @@ python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_PMI.csv" --VECTORS_FI
     --COS_DIST_T 0.6
 
 echo "Experient 3-1 : Unsupervised - Cosine Similarity [Candidates] - PMI Candidates - Lemmatized"
-python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_PMI_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_PMI_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_1/PMI_Lemm/"\
+python36 Experiment_3_1.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_PMI_lemm.txt" --VECTORS_FILE "embeddings_cand_PMI_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_PMI_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_1/PMI_Lemm/"\
     --SVM_W2V   "../SVM_Models/W2V_lemm_cForms_.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms_.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms_.model"  \
@@ -658,7 +658,7 @@ python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_PMI_lemm.csv" --VECTO
     --COS_DIST_T 0.6
 
 echo "Experient 3-1 : Unsupervised - Cosine Similarity [Candidates] - Lexical Fixedness Candidates"
-python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC.csv" --RESULTS_DIR "./results/Experiment_3_1/LEX_Clean/" \
+python36 Experiment_3_1.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_LEX.txt" --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC.csv" --RESULTS_DIR "./results/Experiment_3_1/LEX_Clean/" \
     --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
@@ -668,7 +668,7 @@ python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FI
     --COS_DIST_T 0.6
 
 echo "Experient 3-1 : Unsupervised - Cosine Similarity [Candidates] - Lexical Fixedness Candidates - Lemmatized"
-python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_1/LEX_Lemm/"\
+python36 Experiment_3_1.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_LEX_lemm.txt" --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_1/LEX_Lemm/"\
     --SVM_W2V   "../SVM_Models/W2V_lemm_cForms_.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms_.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms_.model"  \
@@ -678,7 +678,7 @@ python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --VECTO
     --COS_DIST_T 0.6
 
 echo "Experient 3-1 : Unsupervised - Cosine Similarity [Candidates] - Syntactical Fixedness Candidates"
-python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_SYN.csv" --VECTORS_FILE_VNC "embeddings_cand_SYN_VNC.csv" --RESULTS_DIR "./results/Experiment_3_1/SYN_Clean/" \
+python36 Experiment_3_1.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_SYN.txt" --VECTORS_FILE "embeddings_cand_SYN.csv" --VECTORS_FILE_VNC "embeddings_cand_SYN_VNC.csv" --RESULTS_DIR "./results/Experiment_3_1/SYN_Clean/" \
     --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
@@ -688,7 +688,7 @@ python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_SYN.csv" --VECTORS_FI
     --COS_DIST_T 0.6
 
 echo "Experient 3-1 : Unsupervised - Cosine Similarity [Candidates] - Syntactical Fixedness Candidates - Lemmatized"
-python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_SYN_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_SYN_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_1/SYN_Lemm/"\
+python36 Experiment_3_1.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_LEX_lemm.txt" --VECTORS_FILE "embeddings_cand_SYN_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_SYN_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_1/SYN_Lemm/"\
     --SVM_W2V   "../SVM_Models/W2V_lemm_cForms_.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms_.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms_.model"  \
@@ -698,7 +698,7 @@ python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_SYN_lemm.csv" --VECTO
     --COS_DIST_T 0.6
 
 echo "Experient 3-1 : Unsupervised - Cosine Similarity [Candidates] - Overall Fixedness Candidates"
-python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_OVA.csv" --VECTORS_FILE_VNC "embeddings_cand_OVA_VNC.csv" --RESULTS_DIR "./results/Experiment_3_1/OVA_Clean/" \
+python36 Experiment_3_1.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_OVA.txt" --VECTORS_FILE "embeddings_cand_OVA.csv" --VECTORS_FILE_VNC "embeddings_cand_OVA_VNC.csv" --RESULTS_DIR "./results/Experiment_3_1/OVA_Clean/" \
     --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
@@ -708,7 +708,7 @@ python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_OVA.csv" --VECTORS_FI
     --COS_DIST_T 0.6
 
 echo "Experient 3-1 : Unsupervised - Cosine Similarity [Candidates] - Overall Fixedness Candidates - Lemmatized"
-python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_OVA_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_OVA_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_1/OVA_Lemm/"\
+python36 Experiment_3_1.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_OVA_lemm.txt" --VECTORS_FILE "embeddings_cand_OVA_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_OVA_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_1/OVA_Lemm/"\
     --SVM_W2V   "../SVM_Models/W2V_lemm_cForms_.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms_.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms_.model"  \
@@ -719,7 +719,7 @@ python36 Experiment_3_1.py --VECTORS_FILE "embeddings_cand_OVA_lemm.csv" --VECTO
 
 # Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates]
 echo "Experient 3-2 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - PMI Candidates"
-python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_PMI.csv" --VECTORS_FILE_VNC "embeddings_cand_PMI_VNC.csv" --RESULTS_DIR "./results/Experiment_3_2/PMI_Clean/" \
+python36 Experiment_3_2.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_PMI.txt" --VECTORS_FILE "embeddings_cand_PMI.csv" --VECTORS_FILE_VNC "embeddings_cand_PMI_VNC.csv" --RESULTS_DIR "./results/Experiment_3_2/PMI_Clean/" \
     --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
@@ -729,7 +729,7 @@ python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_PMI.csv" --VECTORS_FI
     --UNM_MET_T 0.4 --BETA 0.6
 
 echo "Experient 3-2 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - PMI Candidates - Lemmatized"
-python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_PMI_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_PMI_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_2/PMI_Lemm/"\
+python36 Experiment_3_2.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_PMI_lemm.txt" --VECTORS_FILE "embeddings_cand_PMI_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_PMI_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_2/PMI_Lemm/"\
     --SVM_W2V   "../SVM_Models/W2V_lemm_cForms_.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms_.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms_.model"  \
@@ -739,7 +739,7 @@ python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_PMI_lemm.csv" --VECTO
     --UNM_MET_T 0.4 --BETA 0.6
 
 echo "Experient 3-2 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - Lexical Fixedness Candidates"
-python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC.csv" --RESULTS_DIR "./results/Experiment_3_2/LEX_Clean/" \
+python36 Experiment_3_2.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_LEX.txt" --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC.csv" --RESULTS_DIR "./results/Experiment_3_2/LEX_Clean/" \
     --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
@@ -749,7 +749,7 @@ python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FI
     --UNM_MET_T 0.4 --BETA 0.6
 
 echo "Experient 3-2 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - Lexical Fixedness Candidates - Lemmatized"
-python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_2/LEX_Lemm/"\
+python36 Experiment_3_2.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_LEX_lemm.txt" --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_2/LEX_Lemm/"\
     --SVM_W2V   "../SVM_Models/W2V_lemm_cForms_.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms_.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms_.model"  \
@@ -759,7 +759,7 @@ python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --VECTO
     --UNM_MET_T 0.4 --BETA 0.6
 
 echo "Experient 3-2 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - Syntactical Fixedness Candidates"
-python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC.csv" --RESULTS_DIR "./results/Experiment_3_2/LEX_Clean/" \
+python36 Experiment_3_2.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_SYN.txt" --VECTORS_FILE "embeddings_cand_SYN.csv" --VECTORS_FILE_VNC "embeddings_cand_SYN_VNC.csv" --RESULTS_DIR "./results/Experiment_3_2/SYN_Clean/" \
     --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
@@ -769,17 +769,17 @@ python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FI
     --UNM_MET_T 0.4 --BETA 0.6
 
 echo "Experient 3-2 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - Syntactical Fixedness Candidates - Lemmatized"
-python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_2/LEX_Lemm/"\
-    --SVM_W2V   "../SVM_Models/W2V_lemm_cForms_.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms_.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms_.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_lemm_cForms_.model"  \
+python36 Experiment_3_2.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_SYN_lemm.txt" --VECTORS_FILE "embeddings_cand_SYN_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_SYN_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_2/SYN_Lemm/"\
+    --SVM_W2V   "../SVM_Models/W2V_lemm_cForms.model"   \
+    --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms.model" \
+    --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms.model"  \
+    --SVM_ELMO  "../SVM_Models/ELMO_lemm_cForms.model"  \
     --USE_CFORM \
     --CFORM_DIR "../targets/CForms_cand_SYN.csv" \
     --UNM_MET_T 0.4 --BETA 0.6
 
 echo "Experient 3-2 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - Overall Fixedness Candidates"
-python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC.csv" --RESULTS_DIR "./results/Experiment_3_2/LEX_Clean/" \
+python36 Experiment_3_2.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_OVA.txt" --VECTORS_FILE "embeddings_cand_OVA.csv" --VECTORS_FILE_VNC "embeddings_cand_OVA_VNC.csv" --RESULTS_DIR "./results/Experiment_3_2/OVA_Clean/" \
     --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
     --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
     --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
@@ -789,11 +789,11 @@ python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FI
     --UNM_MET_T 0.4 --BETA 0.6
 
 echo "Experient 3-2 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - Overall Fixedness Candidates - Lemmatized"
-python36 Experiment_3_2.py --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_2/LEX_Lemm/"\
+python36 Experiment_3_2.py --OG_SENT_DIR "../targets/Extracted_Sentences_cand_OVA_lemm.txt" --VECTORS_FILE "embeddings_cand_OVA_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_OVA_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_2/OVA_Lemm/"\
     --SVM_W2V   "../SVM_Models/W2V_lemm_cForms_.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms_.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms_.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_lemm_cForms_.model"  \
+    --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms.model" \
+    --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms.model"  \
+    --SVM_ELMO  "../SVM_Models/ELMO_lemm_cForms.model"  \
     --USE_CFORM \
     --CFORM_DIR "../targets/CForms_cand_OVA.csv" \
     --UNM_MET_T 0.4 --BETA 0.6
