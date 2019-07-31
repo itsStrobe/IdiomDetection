@@ -47,10 +47,18 @@ parser.add_argument("--ELMO_RESULTS"  , "--elmo_results_file_prefix"          , 
 parser.add_argument("--RESULTS_DIR" , "--results_directory" , type=str, help="Results Directory.")
 parser.add_argument("--EXP_EXT"     , "--experiment_suffix" , type=str, help="Experiments Name Extension.")
 
-parser.add_argument("--USE_CFORM"   , help="Use flag to indicate if CForm Feature Should Be Added.", action="store_true")
-parser.add_argument("--USE_SYN_FIX" , help="Use flag to indicate if Syntactic Fixedness Feature Should Be Added.", action="store_true")
-parser.add_argument("--USE_LEX_FIX" , help="Use flag to indicate if Lexical Fixedness Feature Should Be Added.", action="store_true")
-parser.add_argument("--USE_OVA_FIX" , help="Use flag to indicate if Overall Fixedness Feature Should Be Added.", action="store_true")
+parser.add_argument("--USE_CFORM"   , help="Use flag to indicate if CForm Feature Should Be Added."               , action="store_true")
+parser.add_argument("--USE_SYN_FIX" , help="Use flag to indicate if Syntactic Fixedness Feature Should Be Added." , action="store_true")
+parser.add_argument("--USE_LEX_FIX" , help="Use flag to indicate if Lexical Fixedness Feature Should Be Added."   , action="store_true")
+parser.add_argument("--USE_OVA_FIX" , help="Use flag to indicate if Overall Fixedness Feature Should Be Added."   , action="store_true")
+
+parser.add_argument("--N_CLUSTERS" , "--num_clusters"       , type=int, help="k Number of Clusters.")
+parser.add_argument("--N_INIT"     , "--num_runs"  , type=int, help="Number of Runs with Different Centroid Seeds.")
+parser.add_argument("--MAX_ITER"   , "--maximum_iterations" , type=int, help="Maximum number of iterations of the k-means algorithm for a single run.")
+parser.add_argument("--N_JOBS"     , "--number_of_jobs"     , type=int, help="Number of Jobs to Use for Computation.")
+parser.add_argument("--VERBOSE"    , "--verbose_level"      , type=int, help="Verbosity Mode.")
+
+parser.add_argument("--RND_STATE" , "--state_seed" , type=int, help="Random Seed for Replication Purposes.")
 
 parser.add_argument("--SAVE_PLT" , help="Use flag to indicate if Plots Should be Saved.", action="store_true")
 
@@ -76,7 +84,7 @@ ELMO_RESULTS  = "ELMO"
 
 # Experiment Dirs
 RESULTS_DIR = "./results/Experiment_2_3/"
-EXP_EXT     = "_clust_fixedness_cform"
+EXP_EXT     = "_clust"
 
 # File Extensions
 FILE_EXT = ".tsv"
@@ -172,6 +180,22 @@ def saveClassifiedSentences(all_sent, all_targ, all_pred, fileDir):
     data = np.append(data, all_pred, axis = 1)
     pd.DataFrame(data = data, columns=['Sentence', 'Target', 'Prediction']).to_csv(fileDir, sep='\t')
 
+def getPredictions(labels, y, k):
+    pred = np.zeros(y.shape, dtype=bool)
+
+    for cluster in range(k):
+        indexes = np.where(labels == cluster)[0]
+
+        trueCnt = len(np.where(y[indexes] == True)[0])
+
+        if(trueCnt > (len(indexes) - trueCnt)):
+            pred[indexes] = True
+        else:
+            pred[indexes] = False
+
+    return pred
+
+
 def main():
     # Create Results Dir
     if not os.path.exists(os.path.dirname(RESULTS_DIR)):
@@ -238,39 +262,14 @@ def main():
     # Shuffle Sets:
     sent_X, w2v_X, scbow_X, skip_X, elmo_X, y = shuffle(og_sent, features_w2v, features_scbow, features_skip, features_elmo, targets_idiomatic, random_state=RND_STATE)
 
-    # -- Extract Random Centroids -- #
-    # Initialize Cluster Vectors
-    w2v_centroids   = np.zeros((N_CLUSTERS, w2v_X.shape[1]))
-    scbow_centroids = np.zeros((N_CLUSTERS, scbow_X.shape[1]))
-    skip_centroids  = np.zeros((N_CLUSTERS, skip_X.shape[1]))
-    elmo_centroids  = np.zeros((N_CLUSTERS, elmo_X.shape[1]))
-
-    # Extract Centroids Indexes
-    np.random.seed(RND_SEED)
-    cent_i = np.random.choice(np.where(y == True)[0])
-    cent_l = np.random.choice(np.where(y == False)[0])
-
-    # Get Centroids
-    w2v_centroids[0]   = w2v_X[cent_i]
-    w2v_centroids[1]   = w2v_X[cent_l]
-
-    scbow_centroids[0] = scbow_X[cent_i]
-    scbow_centroids[1] = scbow_X[cent_l]
-
-    skip_centroids[0]  = skip_X[cent_i]
-    skip_centroids[1]  = skip_X[cent_l]
-
-    elmo_centroids[0]  = elmo_X[cent_i]
-    elmo_centroids[1]  = elmo_X[cent_l]
-
     # -- Train k-Means -- #
 
     print("<===================> Word2Vec <===================>")
     # - Run KMeans
-    w2v_kMeans = KMeans(n_clusters=N_CLUSTERS, init=w2v_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(w2v_X)
+    w2v_kMeans = KMeans(n_clusters=N_CLUSTERS, init="k-means++", n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(w2v_X)
 
     # Display Clusters:
-    w2v_clust_labels = (np.array(w2v_kMeans.labels_) == y[cent_i])
+    w2v_clust_labels = getPredictions(w2v_kMeans.labels_, y, N_CLUSTERS)
     if(SAVE_PLT): gen_plot(w2v_X, y, w2v_clust_labels, "Original Word2Vec Labels", "k-Means Labels", RESULTS_DIR + W2V_RESULTS + EXP_EXT + IMG_EXT)
     saveClassifiedSentences(sent_X, y, w2v_clust_labels, RESULTS_DIR + W2V_RESULTS + EXP_EXT + FILE_EXT)
 
@@ -280,10 +279,10 @@ def main():
 
     print("<=================> Siamese CBOW <=================>")
     # - Run KMeans
-    scbow_kMeans = KMeans(n_clusters=N_CLUSTERS, init=scbow_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(scbow_X)
+    scbow_kMeans = KMeans(n_clusters=N_CLUSTERS, init="k-means++", n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(scbow_X)
 
     # Display Clusters:
-    scbow_clust_labels = (np.array(scbow_kMeans.labels_) == y[cent_i])
+    scbow_clust_labels = getPredictions(scbow_kMeans.labels_, y, N_CLUSTERS)
     if(SAVE_PLT): gen_plot(scbow_X, y, scbow_clust_labels, "Original Siamese CBOW Labels", "k-Means Labels", RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + IMG_EXT)
     saveClassifiedSentences(sent_X, y, scbow_clust_labels, RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + FILE_EXT)
 
@@ -293,10 +292,10 @@ def main():
 
     print("<================> Skip - Thoughts <===============>")
     # - Run KMeans
-    skip_kMeans = KMeans(n_clusters=N_CLUSTERS, init=skip_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(skip_X)
+    skip_kMeans = KMeans(n_clusters=N_CLUSTERS, init="k-means++", n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(skip_X)
 
     # Display Clusters:
-    skip_clust_labels = (np.array(skip_kMeans.labels_) == y[cent_i])
+    skip_clust_labels = getPredictions(skip_kMeans.labels_, y, N_CLUSTERS)
     if(SAVE_PLT): gen_plot(skip_X, y, skip_clust_labels, "Original Skip-Thoughts Labels", "k-Means Labels", RESULTS_DIR + SKIP_RESULTS + EXP_EXT + IMG_EXT)
     saveClassifiedSentences(sent_X, y, skip_clust_labels, RESULTS_DIR + SKIP_RESULTS + EXP_EXT + FILE_EXT)
 
@@ -306,10 +305,10 @@ def main():
 
     print("<=====================> ELMo <=====================>")
     # - Run KMeans
-    elmo_kMeans = KMeans(n_clusters=N_CLUSTERS, init=elmo_centroids, n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(elmo_X)
+    elmo_kMeans = KMeans(n_clusters=N_CLUSTERS, init="k-means++", n_init=N_INIT, n_jobs=N_JOBS, max_iter=MAX_ITER, verbose=VERBOSE, random_state=RND_STATE).fit(elmo_X)
 
     # Display Clusters:
-    elmo_clust_labels = (np.array(elmo_kMeans.labels_) == y[cent_i])
+    elmo_clust_labels = getPredictions(elmo_kMeans.labels_, y, N_CLUSTERS)
     if(SAVE_PLT): gen_plot(elmo_X, y, elmo_clust_labels, "Original ELMo Labels", "k-Means Labels", RESULTS_DIR + ELMO_RESULTS + EXP_EXT + IMG_EXT)
     saveClassifiedSentences(sent_X, y, elmo_clust_labels, RESULTS_DIR + ELMO_RESULTS + EXP_EXT + FILE_EXT)
 
@@ -363,6 +362,20 @@ if __name__ == '__main__':
         USE_LEX_FIX = True
     if(args.USE_OVA_FIX):
         USE_OVA_FIX = True
+
+    if(args.N_CLUSTERS):
+        N_CLUSTERS = args.N_CLUSTERS
+    if(args.N_INIT):
+        N_INIT = args.N_INIT
+    if(args.MAX_ITER):
+        MAX_ITER = args.MAX_ITER
+    if(args.N_JOBS):
+        N_JOBS = args.N_JOBS
+    if(args.VERBOSE):
+        VERBOSE = args.VERBOSE
+
+    if(args.RND_STATE):
+        RND_STATE = args.RND_STATE
 
     if(args.SAVE_PLT):
         SAVE_PLT = True
