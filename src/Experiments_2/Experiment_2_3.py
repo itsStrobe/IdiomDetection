@@ -53,7 +53,7 @@ parser.add_argument("--USE_LEX_FIX" , help="Use flag to indicate if Lexical Fixe
 parser.add_argument("--USE_OVA_FIX" , help="Use flag to indicate if Overall Fixedness Feature Should Be Added."   , action="store_true")
 
 parser.add_argument("--N_CLUSTERS" , "--num_clusters"       , type=int, help="k Number of Clusters.")
-parser.add_argument("--N_INIT"     , "--num_runs"  , type=int, help="Number of Runs with Different Centroid Seeds.")
+parser.add_argument("--N_INIT"     , "--num_runs"           , type=int, help="Number of Runs with Different Centroid Seeds.")
 parser.add_argument("--MAX_ITER"   , "--maximum_iterations" , type=int, help="Maximum number of iterations of the k-means algorithm for a single run.")
 parser.add_argument("--N_JOBS"     , "--number_of_jobs"     , type=int, help="Number of Jobs to Use for Computation.")
 parser.add_argument("--VERBOSE"    , "--verbose_level"      , type=int, help="Verbosity Mode.")
