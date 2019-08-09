@@ -571,7 +571,7 @@ echo "RunExperiments.sh"
 cd Experiments_1
 
 # - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python3 venv && source venv/bin/activate
+virtualenv -p python36 venv && source venv/bin/activate
 pip3 install -r requirements.txt
 ################################
 
@@ -610,7 +610,7 @@ cd ..
 cd Experiments_2
 
 # - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python3 venv && source venv/bin/activate
+virtualenv -p python36 venv && source venv/bin/activate
 pip3 install -r requirements.txt
 ################################
 
@@ -863,7 +863,7 @@ cd ..
 cd Experiments_3
 
 # - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python3 venv && source venv/bin/activate
+virtualenv -p python36 venv && source venv/bin/activate
 pip3 install -r requirements.txt
 ################################
 
