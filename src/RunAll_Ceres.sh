@@ -113,368 +113,368 @@ echo "TrainEmbeddings.sh"
 #----------------------------------------------------------#
 #__________________________________________________________#
 
-echo "FindVNICs.sh"
-
-# - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python36 venv && source venv/bin/activate
-pip3 install -r requirements.txt
-python36 -c "import nltk; nltk.download('wordnet')"
-################################
- 
-echo "Extracting Patterns from Corpora"
-python36 ExtractPatternsInCorpora.py
-
-# Extract the Potential VNICs based on PMI
-
-echo "Extracting Potential VNICs from Corpora"
-python36 ExtractPotentialVNICs.py
-
-echo "Extracting Potential VNICs Instances from Corpora"
-python36 ExtractVNICsInstances.py --VNIC_FILE "./VNICs/PotentialVNICs_PMI.csv" --VNIC_LOC_FILE "./targets/VNC-Tokens_candidates_PMI" \
-    --TOP_N 20 --MAX_WINDOW 7 --MAX_SENT_LEN 80
-
-python36 ExtractVNICsInstances.py --VNIC_FILE "./VNICs/PotentialVNICs_LEX.csv" --VNIC_LOC_FILE "./targets/VNC-Tokens_candidates_LEX" \
-    --TOP_N 20 --MAX_WINDOW 7 --MAX_SENT_LEN 80
-
-python36 ExtractVNICsInstances.py --VNIC_FILE "./VNICs/PotentialVNICs_SYN.csv" --VNIC_LOC_FILE "./targets/VNC-Tokens_candidates_SYN" \
-    --TOP_N 20 --MAX_WINDOW 7 --MAX_SENT_LEN 80
-
-python36 ExtractVNICsInstances.py --VNIC_FILE "./VNICs/PotentialVNICs_OVA.csv" --VNIC_LOC_FILE "./targets/VNC-Tokens_candidates_OVA" \
-    --TOP_N 20 --MAX_WINDOW 7 --MAX_SENT_LEN 80
-
-
-echo "Extracting Potential VNICs Sentences from Corpora"
-python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candidates_PMI" \
-    --SENT_CD_DIR         "./targets/Extracted_Sentences_cand_PMI.txt" \
-    --SENT_LEMM_CD_DIR    "./targets/Extracted_Sentences_cand_PMI_lemm.txt" \
-    --SENTVNC_CD_DIR      "./targets/Extracted_Sentences_cand_PMI_VNC.txt" \
-    --SENTVNC_LEMM_CD_DIR "./targets/Extracted_Sentences_cand_PMI_VNC_lemm.txt" \
-    --CFORM_CD_DIR   "./targets/CForms_cand_PMI.csv" \
-    --SYN_FIX_CD_DIR "./targets/SynFix_cand_PMI.csv" \
-    --LEX_FIX_CD_DIR "./targets/LexFix_cand_PMI.csv" \
-    --OVA_FIX_CD_DIR "./targets/OvaFix_cand_PMI.csv" \
-    --K 50 --ALPHA 0.6 --MAX_WINDOW 7
-
-python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candidates_LEX" \
-    --SENT_CD_DIR         "./targets/Extracted_Sentences_cand_LEX.txt" \
-    --SENT_LEMM_CD_DIR    "./targets/Extracted_Sentences_cand_LEX_lemm.txt" \
-    --SENTVNC_CD_DIR      "./targets/Extracted_Sentences_cand_LEX_VNC.txt" \
-    --SENTVNC_LEMM_CD_DIR "./targets/Extracted_Sentences_cand_LEX_VNC_lemm.txt" \
-    --CFORM_CD_DIR   "./targets/CForms_cand_LEX.csv" \
-    --SYN_FIX_CD_DIR "./targets/SynFix_cand_LEX.csv" \
-    --LEX_FIX_CD_DIR "./targets/LexFix_cand_LEX.csv" \
-    --OVA_FIX_CD_DIR "./targets/OvaFix_cand_LEX.csv" \
-    --K 50 --ALPHA 0.6 --MAX_WINDOW 7
-
-python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candidates_SYN" \
-    --SENT_CD_DIR         "./targets/Extracted_Sentences_cand_SYN.txt" \
-    --SENT_LEMM_CD_DIR    "./targets/Extracted_Sentences_cand_SYN_lemm.txt" \
-    --SENTVNC_CD_DIR      "./targets/Extracted_Sentences_cand_SYN_VNC.txt" \
-    --SENTVNC_LEMM_CD_DIR "./targets/Extracted_Sentences_cand_SYN_VNC_lemm.txt" \
-    --CFORM_CD_DIR   "./targets/CForms_cand_SYN.csv" \
-    --SYN_FIX_CD_DIR "./targets/SynFix_cand_SYN.csv" \
-    --LEX_FIX_CD_DIR "./targets/LexFix_cand_SYN.csv" \
-    --OVA_FIX_CD_DIR "./targets/OvaFix_cand_SYN.csv" \
-    --K 50 --ALPHA 0.6 --MAX_WINDOW 7
-
-python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candidates_OVA" \
-    --SENT_CD_DIR         "./targets/Extracted_Sentences_cand_OVA.txt" \
-    --SENT_LEMM_CD_DIR    "./targets/Extracted_Sentences_cand_OVA_lemm.txt" \
-    --SENTVNC_CD_DIR      "./targets/Extracted_Sentences_cand_OVA_VNC.txt" \
-    --SENTVNC_LEMM_CD_DIR "./targets/Extracted_Sentences_cand_OVA_VNC_lemm.txt" \
-    --CFORM_CD_DIR   "./targets/CForms_cand_OVA.csv" \
-    --SYN_FIX_CD_DIR "./targets/SynFix_cand_OVA.csv" \
-    --LEX_FIX_CD_DIR "./targets/LexFix_cand_OVA.csv" \
-    --OVA_FIX_CD_DIR "./targets/OvaFix_cand_OVA.csv" \
-    --K 50 --ALPHA 0.6 --MAX_WINDOW 7
-
-deactivate
-
-#==========================================================#
-#----------------------------------------------------------#
-#__________________________________________________________#
-
-echo "GenerateEmbeddings.sh"
-
-# ============================================================ #
-
-# Word2Vec
-cd ./Word2Vec
-
-# - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python36 venv && source venv/bin/activate
-pip3 install -r requirements.txt
-################################\
-
-echo "Generating Word2Vec Embeddings"
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings.csv" \
-                                  --EMBDVNC_DIR "./embeddings_VNC.csv" \
-                                  --MODEL_DIR   "./models/W2V_ver1.model"
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_VNC_lemm.csv" \
-                                  --MODEL_DIR   "./models/W2V_ver1_lemm.model"
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_PMI.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_PMI_VNC.csv" \
-                                  --MODEL_DIR   "./models/W2V_ver1.model"
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_PMI_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_PMI_VNC_lemm.csv" \
-                                  --MODEL_DIR   "./models/W2V_ver1_lemm.model"
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_LEX.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_LEX_VNC.csv" \
-                                  --MODEL_DIR   "./models/W2V_ver1.model"
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_LEX_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_LEX_VNC_lemm.csv" \
-                                  --MODEL_DIR   "./models/W2V_ver1_lemm.model"
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_SYN.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_SYN_VNC.csv" \
-                                  --MODEL_DIR   "./models/W2V_ver1.model"
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_SYN_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_SYN_VNC_lemm.csv" \
-                                  --MODEL_DIR   "./models/W2V_ver1_lemm.model"
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_OVA.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_OVA_VNC.csv" \
-                                  --MODEL_DIR   "./models/W2V_ver1.model"
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_OVA_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_OVA_VNC_lemm.csv" \
-                                  --MODEL_DIR   "./models/W2V_ver1_lemm.model"
-
-deactivate
-cd ..
-
-# ============================================================ #
-
-# Siamese CBOW
-cd ./SiameseCBOW
-
-# - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python venv && source venv/bin/activate
-pip install -r requirements.txt
-################################
-
-echo "Generating SiameseCBOW Embeddings"
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings.csv" \
-                                  --EMBDVNC_DIR "./embeddings_VNC.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_VNC_lemm.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_PMI.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_PMI_VNC.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_PMI_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_PMI_VNC_lemm.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_LEX.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_LEX_VNC.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_LEX_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_LEX_VNC_lemm.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_SYN.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_SYN_VNC.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_SYN_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_SYN_VNC_lemm.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_OVA.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_OVA_VNC.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_OVA_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_OVA_VNC_lemm.csv"
-
-deactivate
-cd ..
-
-# ============================================================ #
-
-# Skip-Thoughts
-cd ./SkipThoughts
-
-# - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python venv && source venv/bin/activate
-pip3 install -r requirements.txt
-################################
-
-echo "Generating Skip-Thoughts Embeddings"
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings.csv" \
-                                  --EMBDVNC_DIR "./embeddings_VNC.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_VNC_lemm.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_PMI.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_PMI_VNC.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_PMI_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_PMI_VNC_lemm.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_LEX.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_LEX_VNC.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_LEX_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_LEX_VNC_lemm.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_SYN.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_SYN_VNC.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_SYN_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_SYN_VNC_lemm.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_OVA.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_OVA_VNC.csv"
-
-python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_OVA_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_OVA_VNC_lemm.csv"
-
-deactivate
-cd ..
-
-# ============================================================ #
-
-# ELMo
-cd ./ELMo
-
-# - VIRTUAL EVIRONMENT SETUP - #
-virtualenv -p python36 venv && source venv/bin/activate
-pip3 install -r requirements.txt
-################################
-
-echo "Generating ELMo Embeddings"
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings.csv" \
-                                  --EMBDVNC_DIR "./embeddings_VNC.csv" \
-                                  --BATCH_SIZE  300
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_VNC_lemm.csv" \
-                                  --BATCH_SIZE  300
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_PMI.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_PMI_VNC.csv" \
-                                  --BATCH_SIZE  300
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_PMI_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_PMI_VNC_lemm.csv" \
-                                  --BATCH_SIZE  300
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_LEX.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_LEX_VNC.csv" \
-                                  --BATCH_SIZE  300
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_LEX_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_LEX_VNC_lemm.csv" \
-                                  --BATCH_SIZE  300
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_SYN.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_SYN_VNC.csv" \
-                                  --BATCH_SIZE  300
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_SYN_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_SYN_VNC_lemm.csv" \
-                                  --BATCH_SIZE  300
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_OVA.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_OVA_VNC.csv" \
-                                  --BATCH_SIZE  300
-
-python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA_lemm.txt" \
-                                  --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC_lemm.txt" \
-                                  --EMBD_DIR    "./embeddings_cand_OVA_lemm.csv" \
-                                  --EMBDVNC_DIR "./embeddings_cand_OVA_VNC_lemm.csv" \
-                                  --BATCH_SIZE  300
-
-deactivate
-cd ..
-
-#==========================================================#
-#----------------------------------------------------------#
-#__________________________________________________________#
+# echo "FindVNICs.sh"
+# 
+# # - VIRTUAL EVIRONMENT SETUP - #
+# virtualenv -p python36 venv && source venv/bin/activate
+# pip3 install -r requirements.txt
+# python36 -c "import nltk; nltk.download('wordnet')"
+# ################################
+#  
+# echo "Extracting Patterns from Corpora"
+# python36 ExtractPatternsInCorpora.py
+# 
+# # Extract the Potential VNICs based on PMI
+# 
+# echo "Extracting Potential VNICs from Corpora"
+# python36 ExtractPotentialVNICs.py
+# 
+# echo "Extracting Potential VNICs Instances from Corpora"
+# python36 ExtractVNICsInstances.py --VNIC_FILE "./VNICs/PotentialVNICs_PMI.csv" --VNIC_LOC_FILE "./targets/VNC-Tokens_candidates_PMI" \
+#     --TOP_N 20 --MAX_WINDOW 7 --MAX_SENT_LEN 80
+# 
+# python36 ExtractVNICsInstances.py --VNIC_FILE "./VNICs/PotentialVNICs_LEX.csv" --VNIC_LOC_FILE "./targets/VNC-Tokens_candidates_LEX" \
+#     --TOP_N 20 --MAX_WINDOW 7 --MAX_SENT_LEN 80
+# 
+# python36 ExtractVNICsInstances.py --VNIC_FILE "./VNICs/PotentialVNICs_SYN.csv" --VNIC_LOC_FILE "./targets/VNC-Tokens_candidates_SYN" \
+#     --TOP_N 20 --MAX_WINDOW 7 --MAX_SENT_LEN 80
+# 
+# python36 ExtractVNICsInstances.py --VNIC_FILE "./VNICs/PotentialVNICs_OVA.csv" --VNIC_LOC_FILE "./targets/VNC-Tokens_candidates_OVA" \
+#     --TOP_N 20 --MAX_WINDOW 7 --MAX_SENT_LEN 80
+# 
+# 
+# echo "Extracting Potential VNICs Sentences from Corpora"
+# python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candidates_PMI" \
+#     --SENT_CD_DIR         "./targets/Extracted_Sentences_cand_PMI.txt" \
+#     --SENT_LEMM_CD_DIR    "./targets/Extracted_Sentences_cand_PMI_lemm.txt" \
+#     --SENTVNC_CD_DIR      "./targets/Extracted_Sentences_cand_PMI_VNC.txt" \
+#     --SENTVNC_LEMM_CD_DIR "./targets/Extracted_Sentences_cand_PMI_VNC_lemm.txt" \
+#     --CFORM_CD_DIR   "./targets/CForms_cand_PMI.csv" \
+#     --SYN_FIX_CD_DIR "./targets/SynFix_cand_PMI.csv" \
+#     --LEX_FIX_CD_DIR "./targets/LexFix_cand_PMI.csv" \
+#     --OVA_FIX_CD_DIR "./targets/OvaFix_cand_PMI.csv" \
+#     --K 50 --ALPHA 0.6 --MAX_WINDOW 7
+# 
+# python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candidates_LEX" \
+#     --SENT_CD_DIR         "./targets/Extracted_Sentences_cand_LEX.txt" \
+#     --SENT_LEMM_CD_DIR    "./targets/Extracted_Sentences_cand_LEX_lemm.txt" \
+#     --SENTVNC_CD_DIR      "./targets/Extracted_Sentences_cand_LEX_VNC.txt" \
+#     --SENTVNC_LEMM_CD_DIR "./targets/Extracted_Sentences_cand_LEX_VNC_lemm.txt" \
+#     --CFORM_CD_DIR   "./targets/CForms_cand_LEX.csv" \
+#     --SYN_FIX_CD_DIR "./targets/SynFix_cand_LEX.csv" \
+#     --LEX_FIX_CD_DIR "./targets/LexFix_cand_LEX.csv" \
+#     --OVA_FIX_CD_DIR "./targets/OvaFix_cand_LEX.csv" \
+#     --K 50 --ALPHA 0.6 --MAX_WINDOW 7
+# 
+# python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candidates_SYN" \
+#     --SENT_CD_DIR         "./targets/Extracted_Sentences_cand_SYN.txt" \
+#     --SENT_LEMM_CD_DIR    "./targets/Extracted_Sentences_cand_SYN_lemm.txt" \
+#     --SENTVNC_CD_DIR      "./targets/Extracted_Sentences_cand_SYN_VNC.txt" \
+#     --SENTVNC_LEMM_CD_DIR "./targets/Extracted_Sentences_cand_SYN_VNC_lemm.txt" \
+#     --CFORM_CD_DIR   "./targets/CForms_cand_SYN.csv" \
+#     --SYN_FIX_CD_DIR "./targets/SynFix_cand_SYN.csv" \
+#     --LEX_FIX_CD_DIR "./targets/LexFix_cand_SYN.csv" \
+#     --OVA_FIX_CD_DIR "./targets/OvaFix_cand_SYN.csv" \
+#     --K 50 --ALPHA 0.6 --MAX_WINDOW 7
+# 
+# python36 ExtractCandidateSentences.py --TARG_CD_DIR "./targets/VNC-Tokens_candidates_OVA" \
+#     --SENT_CD_DIR         "./targets/Extracted_Sentences_cand_OVA.txt" \
+#     --SENT_LEMM_CD_DIR    "./targets/Extracted_Sentences_cand_OVA_lemm.txt" \
+#     --SENTVNC_CD_DIR      "./targets/Extracted_Sentences_cand_OVA_VNC.txt" \
+#     --SENTVNC_LEMM_CD_DIR "./targets/Extracted_Sentences_cand_OVA_VNC_lemm.txt" \
+#     --CFORM_CD_DIR   "./targets/CForms_cand_OVA.csv" \
+#     --SYN_FIX_CD_DIR "./targets/SynFix_cand_OVA.csv" \
+#     --LEX_FIX_CD_DIR "./targets/LexFix_cand_OVA.csv" \
+#     --OVA_FIX_CD_DIR "./targets/OvaFix_cand_OVA.csv" \
+#     --K 50 --ALPHA 0.6 --MAX_WINDOW 7
+# 
+# deactivate
+# 
+# #==========================================================#
+# #----------------------------------------------------------#
+# #__________________________________________________________#
+
+# echo "GenerateEmbeddings.sh"
+# 
+# # ============================================================ #
+# 
+# # Word2Vec
+# cd ./Word2Vec
+# 
+# # - VIRTUAL EVIRONMENT SETUP - #
+# virtualenv -p python36 venv && source venv/bin/activate
+# pip3 install -r requirements.txt
+# ################################\
+# 
+# echo "Generating Word2Vec Embeddings"
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_VNC.csv" \
+#                                   --MODEL_DIR   "./models/W2V_ver1.model"
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_VNC_lemm.csv" \
+#                                   --MODEL_DIR   "./models/W2V_ver1_lemm.model"
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_PMI.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_PMI_VNC.csv" \
+#                                   --MODEL_DIR   "./models/W2V_ver1.model"
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_PMI_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_PMI_VNC_lemm.csv" \
+#                                   --MODEL_DIR   "./models/W2V_ver1_lemm.model"
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_LEX.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_LEX_VNC.csv" \
+#                                   --MODEL_DIR   "./models/W2V_ver1.model"
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_LEX_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_LEX_VNC_lemm.csv" \
+#                                   --MODEL_DIR   "./models/W2V_ver1_lemm.model"
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_SYN.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_SYN_VNC.csv" \
+#                                   --MODEL_DIR   "./models/W2V_ver1.model"
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_SYN_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_SYN_VNC_lemm.csv" \
+#                                   --MODEL_DIR   "./models/W2V_ver1_lemm.model"
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_OVA.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_OVA_VNC.csv" \
+#                                   --MODEL_DIR   "./models/W2V_ver1.model"
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_OVA_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_OVA_VNC_lemm.csv" \
+#                                   --MODEL_DIR   "./models/W2V_ver1_lemm.model"
+# 
+# deactivate
+# cd ..
+# 
+# # ============================================================ #
+# 
+# # Siamese CBOW
+# cd ./SiameseCBOW
+# 
+# # - VIRTUAL EVIRONMENT SETUP - #
+# virtualenv -p python venv && source venv/bin/activate
+# pip install -r requirements.txt
+# ################################
+# 
+# echo "Generating SiameseCBOW Embeddings"
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_VNC.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_VNC_lemm.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_PMI.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_PMI_VNC.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_PMI_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_PMI_VNC_lemm.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_LEX.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_LEX_VNC.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_LEX_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_LEX_VNC_lemm.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_SYN.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_SYN_VNC.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_SYN_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_SYN_VNC_lemm.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_OVA.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_OVA_VNC.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_OVA_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_OVA_VNC_lemm.csv"
+# 
+# deactivate
+# cd ..
+# 
+# # ============================================================ #
+# 
+# # Skip-Thoughts
+# cd ./SkipThoughts
+# 
+# # - VIRTUAL EVIRONMENT SETUP - #
+# virtualenv -p python venv && source venv/bin/activate
+# pip3 install -r requirements.txt
+# ################################
+# 
+# echo "Generating Skip-Thoughts Embeddings"
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_VNC.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_VNC_lemm.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_PMI.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_PMI_VNC.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_PMI_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_PMI_VNC_lemm.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_LEX.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_LEX_VNC.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_LEX_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_LEX_VNC_lemm.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_SYN.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_SYN_VNC.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_SYN_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_SYN_VNC_lemm.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_OVA.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_OVA_VNC.csv"
+# 
+# python GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_OVA_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_OVA_VNC_lemm.csv"
+# 
+# deactivate
+# cd ..
+# 
+# # ============================================================ #
+# 
+# # ELMo
+# cd ./ELMo
+# 
+# # - VIRTUAL EVIRONMENT SETUP - #
+# virtualenv -p python36 venv && source venv/bin/activate
+# pip3 install -r requirements.txt
+# ################################
+# 
+# echo "Generating ELMo Embeddings"
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_VNC.csv" \
+#                                   --BATCH_SIZE  300
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_VNC_lemm.csv" \
+#                                   --BATCH_SIZE  300
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_PMI.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_PMI_VNC.csv" \
+#                                   --BATCH_SIZE  300
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_PMI_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_PMI_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_PMI_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_PMI_VNC_lemm.csv" \
+#                                   --BATCH_SIZE  300
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_LEX.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_LEX_VNC.csv" \
+#                                   --BATCH_SIZE  300
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_LEX_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_LEX_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_LEX_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_LEX_VNC_lemm.csv" \
+#                                   --BATCH_SIZE  300
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_SYN.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_SYN_VNC.csv" \
+#                                   --BATCH_SIZE  300
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_SYN_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_SYN_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_SYN_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_SYN_VNC_lemm.csv" \
+#                                   --BATCH_SIZE  300
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_OVA.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_OVA_VNC.csv" \
+#                                   --BATCH_SIZE  300
+# 
+# python36 GenerateWordEmbeddings.py --SENT_DIR    "../targets/Extracted_Sentences_cand_OVA_lemm.txt" \
+#                                   --SENTVNC_DIR "../targets/Extracted_Sentences_cand_OVA_VNC_lemm.txt" \
+#                                   --EMBD_DIR    "./embeddings_cand_OVA_lemm.csv" \
+#                                   --EMBDVNC_DIR "./embeddings_cand_OVA_VNC_lemm.csv" \
+#                                   --BATCH_SIZE  300
+# 
+# deactivate
+# cd ..
+# 
+# #==========================================================#
+# #----------------------------------------------------------#
+# #__________________________________________________________#
 
 # - VIRTUAL EVIRONMENT SETUP - #
 virtualenv -p python36 venv && source venv/bin/activate
@@ -529,28 +529,28 @@ pip3 install -r requirements.txt
 
 echo "Silver Standard for PMI Candidates"
 # Get Silver Standard for PMI Candidates - Word2Vec - CForms
-python36 VNICsCandidatesSilverStandard.py --DATASET_DIR "./targets/VNC-Tokens_candidates_PMI" --BEST_EMBD_DIR "./Word2Vec/embeddings_cand_PMI" \
+python36 VNICsCandidatesSilverStandard.py --DATASET_DIR "./targets/VNC-Tokens_candidates_PMI" --BEST_EMBD_DIR "./Word2Vec/embeddings_cand_PMI.csv" \
     --CFORM_DIR "./targets/CForms_cand_PMI.csv" \
     --BEST_SVM  "./SVM_Models/W2V_cForms.model" \
     --USE_CFORM
 
 echo "Silver Standard for LEX Candidates"
 # Get Silver Standard for LEX Candidates - Word2Vec - CForms
-python36 VNICsCandidatesSilverStandard.py --DATASET_DIR "./targets/VNC-Tokens_candidates_LEX" --BEST_EMBD_DIR "./Word2Vec/embeddings_cand_LEX" \
+python36 VNICsCandidatesSilverStandard.py --DATASET_DIR "./targets/VNC-Tokens_candidates_LEX" --BEST_EMBD_DIR "./Word2Vec/embeddings_cand_LEX.csv" \
     --CFORM_DIR "./targets/CForms_cand_LEX.csv" \
     --BEST_SVM  "./SVM_Models/W2V_cForms.model" \
     --USE_CFORM
 
 echo "Silver Standard for SYN Candidates"
 # Get Silver Standard for SYN Candidates - Word2Vec - CForms
-python36 VNICsCandidatesSilverStandard.py --DATASET_DIR "./targets/VNC-Tokens_candidates_SYN" --BEST_EMBD_DIR "./Word2Vec/embeddings_cand_SYN" \
+python36 VNICsCandidatesSilverStandard.py --DATASET_DIR "./targets/VNC-Tokens_candidates_SYN" --BEST_EMBD_DIR "./Word2Vec/embeddings_cand_SYN.csv" \
     --CFORM_DIR "./targets/CForms_cand_SYN.csv" \
     --BEST_SVM  "./SVM_Models/W2V_cForms.model" \
     --USE_CFORM 
 
 echo "Silver Standard for OVA Candidates"
 # Get Silver Standard for OVA Candidates - Word2Vec - CForms
-python36 VNICsCandidatesSilverStandard.py --DATASET_DIR "./targets/VNC-Tokens_candidates_OVA" --BEST_EMBD_DIR "./Word2Vec/embeddings_cand_OVA" \
+python36 VNICsCandidatesSilverStandard.py --DATASET_DIR "./targets/VNC-Tokens_candidates_OVA" --BEST_EMBD_DIR "./Word2Vec/embeddings_cand_OVA.csv" \
     --CFORM_DIR "./targets/CForms_cand_OVA.csv" \
     --BEST_SVM  "./SVM_Models/W2V_cForms.model" \
     --USE_CFORM 
