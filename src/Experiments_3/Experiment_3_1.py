@@ -1,7 +1,7 @@
 """
-    File:   Experiment
+    File:   Experiment_3_1
     Author: Jose Juan Zavala Iglesias
-    Date:   05/07/2019
+    Date:   23/06/2019
 
     Unsupervised (Cosine Similarity) Classification evaluation for VNC Tokens Dataset using word embeddings generated with:
         >Word2Vec
@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report
+from sklearn.utils import shuffle
 from sklearn.decomposition import PCA
 
 import UnsupervisedMetrics
@@ -28,16 +29,12 @@ import UnsupervisedMetrics
 # ------------- ARGS ------------- #
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--OG_SENT_DIR"      , "--original_sentences_directory"      , type=str, help="Location of the File Containing the Targets' Sentences.")
+parser.add_argument("--OG_SENT_DIR"      , "--original_sentences_dir"            , type=str, help="Location of the File Containing the Original Extracted Sentences.")
 parser.add_argument("--TARGETS_DIR"      , "--targets_directory"                 , type=str, help="Location of the File Containing the Targets in VNC-Token format.")
 parser.add_argument("--W2V_DIR"          , "--w2v_directory"                     , type=str, help="Location of the Input Dir Containing the Word2Vec Embeddings.")
 parser.add_argument("--SCBOW_DIR"        , "--scbow_directory"                   , type=str, help="Location of the Input Dir Containing the Siamese SCBOW Embeddings.")
 parser.add_argument("--SKIP_DIR"         , "--skip-thoughts_directory"           , type=str, help="Location of the Input Dir Containing the Skip-Thoughts Embeddings.")
 parser.add_argument("--ELMO_DIR"         , "--elmo_directory"                    , type=str, help="Location of the Input Dir Containing the ELMo Embeddings.")
-parser.add_argument("--CFORM_DIR"        , "--canonical_forms"                   , type=str, help="Location of the File Indicating the Canonical Forms of the Candidates.")
-parser.add_argument("--SYN_FIX_DIR"      , "--syntactical_fixedness"             , type=str, help="Location of the File Indicating the Syntactical Fixedness of the Candidates.")
-parser.add_argument("--LEX_FIX_DIR"      , "--lexical_fixedness"                 , type=str, help="Location of the File Indicating the Lexical Fixedness of the Candidates.")
-parser.add_argument("--OVA_FIX_DIR"      , "--overall_fixedness"                 , type=str, help="Location of the File Indicating the Overall Fixedness of the Candidates.")
 parser.add_argument("--VECTORS_FILE"     , "--embedded_vectors_file"             , type=str, help="Name of the Embeddings File.")
 parser.add_argument("--VECTORS_FILE_VNC" , "--embedded_vnc_vectors_file"         , type=str, help="Name of the VNC Embeddings File.")
 parser.add_argument("--W2V_RESULTS"      , "--w2v_results_file_prefix"           , type=str, help="Location of the Output File Containing the Cross-Validation Results for Word2Vec's SVM.")
@@ -45,64 +42,33 @@ parser.add_argument("--SCBOW_RESULTS"    , "--scbow_results_file_prefix"        
 parser.add_argument("--SKIP_RESULTS"     , "--skip-thoughts_results_file_prefix" , type=str, help="Location of the Output File Containing the Cross-Validation Results for Skip-Thoughts's SVM.")
 parser.add_argument("--ELMO_RESULTS"     , "--elmo_results_file_prefix"          , type=str, help="Location of the Output File Containing the Cross-Validation Results for ELMo's SVM.")
 
-parser.add_argument("--RESULTS_DIR" , "--results_directory"    , type=str, help="Results Directory.")
-parser.add_argument("--EXP_EXT"     , "--experiment_extension" , type=str, help="Experiment Name Extension.")
+parser.add_argument("--RESULTS_DIR" , "--results_directory" , type=str, help="Results Directory.")
+parser.add_argument("--EXP_EXT"     , "--experiment_suffix" , type=str, help="Experiments Name Extension.")
 
-parser.add_argument("--SVM_W2V"   , "--w2v_svm_model_directory"           , type=str, help="Word2Vec SVM Model Location")
-parser.add_argument("--SVM_SCBOW" , "--scbow_svm_model_directory"         , type=str, help="Siamese CBOW SVM Model Location")
-parser.add_argument("--SVM_SKIP"  , "--skip-thoughts_svm_model_directory" , type=str, help="Skip-Thoughts SVM Model Location")
-parser.add_argument("--SVM_ELMO"  , "--elmo_svm_model_directory"          , type=str, help="ELMo SVM Model Location")
+parser.add_argument("--COS_DIST_Op" , "--threshold_operator"          , type=str, help="Operator for Positive Classification.")
 
-parser.add_argument("--USE_CFORM"   , help="Use flag to indicate if CForm Feature Should Be Used for the SVM Classifier."               , action="store_true")
-parser.add_argument("--USE_SYN_FIX" , help="Use flag to indicate if Syntactic Fixedness Feature Should Be Used for the SVM Classifier." , action="store_true")
-parser.add_argument("--USE_LEX_FIX" , help="Use flag to indicate if Lexical Fixedness Feature Should Be Used for the SVM Classifier."   , action="store_true")
-parser.add_argument("--USE_OVA_FIX" , help="Use flag to indicate if Overall Fixedness Feature Should Be Used for the SVM Classifier."   , action="store_true")
-
-parser.add_argument("--FILE_EXT" , "--output_file_extension"       , type=str, help="File Extension for Output Files.")
-parser.add_argument("--CSV_EXT"  , "--csv_output_file_extension"   , type=str, help="CSV File Extension for Output Files.")
-parser.add_argument("--IMG_EXT"  , "--image_output_file_extension" , type=str, help="Image File Extension for Output Files.")
-
-parser.add_argument("--COS_DIST_T"  , "--cosine_distance_threshold" , type=float, help="Threshold for Classification Using Cosine Distance.")
-parser.add_argument("--COS_DIST_Op" , "--cosine_distance_operator"  , type=str  , help="Operator for Positive Threshold Passing.")
-
-parser.add_argument("--SAVE_PLT" , help="Save Plot of Embeddings and Classification." , action="store_true")
+parser.add_argument("--SAVE_PLT" , help="Use flag to indicate if Plots Should be Saved.", action="store_true")
 
 args = parser.parse_args()
 # ------------- ARGS ------------- #
 
 # Files and Directories:
-OG_SENT_DIR      = "../targets/Extracted_Sentences_cand.txt"
-TARGETS_DIR      = "../targets/VNC-Tokens_candidates"
+OG_SENT_DIR      = "../targets/Extracted_Sentences.txt"
+TARGETS_DIR      = "../targets/English_VNC_Cook/VNC-Tokens_cleaned"
 W2V_DIR          = "../Word2Vec/"
 SCBOW_DIR        = "../SiameseCBOW/"
 SKIP_DIR         = "../SkipThoughts/"
 ELMO_DIR         = "../ELMo/"
-CFORM_DIR        = "../targets/CForms_cand.csv"
-SYN_FIX_DIR      = "../targets/SynFix_cand.csv"
-LEX_FIX_DIR      = "../targets/LexFix_cand.csv"
-OVA_FIX_DIR      = "../targets/OvaFix_cand.csv"
-VECTORS_FILE     = "embeddings_cand.csv"
-VECTORS_FILE_VNC = "embeddings_VNC_cand.csv"
+VECTORS_FILE     = "embeddings.csv"
+VECTORS_FILE_VNC = "embeddings_VNC.csv"
 W2V_RESULTS      = "W2V"
 SCBOW_RESULTS    = "SCBOW"
 SKIP_RESULTS     = "SKIP"
 ELMO_RESULTS     = "ELMO"
 
 # Experiment Dirs
-RESULTS_DIR = "./results/Experiment_3_1/"
+RESULTS_DIR = "./results/Experiment_2_4/"
 EXP_EXT     = "_cosineSimilarity"
-
-# SVM Classifiers Directories:
-SVM_W2V   = "../SVM_Models/W2V_clean.model"
-SVM_SCBOW = "../SVM_Models/SCBOW_clean.model"
-SVM_SKIP  = "../SVM_Models/SKIP_clean.model"
-SVM_ELMO  = "../SVM_Models/ELMO_clean.model"
-
-# SVM Classifiers Features:
-USE_CFORM   = False
-USE_SYN_FIX = False
-USE_LEX_FIX = False
-USE_OVA_FIX = False
 
 # File Extensions
 FILE_EXT = ".tsv"
@@ -110,7 +76,7 @@ CSV_EXT  = ".csv"
 IMG_EXT  = ".png"
 
 # Unsupervised Parameters:
-COS_DIST_T  = 0.6
+COS_DIST_T  = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 COS_DIST_Op = '<'
 
 # Other Parameters
@@ -171,16 +137,16 @@ def gen_plot(feat, targ, pred, title_targ, title_pred, saveDir, dispPlot=False):
 
     plt.close()
 
-def saveClassifiedSentences(all_sent, all_cSim, all_pred, all_gold, fileDir):
+def saveClassifiedSentences(all_sent, all_cSim, all_targ, all_pred, fileDir):
 
     all_sent = all_sent.reshape((all_sent.size, 1))
     all_cSim = all_cSim.reshape((all_cSim.size, 1))
+    all_targ = all_targ.reshape((all_targ.size, 1))
     all_pred = all_pred.reshape((all_pred.size, 1))
-    all_gold = all_gold.reshape((all_gold.size, 1))
     data = np.append(all_sent, all_cSim, axis=1)
+    data = np.append(data, all_targ, axis = 1)
     data = np.append(data, all_pred, axis = 1)
-    data = np.append(data, all_gold, axis = 1)
-    pd.DataFrame(data = data, columns=['Sentence', 'Unsupervised Metric', 'Classification', 'Gold Standard']).to_csv(fileDir, sep='\t')
+    pd.DataFrame(data = data, columns=['Sentence', 'Cos Similarity', 'Target', 'Prediction']).to_csv(fileDir, sep='\t')
 
 def main():
     # Create Results Dir
@@ -192,170 +158,155 @@ def main():
                 raise
 
     # -- EXTRACT DATASETS -- #
+    # Extract all targets and remove those where classification is Q (unknown)
     targets = pd.read_csv(TARGETS_DIR, header=None, usecols=[0], sep=' ').values.flatten()
+    indexes = np.where(targets != 'Q')
+
+    targets_idiomatic = (targets[indexes] == 'I')
+    targets_literal   = (targets[indexes] == 'L')
 
     # Original Sentences
-    og_sent = np.genfromtxt(OG_SENT_DIR, delimiter="\t", dtype=None, encoding="utf_8")
+    og_sent = np.genfromtxt(OG_SENT_DIR, delimiter="\t", dtype=None, encoding="utf_8")[indexes]
 
     # Sentence Embeddings
-    features_w2v   = np.genfromtxt(W2V_DIR   + VECTORS_FILE, delimiter=',')
-    features_scbow = np.genfromtxt(SCBOW_DIR + VECTORS_FILE, delimiter=',')
-    features_skip  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE, delimiter=',')
-    features_elmo  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE, delimiter=',')
-
-    # Sentence Embeddings for SVM
-    features_w2v_SVM   = features_w2v.copy()
-    features_scbow_SVM = features_scbow.copy()
-    features_skip_SVM  = features_skip.copy()
-    features_elmo_SVM  = features_elmo.copy()
+    features_w2v   = np.genfromtxt(W2V_DIR   + VECTORS_FILE, delimiter=',')[indexes]
+    features_scbow = np.genfromtxt(SCBOW_DIR + VECTORS_FILE, delimiter=',')[indexes]
+    features_skip  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE, delimiter=',')[indexes]
+    features_elmo  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE, delimiter=',')[indexes]
 
     # VNC Embeddings
-    features_w2v_VNC   = np.genfromtxt(W2V_DIR   + VECTORS_FILE_VNC, delimiter=',')
-    features_scbow_VNC = np.genfromtxt(SCBOW_DIR + VECTORS_FILE_VNC, delimiter=',')
-    features_skip_VNC  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE_VNC, delimiter=',')
-    features_elmo_VNC  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE_VNC, delimiter=',')
+    features_w2v_VNC   = np.genfromtxt(W2V_DIR   + VECTORS_FILE_VNC, delimiter=',')[indexes]
+    features_scbow_VNC = np.genfromtxt(SCBOW_DIR + VECTORS_FILE_VNC, delimiter=',')[indexes]
+    features_skip_VNC  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE_VNC, delimiter=',')[indexes]
+    features_elmo_VNC  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE_VNC, delimiter=',')[indexes]
 
-    # -- ADD FAZLY's METRICS -- #
-    if(USE_CFORM):
-        cForms = np.genfromtxt(CFORM_DIR, delimiter=',')
-        cForms = cForms.reshape((cForms.size, 1))
+    # Initialize Results DataFrames
+    df_w2v_accuracy  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_w2v_f1_score  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_w2v_precision = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_w2v_recall    = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
 
-        features_w2v_SVM   = np.append(features_w2v_SVM,   cForms, axis=1)
-        features_scbow_SVM = np.append(features_scbow_SVM, cForms, axis=1)
-        features_skip_SVM  = np.append(features_skip_SVM,  cForms, axis=1)
-        features_elmo_SVM  = np.append(features_elmo_SVM,  cForms, axis=1)
+    df_scbow_accuracy  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_scbow_f1_score  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_scbow_precision = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_scbow_recall    = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
 
-    if(USE_SYN_FIX):
-        synFix = np.genfromtxt(SYN_FIX_DIR, delimiter=',')
-        synFix = synFix.reshape((synFix.size, 1))
+    df_skip_accuracy  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_skip_f1_score  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_skip_precision = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_skip_recall    = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
 
-        features_w2v_SVM   = np.append(features_w2v_SVM,   synFix, axis=1)
-        features_scbow_SVM = np.append(features_scbow_SVM, synFix, axis=1)
-        features_skip_SVM  = np.append(features_skip_SVM,  synFix, axis=1)
-        features_elmo_SVM  = np.append(features_elmo_SVM,  synFix, axis=1)
+    df_elmo_accuracy  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_elmo_f1_score  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_elmo_precision = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_elmo_recall    = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
 
-    if(USE_LEX_FIX):
-        lexFix = np.genfromtxt(LEX_FIX_DIR, delimiter=',')
-        lexFix = lexFix.reshape((lexFix.size, 1))
+    # Shuffle Sets:
+    sent_X, w2v_X, w2v_X_VNC, scbow_X, scbow_X_VNC, skip_X, skip_X_VNC, elmo_X, elmo_X_VNC, y = og_sent, features_w2v, features_w2v_VNC, features_scbow, features_scbow_VNC, features_skip, features_skip_VNC, features_elmo, features_elmo_VNC, targets_idiomatic
 
-        features_w2v_SVM   = np.append(features_w2v_SVM,   lexFix, axis=1)
-        features_scbow_SVM= np.append(features_scbow_SVM, lexFix, axis=1)
-        features_skip_SVM  = np.append(features_skip_SVM,  lexFix, axis=1)
-        features_elmo_SVM  = np.append(features_elmo_SVM,  lexFix, axis=1)
+    for cos_dist_t in COS_DIST_T:
+        exp_ext = EXP_EXT + "_COS_DIST_T_" + str(cos_dist_t)
 
-    if(USE_OVA_FIX):
-        ovaFix = np.genfromtxt(OVA_FIX_DIR, delimiter=',')
-        ovaFix = ovaFix.reshape((ovaFix.size, 1))
+        print("<===================> Word2Vec <===================>")
+        # - Calculate Cosine Similarity
+        w2v_cosSims = UnsupervisedMetrics.CosineSimilarity(w2v_X, w2v_X_VNC)
 
-        features_w2v_SVM   = np.append(features_w2v_SVM,   ovaFix, axis=1)
-        features_scbow_SVM = np.append(features_scbow_SVM, ovaFix, axis=1)
-        features_skip_SVM  = np.append(features_skip_SVM,  ovaFix, axis=1)
-        features_elmo_SVM  = np.append(features_elmo_SVM,  ovaFix, axis=1)
+        # - Get Predictions
+        w2v_pred = UnsupervisedMetrics.ThresholdClassifier(w2v_cosSims, T=cos_dist_t, Op=COS_DIST_Op)
 
-    # Split Sets:
-    sent_X, w2v_X, w2v_X_VNC, w2v_X_SVM, scbow_X, scbow_X_VNC, scbow_X_SVM, skip_X, skip_X_VNC, skip_X_SVM, elmo_X, elmo_X_VNC, elmo_X_SVM = og_sent, features_w2v, features_w2v_VNC, features_w2v_SVM, features_scbow, features_scbow_VNC, features_scbow_SVM, features_skip, features_skip_VNC, features_skip_SVM, features_elmo, features_elmo_VNC, features_elmo_SVM
+        # Display Classifications:
+        if(SAVE_PLT): gen_plot(w2v_X, y, w2v_pred, "Original Word2Vec Labels", "Cosine Similarity Labels", RESULTS_DIR + W2V_RESULTS + exp_ext + IMG_EXT)
+        saveClassifiedSentences(sent_X, w2v_cosSims, y, w2v_pred, RESULTS_DIR + W2V_RESULTS + exp_ext + FILE_EXT)
 
+        print("Results:", classification_report(y, w2v_pred))
+        results_w2v = pd.DataFrame.from_dict(classification_report(y, w2v_pred, output_dict=True))
+        results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + exp_ext + CSV_EXT)
 
-    print("<===================> Word2Vec <===================>")
-    # - Calculate Cosine Similarity
-    w2v_cosSims = UnsupervisedMetrics.CosineSimilarity(w2v_X, w2v_X_VNC)
+        df_w2v_accuracy[cos_dist_t, "Threshold"]  = accuracy_score(y, w2v_pred)
+        df_w2v_f1_score[cos_dist_t, "Threshold"]  = results_w2v['True']['f1-score']
+        df_w2v_precision[cos_dist_t, "Threshold"] = results_w2v['True']['precision']
+        df_w2v_recall[cos_dist_t, "Threshold"]    = results_w2v['True']['recall']
 
-    # - Get Predictions
-    w2v_pred = UnsupervisedMetrics.ThresholdClassifier(w2v_cosSims, T=COS_DIST_T, Op=COS_DIST_Op)
+        print("<=================> Siamese CBOW <=================>")
+        # - Calculate Cosine Similarity
+        scbow_cosSims = UnsupervisedMetrics.CosineSimilarity(scbow_X, scbow_X_VNC)
 
-    # - Get SVM Predictions
-    if(os.path.isfile(SVM_W2V)):
-        with open(SVM_W2V, 'rb') as svmFile:
-            svm_clf = pickle.load(svmFile)
-    else:
-        print("File does not exists:", SVM_W2V)
-        return
-    y = svm_clf.predict(w2v_X_SVM)
+        # - Get Predictions
+        scbow_pred = UnsupervisedMetrics.ThresholdClassifier(scbow_cosSims, T=cos_dist_t, Op=COS_DIST_Op)
 
-    # Display Classifications:
-    if(SAVE_PLT): gen_plot(w2v_X, y, w2v_pred, "Original Word2Vec Labels", "Cosine Similarity Labels", RESULTS_DIR + W2V_RESULTS + EXP_EXT + IMG_EXT)
-    saveClassifiedSentences(sent_X, w2v_cosSims, w2v_pred, y, RESULTS_DIR + W2V_RESULTS + EXP_EXT + FILE_EXT)
+        # Display Classifications:
+        if(SAVE_PLT): gen_plot(scbow_X, y, scbow_pred, "Original Siamese CBOW Labels", "Cosine Similarity Labels", RESULTS_DIR + SCBOW_RESULTS + exp_ext + IMG_EXT)
+        saveClassifiedSentences(sent_X, scbow_cosSims, y, scbow_pred, RESULTS_DIR + SCBOW_RESULTS + exp_ext + FILE_EXT)
 
-    # Classification Report with SVM Classification as Gold Standard
-    print("Results:", classification_report(y, w2v_pred))
-    results_w2v = pd.DataFrame.from_dict(classification_report(y, w2v_pred, output_dict=True))
-    results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + EXP_EXT + CSV_EXT)
+        print("Results:", classification_report(y, scbow_pred))
+        results_scbow = pd.DataFrame.from_dict(classification_report(y, scbow_pred, output_dict=True))
+        results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + exp_ext + CSV_EXT)
 
-    print("<=================> Siamese CBOW <=================>")
-    # - Calculate Cosine Similarity
-    scbow_cosSims = UnsupervisedMetrics.CosineSimilarity(scbow_X, scbow_X_VNC)
+        df_scbow_accuracy[cos_dist_t, "Threshold"]  = accuracy_score(y, scbow_pred)
+        df_scbow_f1_score[cos_dist_t, "Threshold"]  = results_scbow['True']['f1-score']
+        df_scbow_precision[cos_dist_t, "Threshold"] = results_scbow['True']['precision']
+        df_scbow_recall[cos_dist_t, "Threshold"]    = results_scbow['True']['recall']
 
-    # - Get Predictions
-    scbow_pred = UnsupervisedMetrics.ThresholdClassifier(scbow_cosSims, T=COS_DIST_T, Op=COS_DIST_Op)
+        print("<================> Skip - Thoughts <===============>")
+        # - Calculate Cosine Similarity
+        skip_cosSims = UnsupervisedMetrics.CosineSimilarity(skip_X, skip_X_VNC)
 
-    # - Get SVM Predictions
-    if(os.path.isfile(SVM_SCBOW)):
-        with open(SVM_SCBOW, 'rb') as svmFile:
-            svm_clf = pickle.load(svmFile)
-    else:
-        print("File does not exists:", SVM_SCBOW)
-        return
-    y = svm_clf.predict(scbow_X_SVM)
+        # - Get Predictions
+        skip_pred = UnsupervisedMetrics.ThresholdClassifier(skip_cosSims, T=cos_dist_t, Op=COS_DIST_Op)
 
-    # Display Classifications:
-    if(SAVE_PLT): gen_plot(scbow_X, y, scbow_pred, "Original Siamese CBOW Labels", "Cosine Similarity Labels", RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + IMG_EXT)
-    saveClassifiedSentences(sent_X, scbow_cosSims, scbow_pred, y, RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + FILE_EXT)
+        # Display Classifications:
+        if(SAVE_PLT): gen_plot(skip_X, y, skip_pred, "Original Skip-Thoughts Labels", "Cosine Similarity Labels", RESULTS_DIR + SKIP_RESULTS + exp_ext + IMG_EXT)
+        saveClassifiedSentences(sent_X, skip_cosSims, y, skip_pred, RESULTS_DIR + SKIP_RESULTS + exp_ext + FILE_EXT)
 
-    # Classification Report with SVM Classification as Gold Standard
-    print("Results:", classification_report(y, scbow_pred))
-    results_scbow = pd.DataFrame.from_dict(classification_report(y, scbow_pred, output_dict=True))
-    results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + CSV_EXT)
+        print("Results:", classification_report(y, skip_pred))
+        results_skip = pd.DataFrame.from_dict(classification_report(y, skip_pred, output_dict=True))
+        results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + exp_ext + CSV_EXT)
 
-    print("<================> Skip - Thoughts <===============>")
-    # - Calculate Cosine Similarity
-    skip_cosSims = UnsupervisedMetrics.CosineSimilarity(skip_X, skip_X_VNC)
+        df_skip_accuracy[cos_dist_t, "Threshold"]  = accuracy_score(y, skip_pred)
+        df_skip_f1_score[cos_dist_t, "Threshold"]  = results_skip['True']['f1-score']
+        df_skip_precision[cos_dist_t, "Threshold"] = results_skip['True']['precision']
+        df_skip_recall[cos_dist_t, "Threshold"]    = results_skip['True']['recall']
 
-    # - Get Predictions
-    skip_pred = UnsupervisedMetrics.ThresholdClassifier(skip_cosSims, T=COS_DIST_T, Op=COS_DIST_Op)
+        print("<=====================> ELMo <=====================>")
+        # - Calculate Cosine Similarity
+        elmo_cosSims = UnsupervisedMetrics.CosineSimilarity(elmo_X, elmo_X_VNC)
 
-    # - Get SVM Predictions
-    if(os.path.isfile(SVM_SKIP)):
-        with open(SVM_SKIP, 'rb') as svmFile:
-            svm_clf = pickle.load(svmFile)
-    else:
-        print("File does not exists:", SVM_SKIP)
-        return
-    y = svm_clf.predict(skip_X_SVM)
+        # - Get Predictions
+        elmo_pred = UnsupervisedMetrics.ThresholdClassifier(elmo_cosSims, T=cos_dist_t, Op=COS_DIST_Op)
 
-    # Display Classifications:
-    if(SAVE_PLT): gen_plot(skip_X, y, skip_pred, "Original Skip-Thoughts Labels", "Cosine Similarity Labels", RESULTS_DIR + SKIP_RESULTS + EXP_EXT + IMG_EXT)
-    saveClassifiedSentences(sent_X, skip_cosSims, skip_pred, y, RESULTS_DIR + SKIP_RESULTS + EXP_EXT + FILE_EXT)
+        # Display Classifications:
+        if(SAVE_PLT): gen_plot(elmo_X, y, elmo_pred, "Original ELMo Labels", "Cosine Similarity Labels", RESULTS_DIR + ELMO_RESULTS + exp_ext + IMG_EXT)
+        saveClassifiedSentences(sent_X, elmo_cosSims, y, elmo_pred, RESULTS_DIR + ELMO_RESULTS + exp_ext + FILE_EXT)
 
-    # Classification Report with SVM Classification as Gold Standard
-    print("Results:", classification_report(y, skip_pred))
-    results_skip = pd.DataFrame.from_dict(classification_report(y, skip_pred, output_dict=True))
-    results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + EXP_EXT + CSV_EXT)
+        print("Results:", classification_report(y, elmo_pred))
+        results_elmo = pd.DataFrame.from_dict(classification_report(y, elmo_pred, output_dict=True))
+        results_elmo.to_csv(RESULTS_DIR + ELMO_RESULTS + exp_ext + CSV_EXT)
 
-    print("<=====================> ELMo <=====================>")
-    # - Calculate Cosine Similarity
-    elmo_cosSims = UnsupervisedMetrics.CosineSimilarity(elmo_X, elmo_X_VNC)
+        df_elmo_accuracy[cos_dist_t, "Threshold"]  = accuracy_score(y, elmo_pred)
+        df_elmo_f1_score[cos_dist_t, "Threshold"]  = results_elmo['True']['f1-score']
+        df_elmo_precision[cos_dist_t, "Threshold"] = results_elmo['True']['precision']
+        df_elmo_recall[cos_dist_t, "Threshold"]    = results_elmo['True']['recall']
 
-    # - Get Predictions
-    elmo_pred = UnsupervisedMetrics.ThresholdClassifier(elmo_cosSims, T=COS_DIST_T, Op=COS_DIST_Op)
+    # Store Result Grid
+    df_w2v_accuracy.to_csv(RESULTS_DIR  + W2V_RESULTS + "_ACCURACY_"  + EXP_EXT + CSV_EXT)  
+    df_w2v_f1_score.to_csv(RESULTS_DIR  + W2V_RESULTS + "_F1-SCORE_"  + EXP_EXT + CSV_EXT)  
+    df_w2v_precision.to_csv(RESULTS_DIR + W2V_RESULTS + "_PREVISION_" + EXP_EXT + CSV_EXT) 
+    df_w2v_recall.to_csv(RESULTS_DIR    + W2V_RESULTS + "_RECALL_"    + EXP_EXT + CSV_EXT)    
 
-    # - Get SVM Predictions
-    if(os.path.isfile(SVM_ELMO)):
-        with open(SVM_ELMO, 'rb') as svmFile:
-            svm_clf = pickle.load(svmFile)
-    else:
-        print("File does not exists:", SVM_ELMO)
-        return
-    y = svm_clf.predict(elmo_X_SVM)
+    df_scbow_accuracy.to_csv(RESULTS_DIR  + SCBOW_RESULTS + "_ACCURACY_"  + EXP_EXT + CSV_EXT)  
+    df_scbow_f1_score.to_csv(RESULTS_DIR  + SCBOW_RESULTS + "_F1-SCORE_"  + EXP_EXT + CSV_EXT)  
+    df_scbow_precision.to_csv(RESULTS_DIR + SCBOW_RESULTS + "_PREVISION_" + EXP_EXT + CSV_EXT) 
+    df_scbow_recall.to_csv(RESULTS_DIR    + SCBOW_RESULTS + "_RECALL_"    + EXP_EXT + CSV_EXT)    
 
-    # Display Classifications:
-    if(SAVE_PLT): gen_plot(elmo_X, y, elmo_pred, "Original ELMo Labels", "Cosine Similarity Labels", RESULTS_DIR + ELMO_RESULTS + EXP_EXT + IMG_EXT)
-    saveClassifiedSentences(sent_X, elmo_cosSims, elmo_pred, y, RESULTS_DIR + ELMO_RESULTS + EXP_EXT + FILE_EXT)
+    df_skip_accuracy.to_csv(RESULTS_DIR  + SKIP_RESULTS + "_ACCURACY_"  + EXP_EXT + CSV_EXT) 
+    df_skip_f1_score.to_csv(RESULTS_DIR  + SKIP_RESULTS + "_F1-SCORE_"  + EXP_EXT + CSV_EXT) 
+    df_skip_precision.to_csv(RESULTS_DIR + SKIP_RESULTS + "_PREVISION_" + EXP_EXT + CSV_EXT)
+    df_skip_recall.to_csv(RESULTS_DIR    + SKIP_RESULTS + "_RECALL_"    + EXP_EXT + CSV_EXT)   
 
-    # Classification Report with SVM Classification as Gold Standard
-    print("Results:", classification_report(y, elmo_pred))
-    results_skip = pd.DataFrame.from_dict(classification_report(y, elmo_pred, output_dict=True))
-    results_skip.to_csv(RESULTS_DIR + ELMO_RESULTS + EXP_EXT + CSV_EXT)
-
+    df_elmo_accuracy.to_csv(RESULTS_DIR  + ELMO_RESULTS + "_ACCURACY_"  + EXP_EXT + CSV_EXT) 
+    df_elmo_f1_score.to_csv(RESULTS_DIR  + ELMO_RESULTS + "_F1-SCORE_"  + EXP_EXT + CSV_EXT) 
+    df_elmo_precision.to_csv(RESULTS_DIR + ELMO_RESULTS + "_PREVISION_" + EXP_EXT + CSV_EXT)
+    df_elmo_recall.to_csv(RESULTS_DIR    + ELMO_RESULTS + "_RECALL_"    + EXP_EXT + CSV_EXT)
 
 if __name__ == '__main__':
 
@@ -371,14 +322,6 @@ if __name__ == '__main__':
         SKIP_DIR = args.SKIP_DIR
     if(args.ELMO_DIR):
         ELMO_DIR = args.ELMO_DIR
-    if(args.CFORM_DIR):
-        CFORM_DIR = args.CFORM_DIR
-    if(args.SYN_FIX_DIR):
-        SYN_FIX_DIR = args.SYN_FIX_DIR
-    if(args.LEX_FIX_DIR):
-        LEX_FIX_DIR = args.LEX_FIX_DIR
-    if(args.OVA_FIX_DIR):
-        OVA_FIX_DIR = args.OVA_FIX_DIR
     if(args.VECTORS_FILE):
         VECTORS_FILE = args.VECTORS_FILE
     if(args.VECTORS_FILE_VNC):
@@ -397,38 +340,10 @@ if __name__ == '__main__':
     if(args.EXP_EXT):
         EXP_EXT = args.EXP_EXT
 
-    if(args.SVM_W2V):
-        SVM_W2V = args.SVM_W2V
-    if(args.SVM_SCBOW):
-        SVM_SCBOW = args.SVM_SCBOW
-    if(args.SVM_SKIP):
-        SVM_SKIP = args.SVM_SKIP
-    if(args.SVM_ELMO):
-        SVM_ELMO = args.SVM_ELMO
-
-    if(args.USE_CFORM):
-        USE_CFORM = True
-    if(args.USE_SYN_FIX):
-        USE_SYN_FIX = True
-    if(args.USE_LEX_FIX):
-        USE_LEX_FIX = True
-    if(args.USE_OVA_FIX):
-        USE_OVA_FIX = True
-
-    if(args.FILE_EXT):
-        FILE_EXT = args.FILE_EXT
-    if(args.CSV_EXT):
-        CSV_EXT = args.CSV_EXT
-    if(args.IMG_EXT):
-        IMG_EXT = args.IMG_EXT
-
-    if(args.COS_DIST_T):
-        COS_DIST_T = args.COS_DIST_T
-    if(args.COS_DIST_Op):
-        COS_DIST_Op = args.COS_DIST_Op
-
     if(args.SAVE_PLT):
         SAVE_PLT = True
 
+    if(args.COS_DIST_Op):
+        COS_DIST_Op = args.COS_DIST_Op
 
     main()

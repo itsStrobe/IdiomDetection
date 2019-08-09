@@ -1,15 +1,15 @@
 """
-    File:   Experiment
+    File:   Experiment_3_4
     Author: Jose Juan Zavala Iglesias
-    Date:   23/06/2019
+    Date:   05/07/2019
 
-    Unsupervised (Cosine Similarity) Classification evaluation for VNC Tokens Dataset using word embeddings generated with:
+    Unsupervised (Cosine Similarity + Overall Fixedness) Classification evaluation for VNC Tokens Dataset using word embeddings generated with:
         >Word2Vec
         >Skip-Thoughts
         >Siamese CBOW
         >ELMo
 
-    Added Fazly et. al (2009) Metrics
+    Added Fazly et. al (2009) CForm
 """
 
 import os
@@ -21,7 +21,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report
-from sklearn.utils import shuffle
 from sklearn.decomposition import PCA
 
 import UnsupervisedMetrics
@@ -29,12 +28,13 @@ import UnsupervisedMetrics
 # ------------- ARGS ------------- #
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--OG_SENT_DIR"      , "--original_sentences_dir"            , type=str, help="Location of the File Containing the Original Extracted Sentences.")
+parser.add_argument("--OG_SENT_DIR"      , "--original_sentences_directory"      , type=str, help="Location of the File Containing the Targets' Sentences.")
 parser.add_argument("--TARGETS_DIR"      , "--targets_directory"                 , type=str, help="Location of the File Containing the Targets in VNC-Token format.")
 parser.add_argument("--W2V_DIR"          , "--w2v_directory"                     , type=str, help="Location of the Input Dir Containing the Word2Vec Embeddings.")
 parser.add_argument("--SCBOW_DIR"        , "--scbow_directory"                   , type=str, help="Location of the Input Dir Containing the Siamese SCBOW Embeddings.")
 parser.add_argument("--SKIP_DIR"         , "--skip-thoughts_directory"           , type=str, help="Location of the Input Dir Containing the Skip-Thoughts Embeddings.")
 parser.add_argument("--ELMO_DIR"         , "--elmo_directory"                    , type=str, help="Location of the Input Dir Containing the ELMo Embeddings.")
+parser.add_argument("--CFORM_DIR"        , "--canonical_forms"                   , type=str, help="Location of the File Indicating the Canonical Forms of the Candidates.")
 parser.add_argument("--VECTORS_FILE"     , "--embedded_vectors_file"             , type=str, help="Name of the Embeddings File.")
 parser.add_argument("--VECTORS_FILE_VNC" , "--embedded_vnc_vectors_file"         , type=str, help="Name of the VNC Embeddings File.")
 parser.add_argument("--W2V_RESULTS"      , "--w2v_results_file_prefix"           , type=str, help="Location of the Output File Containing the Cross-Validation Results for Word2Vec's SVM.")
@@ -42,34 +42,40 @@ parser.add_argument("--SCBOW_RESULTS"    , "--scbow_results_file_prefix"        
 parser.add_argument("--SKIP_RESULTS"     , "--skip-thoughts_results_file_prefix" , type=str, help="Location of the Output File Containing the Cross-Validation Results for Skip-Thoughts's SVM.")
 parser.add_argument("--ELMO_RESULTS"     , "--elmo_results_file_prefix"          , type=str, help="Location of the Output File Containing the Cross-Validation Results for ELMo's SVM.")
 
-parser.add_argument("--RESULTS_DIR" , "--results_directory" , type=str, help="Results Directory.")
-parser.add_argument("--EXP_EXT"     , "--experiment_suffix" , type=str, help="Experiments Name Extension.")
+parser.add_argument("--RESULTS_DIR" , "--results_directory"     , type=str, help="Results Directory.")
+parser.add_argument("--EXP_EXT"     , "--experiment_extension"  , type=str, help="Experiment Name Extension.")
 
-parser.add_argument("--COS_DIST_T"  , "--cosine_similarity_threshold" , type=int, help="Cosine Similarity Threshold.")
-parser.add_argument("--COS_DIST_Op" , "--threshold_operator"          , type=str, help="Operator for Positive Classification.")
+parser.add_argument("--FILE_EXT" , "--output_file_extension"       , type=str, help="File Extension for Output Files.")
+parser.add_argument("--CSV_EXT"  , "--csv_output_file_extension"   , type=str, help="CSV File Extension for Output Files.")
+parser.add_argument("--IMG_EXT"  , "--image_output_file_extension" , type=str, help="Image File Extension for Output Files.")
 
-parser.add_argument("--SAVE_PLT" , help="Use flag to indicate if Plots Should be Saved.", action="store_true")
+parser.add_argument("--UNM_MET_T"  , "--unnamed_metric_threshold" , type=float, help="Threshold for Classification Using Unnamed Metric.")
+parser.add_argument("--UNM_MET_Op" , "--unnamed_metric_operator"  , type=str  , help="Operator for Positive Threshold Passing.")
+parser.add_argument("--BETA"       , "--beta_parameter"           , type=float, help="Beta Parameter for Unnamed Metric.")
+
+parser.add_argument("--SAVE_PLT" , help="Save Plot of Embeddings and Classification." , action="store_true")
 
 args = parser.parse_args()
 # ------------- ARGS ------------- #
 
 # Files and Directories:
-OG_SENT_DIR      = "../targets/Extracted_Sentences.txt"
-TARGETS_DIR      = "../targets/English_VNC_Cook/VNC-Tokens_cleaned"
+OG_SENT_DIR      = "../targets/Extracted_Sentences_cand.txt"
+TARGETS_DIR      = "../targets/VNC-Tokens_candidates"
 W2V_DIR          = "../Word2Vec/"
 SCBOW_DIR        = "../SiameseCBOW/"
 SKIP_DIR         = "../SkipThoughts/"
 ELMO_DIR         = "../ELMo/"
-VECTORS_FILE     = "embeddings.csv"
-VECTORS_FILE_VNC = "embeddings_VNC.csv"
+CFORM_DIR        = "../targets/CForms_cand.csv"
+VECTORS_FILE     = "embeddings_lemm_cand.csv"
+VECTORS_FILE_VNC = "embeddings_VNC_lemm_cand.csv"
 W2V_RESULTS      = "W2V"
 SCBOW_RESULTS    = "SCBOW"
 SKIP_RESULTS     = "SKIP"
 ELMO_RESULTS     = "ELMO"
 
 # Experiment Dirs
-RESULTS_DIR = "./results/Experiment_2_4/"
-EXP_EXT     = "_cosineSimilarity"
+RESULTS_DIR = "./results/Experiment_3_4/"
+EXP_EXT     = "_unnamedMetric"
 
 # File Extensions
 FILE_EXT = ".tsv"
@@ -77,8 +83,9 @@ CSV_EXT  = ".csv"
 IMG_EXT  = ".png"
 
 # Unsupervised Parameters:
-COS_DIST_T  = 0.6
-COS_DIST_Op = '<'
+UNM_MET_T  = 0.4
+UNM_MET_Op = '>'
+BETA       = 0.6
 
 # Other Parameters
 SAVE_PLT = False
@@ -138,16 +145,16 @@ def gen_plot(feat, targ, pred, title_targ, title_pred, saveDir, dispPlot=False):
 
     plt.close()
 
-def saveClassifiedSentences(all_sent, all_cSim, all_targ, all_pred, fileDir):
+def saveClassifiedSentences(all_sent, all_cSim, all_pred, all_gold, fileDir):
 
     all_sent = all_sent.reshape((all_sent.size, 1))
     all_cSim = all_cSim.reshape((all_cSim.size, 1))
-    all_targ = all_targ.reshape((all_targ.size, 1))
     all_pred = all_pred.reshape((all_pred.size, 1))
+    all_gold = all_gold.reshape((all_gold.size, 1))
     data = np.append(all_sent, all_cSim, axis=1)
-    data = np.append(data, all_targ, axis = 1)
     data = np.append(data, all_pred, axis = 1)
-    pd.DataFrame(data = data, columns=['Sentence', 'Cos Similarity', 'Target', 'Prediction']).to_csv(fileDir, sep='\t')
+    data = np.append(data, all_gold, axis = 1)
+    pd.DataFrame(data = data, columns=['Sentence', 'Unsupervised Metric', 'Classification', 'Gold Standard']).to_csv(fileDir, sep='\t')
 
 def main():
     # Create Results Dir
@@ -159,7 +166,6 @@ def main():
                 raise
 
     # -- EXTRACT DATASETS -- #
-    # Extract all targets and remove those where classification is Q (unknown)
     targets = pd.read_csv(TARGETS_DIR, header=None, usecols=[0], sep=' ').values.flatten()
     indexes = np.where(targets != 'Q')
 
@@ -167,35 +173,42 @@ def main():
     targets_literal   = (targets[indexes] == 'L')
 
     # Original Sentences
-    og_sent = np.genfromtxt(OG_SENT_DIR, delimiter="\t", dtype=None, encoding="utf_8")[indexes]
+    og_sent = np.genfromtxt(OG_SENT_DIR, delimiter="\t", dtype=None, encoding="utf_8")
 
     # Sentence Embeddings
-    features_w2v   = np.genfromtxt(W2V_DIR   + VECTORS_FILE, delimiter=',')[indexes]
-    features_scbow = np.genfromtxt(SCBOW_DIR + VECTORS_FILE, delimiter=',')[indexes]
-    features_skip  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE, delimiter=',')[indexes]
-    features_elmo  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE, delimiter=',')[indexes]
+    features_w2v   = np.genfromtxt(W2V_DIR   + VECTORS_FILE, delimiter=',')
+    features_scbow = np.genfromtxt(SCBOW_DIR + VECTORS_FILE, delimiter=',')
+    features_skip  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE, delimiter=',')
+    features_elmo  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE, delimiter=',')
 
     # VNC Embeddings
-    features_w2v_VNC   = np.genfromtxt(W2V_DIR   + VECTORS_FILE_VNC, delimiter=',')[indexes]
-    features_scbow_VNC = np.genfromtxt(SCBOW_DIR + VECTORS_FILE_VNC, delimiter=',')[indexes]
-    features_skip_VNC  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE_VNC, delimiter=',')[indexes]
-    features_elmo_VNC  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE_VNC, delimiter=',')[indexes]
+    features_w2v_VNC   = np.genfromtxt(W2V_DIR   + VECTORS_FILE_VNC, delimiter=',')
+    features_scbow_VNC = np.genfromtxt(SCBOW_DIR + VECTORS_FILE_VNC, delimiter=',')
+    features_skip_VNC  = np.genfromtxt(SKIP_DIR  + VECTORS_FILE_VNC, delimiter=',')
+    features_elmo_VNC  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE_VNC, delimiter=',')
 
-    # Shuffle Sets:
-    sent_X, w2v_X, w2v_X_VNC, scbow_X, scbow_X_VNC, skip_X, skip_X_VNC, elmo_X, elmo_X_VNC, y = og_sent, features_w2v, features_w2v_VNC, features_scbow, features_scbow_VNC, features_skip, features_skip_VNC, features_elmo, features_elmo_VNC, targets_idiomatic
+    # Pre-Calculated Overall Fixedness
+    features_CForm = np.genfromtxt(CFORM_DIR, delimiter=',')
+
+    # Split Sets:
+    sent_X, w2v_X, w2v_X_VNC, w2v_X_SVM, scbow_X, scbow_X_VNC, scbow_X_SVM, skip_X, skip_X_VNC, skip_X_SVM, elmo_X, elmo_X_VNC, elmo_X_SVM, cForm_X, y = og_sent, features_w2v, features_w2v_VNC, features_w2v_SVM, features_scbow, features_scbow_VNC, features_scbow_SVM, features_skip, features_skip_VNC, features_skip_SVM, features_elmo, features_elmo_VNC, features_elmo_SVM, features_CForm, targets_idiomatic
 
 
     print("<===================> Word2Vec <===================>")
     # - Calculate Cosine Similarity
     w2v_cosSims = UnsupervisedMetrics.CosineSimilarity(w2v_X, w2v_X_VNC)
 
+    # - Calculate Unnamed Metric
+    w2v_unnamedMetric = UnsupervisedMetrics.UnnamedMetric(w2v_cosSims, cForm_X, beta=BETA)
+
     # - Get Predictions
-    w2v_pred = UnsupervisedMetrics.ThresholdClassifier(w2v_cosSims, T=COS_DIST_T, Op=COS_DIST_Op)
+    w2v_pred = UnsupervisedMetrics.ThresholdClassifier(w2v_unnamedMetric, T=UNM_MET_T, Op=UNM_MET_Op)
 
     # Display Classifications:
     if(SAVE_PLT): gen_plot(w2v_X, y, w2v_pred, "Original Word2Vec Labels", "Cosine Similarity Labels", RESULTS_DIR + W2V_RESULTS + EXP_EXT + IMG_EXT)
-    saveClassifiedSentences(sent_X, w2v_cosSims, y, w2v_pred, RESULTS_DIR + W2V_RESULTS + EXP_EXT + FILE_EXT)
+    saveClassifiedSentences(sent_X, w2v_unnamedMetric, w2v_pred, y, RESULTS_DIR + W2V_RESULTS + EXP_EXT + FILE_EXT)
 
+    # Classification Report with SVM Classification as Gold Standard
     print("Results:", classification_report(y, w2v_pred))
     results_w2v = pd.DataFrame.from_dict(classification_report(y, w2v_pred, output_dict=True))
     results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + EXP_EXT + CSV_EXT)
@@ -204,13 +217,17 @@ def main():
     # - Calculate Cosine Similarity
     scbow_cosSims = UnsupervisedMetrics.CosineSimilarity(scbow_X, scbow_X_VNC)
 
+    # - Calculate Unnamed Metric
+    scbow_unnamedMetric = UnsupervisedMetrics.UnnamedMetric(scbow_cosSims, cForm_X, beta=BETA)
+
     # - Get Predictions
-    scbow_pred = UnsupervisedMetrics.ThresholdClassifier(scbow_cosSims, T=COS_DIST_T, Op=COS_DIST_Op)
+    scbow_pred = UnsupervisedMetrics.ThresholdClassifier(scbow_unnamedMetric, T=UNM_MET_T, Op=UNM_MET_Op)
 
     # Display Classifications:
     if(SAVE_PLT): gen_plot(scbow_X, y, scbow_pred, "Original Siamese CBOW Labels", "Cosine Similarity Labels", RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + IMG_EXT)
-    saveClassifiedSentences(sent_X, scbow_cosSims, y, scbow_pred, RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + FILE_EXT)
+    saveClassifiedSentences(sent_X, scbow_unnamedMetric, scbow_pred, y, RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + FILE_EXT)
 
+    # Classification Report with SVM Classification as Gold Standard
     print("Results:", classification_report(y, scbow_pred))
     results_scbow = pd.DataFrame.from_dict(classification_report(y, scbow_pred, output_dict=True))
     results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + EXP_EXT + CSV_EXT)
@@ -219,13 +236,17 @@ def main():
     # - Calculate Cosine Similarity
     skip_cosSims = UnsupervisedMetrics.CosineSimilarity(skip_X, skip_X_VNC)
 
+    # - Calculate Unnamed Metric
+    skip_unnamedMetric = UnsupervisedMetrics.UnnamedMetric(skip_cosSims, cForm_X, beta=BETA)
+
     # - Get Predictions
-    skip_pred = UnsupervisedMetrics.ThresholdClassifier(skip_cosSims, T=COS_DIST_T, Op=COS_DIST_Op)
+    skip_pred = UnsupervisedMetrics.ThresholdClassifier(skip_unnamedMetric, T=UNM_MET_T, Op=UNM_MET_Op)
 
     # Display Classifications:
     if(SAVE_PLT): gen_plot(skip_X, y, skip_pred, "Original Skip-Thoughts Labels", "Cosine Similarity Labels", RESULTS_DIR + SKIP_RESULTS + EXP_EXT + IMG_EXT)
-    saveClassifiedSentences(sent_X, skip_cosSims, y, skip_pred, RESULTS_DIR + SKIP_RESULTS + EXP_EXT + FILE_EXT)
+    saveClassifiedSentences(sent_X, skip_unnamedMetric, skip_pred, y, RESULTS_DIR + SKIP_RESULTS + EXP_EXT + FILE_EXT)
 
+    # Classification Report with SVM Classification as Gold Standard
     print("Results:", classification_report(y, skip_pred))
     results_skip = pd.DataFrame.from_dict(classification_report(y, skip_pred, output_dict=True))
     results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + EXP_EXT + CSV_EXT)
@@ -234,16 +255,21 @@ def main():
     # - Calculate Cosine Similarity
     elmo_cosSims = UnsupervisedMetrics.CosineSimilarity(elmo_X, elmo_X_VNC)
 
+    # - Calculate Unnamed Metric
+    elmo_unnamedMetric = UnsupervisedMetrics.UnnamedMetric(elmo_cosSims, cForm_X, beta=BETA)
+
     # - Get Predictions
-    elmo_pred = UnsupervisedMetrics.ThresholdClassifier(elmo_cosSims, T=COS_DIST_T, Op=COS_DIST_Op)
+    elmo_pred = UnsupervisedMetrics.ThresholdClassifier(elmo_unnamedMetric, T=UNM_MET_T, Op=UNM_MET_Op)
 
     # Display Classifications:
     if(SAVE_PLT): gen_plot(elmo_X, y, elmo_pred, "Original ELMo Labels", "Cosine Similarity Labels", RESULTS_DIR + ELMO_RESULTS + EXP_EXT + IMG_EXT)
-    saveClassifiedSentences(sent_X, elmo_cosSims, y, elmo_pred, RESULTS_DIR + ELMO_RESULTS + EXP_EXT + FILE_EXT)
+    saveClassifiedSentences(sent_X, elmo_unnamedMetric, elmo_pred, y, RESULTS_DIR + ELMO_RESULTS + EXP_EXT + FILE_EXT)
 
+    # Classification Report with SVM Classification as Gold Standard
     print("Results:", classification_report(y, elmo_pred))
-    results_elmo = pd.DataFrame.from_dict(classification_report(y, elmo_pred, output_dict=True))
-    results_elmo.to_csv(RESULTS_DIR + ELMO_RESULTS + EXP_EXT + CSV_EXT)
+    results_skip = pd.DataFrame.from_dict(classification_report(y, elmo_pred, output_dict=True))
+    results_skip.to_csv(RESULTS_DIR + ELMO_RESULTS + EXP_EXT + CSV_EXT)
+
 
 if __name__ == '__main__':
 
@@ -259,6 +285,8 @@ if __name__ == '__main__':
         SKIP_DIR = args.SKIP_DIR
     if(args.ELMO_DIR):
         ELMO_DIR = args.ELMO_DIR
+    if(args.CFORM_DIR):
+        CFORM_DIR = args.CFORM_DIR
     if(args.VECTORS_FILE):
         VECTORS_FILE = args.VECTORS_FILE
     if(args.VECTORS_FILE_VNC):
@@ -277,12 +305,22 @@ if __name__ == '__main__':
     if(args.EXP_EXT):
         EXP_EXT = args.EXP_EXT
 
+    if(args.FILE_EXT):
+        FILE_EXT = args.FILE_EXT
+    if(args.CSV_EXT):
+        CSV_EXT = args.CSV_EXT
+    if(args.IMG_EXT):
+        IMG_EXT = args.IMG_EXT
+
+    if(args.UNM_MET_T):
+        UNM_MET_T = args.UNM_MET_T
+    if(args.UNM_MET_Op):
+        UNM_MET_Op = args.UNM_MET_Op
+    if(args.BETA):
+        BETA = args.BETA
+
     if(args.SAVE_PLT):
         SAVE_PLT = True
 
-    if(args.COS_DIST_T):
-        COS_DIST_T = args.COS_DIST_T
-    if(args.COS_DIST_Op):
-        COS_DIST_Op = args.COS_DIST_Op
 
     main()
