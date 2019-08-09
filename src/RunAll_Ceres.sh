@@ -586,18 +586,18 @@ python3 Experiment_1_1.py --VECTORS_FILE "embeddings.csv" --RESULTS_DIR "./resul
     --USE_CFORM
 
 echo "Experiment 1-1 : King and Cook Experiments - SVM - Embeddings + CForm + Fazly's Fixedness Metrics"
-python3 Experiment_1_1.py -VECTORS_FILE "embeddings.csv" --RESULTS_DIR "./results/Experiment_1_1/CForm_Fix/" \
+python3 Experiment_1_1.py --VECTORS_FILE "embeddings.csv" --RESULTS_DIR "./results/Experiment_1_1/CForm_Fix/" \
     --USE_CFORM --USE_SYN_FIX --USE_LEX_FIX --USE_OVA_FIX
 
 echo "Experiment 1-1 : King and Cook Experiments - SVM - Embeddings Lemmatized"
 python3 Experiment_1_1.py --VECTORS_FILE "embeddings_lemm.csv" --RESULTS_DIR "./results/Experiment_1_1/Lemm/"
 
 echo "Experiment 1-1 : King and Cook Experiments - SVM - Embeddings Lemmatized + CForm"
-python3 Experiment_1_1.py -VECTORS_FILE "embeddings_lemm.csv" --RESULTS_DIR "./results/Experiment_1_1/CForm_Lemm/" \
+python3 Experiment_1_1.py --VECTORS_FILE "embeddings_lemm.csv" --RESULTS_DIR "./results/Experiment_1_1/CForm_Lemm/" \
     --USE_CFORM
 
 echo "Experiment 1-1 : King and Cook Experiments - SVM - Embeddings Lemmatized + CForm + Fazly's Fixedness Metrics"
-python3 Experiment_1_1.py -VECTORS_FILE "embeddings_lemm.csv" --RESULTS_DIR "./results/Experiment_1_1/CForm_Fix_Lemm/" \
+python3 Experiment_1_1.py --VECTORS_FILE "embeddings_lemm.csv" --RESULTS_DIR "./results/Experiment_1_1/CForm_Fix_Lemm/" \
     --USE_CFORM --USE_SYN_FIX --USE_LEX_FIX --USE_OVA_FIX
 
 deactivate
@@ -871,177 +871,89 @@ echo "Experiments 3"
 
 # Unsupervised - Cosine Similarity
 echo "Experiment 3-1 : Unsupervised - Cosine Similarity - Embeddings"
-python3 Experiment_2_4.py --VECTORS_FILE "embeddings.csv" --VECTORS_FILE_VNC "embeddings_VNC.csv"  --RESULTS_DIR "./results/Experiment_3_1/Clean/" \
+python3 Experiment_3_1.py --VECTORS_FILE "embeddings.csv" --VECTORS_FILE_VNC "embeddings_VNC.csv"  --RESULTS_DIR "./results/Experiment_3_1/Clean/" \
 
 echo "Experiment 3-1 : Unsupervised - Cosine Similarity - Embeddings"
-python3 Experiment_2_4.py --VECTORS_FILE "embeddings_lemm.csv" --VECTORS_FILE_VNC "embeddings_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_1/Lemm/" \
+python3 Experiment_3_1.py --VECTORS_FILE "embeddings_lemm.csv" --VECTORS_FILE_VNC "embeddings_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_1/Lemm/" \
 
-echo "Experiment 3-2 : Unsupervised - New Metrics - Embeddings -> Cosine Similarity and Overall Fixedness"
+# Unsupervised - Cosine Similarity + CForm
+echo "Experiment 3-2 : Unsupervised - New Metrics - Embeddings -> Cosine Similarity and CForm"
 python3 Experiment_3_2.py --VECTORS_FILE "embeddings.csv" --VECTORS_FILE_VNC "embeddings_VNC.csv"  --RESULTS_DIR "./results/Experiment_3_2/Clean/"
 
-
-echo "Experiment 3-2 : Unsupervised - New Metrics - Lemmatized Embeddings -> Cosine Similarity and Overall Fixedness"
+echo "Experiment 3-2 : Unsupervised - New Metrics - Lemmatized Embeddings -> Cosine Similarity and CForm"
 python3 Experiment_3_2.py --VECTORS_FILE "embeddings_lemm.csv" --VECTORS_FILE_VNC "embeddings_VNC_lemm.csv"  --RESULTS_DIR "./results/Experiment_3_2/Lemm/"
 
 # Unsupervised - Cosine Similarity [Candidates]
 echo "Experiment 3-3 : Unsupervised - Cosine Similarity [Candidates] - PMI Candidates"
 python3 Experiment_3_3.py --VECTORS_FILE "embeddings_cand_PMI.csv" --VECTORS_FILE_VNC "embeddings_cand_PMI_VNC.csv" --RESULTS_DIR "./results/Experiment_3_3/PMI_Clean/" \
-    --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_cForms.model"  \
-    --USE_CFORM \
-    --CFORM_DIR "../targets/CForms_cand_PMI.csv" \
     --COS_DIST_T 0.6
 
 echo "Experiment 3-3 : Unsupervised - Cosine Similarity [Candidates] - PMI Candidates - Lemmatized"
 python3 Experiment_3_3.py --VECTORS_FILE "embeddings_cand_PMI_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_PMI_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_3/PMI_Lemm/"\
-    --SVM_W2V   "../SVM_Models/W2V_lemm_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_lemm_cForms.model"  \
-    --USE_CFORM \
-    --CFORM_DIR "../targets/CForms_cand_PMI.csv" \
     --COS_DIST_T 0.6
 
 echo "Experiment 3-3 : Unsupervised - Cosine Similarity [Candidates] - Lexical Fixedness Candidates"
 python3 Experiment_3_3.py --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC.csv" --RESULTS_DIR "./results/Experiment_3_3/LEX_Clean/" \
-    --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_cForms.model"  \
-    --USE_CFORM \
-    --CFORM_DIR "../targets/CForms_cand_LEX.csv" \
     --COS_DIST_T 0.6
 
 echo "Experiment 3-3 : Unsupervised - Cosine Similarity [Candidates] - Lexical Fixedness Candidates - Lemmatized"
 python3 Experiment_3_3.py --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_3/LEX_Lemm/"\
-    --SVM_W2V   "../SVM_Models/W2V_lemm_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_lemm_cForms.model"  \
-    --USE_CFORM \
-    --CFORM_DIR "../targets/CForms_cand_LEX.csv" \
     --COS_DIST_T 0.6
 
 echo "Experiment 3-3 : Unsupervised - Cosine Similarity [Candidates] - Syntactical Fixedness Candidates"
 python3 Experiment_3_3.py --VECTORS_FILE "embeddings_cand_SYN.csv" --VECTORS_FILE_VNC "embeddings_cand_SYN_VNC.csv" --RESULTS_DIR "./results/Experiment_3_3/SYN_Clean/" \
-    --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_cForms.model"  \
-    --USE_CFORM \
-    --CFORM_DIR "../targets/CForms_cand_SYN.csv" \
     --COS_DIST_T 0.6
 
 echo "Experiment 3-3 : Unsupervised - Cosine Similarity [Candidates] - Syntactical Fixedness Candidates - Lemmatized"
 python3 Experiment_3_3.py --VECTORS_FILE "embeddings_cand_SYN_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_SYN_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_3/SYN_Lemm/"\
-    --SVM_W2V   "../SVM_Models/W2V_lemm_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_lemm_cForms.model"  \
-    --USE_CFORM \
-    --CFORM_DIR "../targets/CForms_cand_SYN.csv" \
     --COS_DIST_T 0.6
 
 echo "Experiment 3-3 : Unsupervised - Cosine Similarity [Candidates] - Overall Fixedness Candidates"
 python3 Experiment_3_3.py --VECTORS_FILE "embeddings_cand_OVA.csv" --VECTORS_FILE_VNC "embeddings_cand_OVA_VNC.csv" --RESULTS_DIR "./results/Experiment_3_3/OVA_Clean/" \
-    --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_cForms.model"  \
-    --USE_CFORM \
-    --CFORM_DIR "../targets/CForms_cand_OVA.csv" \
     --COS_DIST_T 0.6
 
 echo "Experiment 3-3 : Unsupervised - Cosine Similarity [Candidates] - Overall Fixedness Candidates - Lemmatized"
 python3 Experiment_3_3.py --VECTORS_FILE "embeddings_cand_OVA_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_OVA_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_3/OVA_Lemm/"\
-    --SVM_W2V   "../SVM_Models/W2V_lemm_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_lemm_cForms.model"  \
-    --USE_CFORM \
-    --CFORM_DIR "../targets/CForms_cand_OVA.csv" \
     --COS_DIST_T 0.6
 
-# Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates]
-echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - PMI Candidates"
+# Unsupervised - Cosine Similarity + CForm [Candidates]
+echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and CForm [Candidates] - PMI Candidates"
 python3 Experiment_3_4.py --VECTORS_FILE "embeddings_cand_PMI.csv" --VECTORS_FILE_VNC "embeddings_cand_PMI_VNC.csv" --RESULTS_DIR "./results/Experiment_3_4/PMI_Clean/" \
-    --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_cForms.model"  \
-    --USE_CFORM \
     --CFORM_DIR "../targets/CForms_cand_PMI.csv" \
     --UNM_MET_T 0.4 --BETA 0.6
 
-echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - PMI Candidates - Lemmatized"
+echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and CForm [Candidates] - PMI Candidates - Lemmatized"
 python3 Experiment_3_4.py --VECTORS_FILE "embeddings_cand_PMI_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_PMI_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_4/PMI_Lemm/"\
-    --SVM_W2V   "../SVM_Models/W2V_lemm_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_lemm_cForms.model"  \
-    --USE_CFORM \
     --CFORM_DIR "../targets/CForms_cand_PMI.csv" \
     --UNM_MET_T 0.4 --BETA 0.6
 
-echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - Lexical Fixedness Candidates"
+echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and CForm [Candidates] - Lexical Fixedness Candidates"
 python3 Experiment_3_4.py --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC.csv" --RESULTS_DIR "./results/Experiment_3_4/LEX_Clean/" \
-    --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_cForms.model"  \
-    --USE_CFORM \
     --CFORM_DIR "../targets/CForms_cand_LEX.csv" \
     --UNM_MET_T 0.4 --BETA 0.6
 
-echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - Lexical Fixedness Candidates - Lemmatized"
+echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and CForm [Candidates] - Lexical Fixedness Candidates - Lemmatized"
 python3 Experiment_3_4.py --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_4/LEX_Lemm/"\
-    --SVM_W2V   "../SVM_Models/W2V_lemm_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_lemm_cForms.model"  \
-    --USE_CFORM \
     --CFORM_DIR "../targets/CForms_cand_LEX.csv" \
     --UNM_MET_T 0.4 --BETA 0.6
 
-echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - Syntactical Fixedness Candidates"
-python3 Experiment_3_4.py --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC.csv" --RESULTS_DIR "./results/Experiment_3_4/LEX_Clean/" \
-    --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_cForms.model"  \
-    --USE_CFORM \
+echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and CForm [Candidates] - Syntactical Fixedness Candidates"
+python3 Experiment_3_4.py --VECTORS_FILE "embeddings_cand_SYN.csv" --VECTORS_FILE_VNC "embeddings_cand_SYN_VNC.csv" --RESULTS_DIR "./results/Experiment_3_4/SYN_Clean/" \
     --CFORM_DIR "../targets/CForms_cand_SYN.csv" \
     --UNM_MET_T 0.4 --BETA 0.6
 
-echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - Syntactical Fixedness Candidates - Lemmatized"
-python3 Experiment_3_4.py --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_4/LEX_Lemm/"\
-    --SVM_W2V   "../SVM_Models/W2V_lemm_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_lemm_cForms.model"  \
-    --USE_CFORM \
+echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and CForm [Candidates] - Syntactical Fixedness Candidates - Lemmatized"
+python3 Experiment_3_4.py --VECTORS_FILE "embeddings_cand_SYN_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_SYN_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_4/SYN_Lemm/"\
     --CFORM_DIR "../targets/CForms_cand_SYN.csv" \
     --UNM_MET_T 0.4 --BETA 0.6
 
-echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - Overall Fixedness Candidates"
-python3 Experiment_3_4.py --VECTORS_FILE "embeddings_cand_LEX.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC.csv" --RESULTS_DIR "./results/Experiment_3_4/LEX_Clean/" \
-    --SVM_W2V   "../SVM_Models/W2V_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_cForms.model"  \
-    --USE_CFORM \
+echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and CForm [Candidates] - Overall Fixedness Candidates"
+python3 Experiment_3_4.py --VECTORS_FILE "embeddings_cand_OVA.csv" --VECTORS_FILE_VNC "embeddings_cand_OVA_VNC.csv" --RESULTS_DIR "./results/Experiment_3_4/OVA_Clean/" \
     --CFORM_DIR "../targets/CForms_cand_OVA.csv" \
     --UNM_MET_T 0.4 --BETA 0.6
 
-echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and Overall Fixedness [Candidates] - Overall Fixedness Candidates - Lemmatized"
-python3 Experiment_3_4.py --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_LEX_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_4/LEX_Lemm/"\
-    --SVM_W2V   "../SVM_Models/W2V_lemm_cForms.model"   \
-    --SVM_SCBOW "../SVM_Models/SCBOW_lemm_cForms.model" \
-    --SVM_SKIP  "../SVM_Models/SKIP_lemm_cForms.model"  \
-    --SVM_ELMO  "../SVM_Models/ELMO_lemm_cForms.model"  \
-    --USE_CFORM \
+echo "Experiment 3-4 : Unsupervised - New Metrics -> Cosine Similarity and CForm [Candidates] - Overall Fixedness Candidates - Lemmatized"
+python3 Experiment_3_4.py --VECTORS_FILE "embeddings_cand_OVA_lemm.csv" --VECTORS_FILE_VNC "embeddings_cand_OVA_VNC_lemm.csv" --RESULTS_DIR "./results/Experiment_3_4/OVA_Lemm/"\
     --CFORM_DIR "../targets/CForms_cand_OVA.csv" \
     --UNM_MET_T 0.4 --BETA 0.6
 
