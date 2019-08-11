@@ -481,35 +481,35 @@ virtualenv -p python36 venv && source venv/bin/activate
 pip3 install -r requirements.txt
 ################################
 
-echo "Training Embeddings"
-# Train SVMs - Unlemmatized + CForms + Fixedness
+echo "Training SVMs - Unlemmatized"
+# Train SVMs - Unlemmatized
 python36 TrainSVMs.py --VECTORS_FILE "embeddings.csv" --MODELS_DIR "./SVM_Models/" --MODEL_EXT "_clean" \
     --C_W2V 0.1 --C_SKIP 1 --C_SCBOW 1 --C_ELMo 1
 
-echo "Training Embeddings + CForms"
-# Train SVMs - Unlemmatized + CForms + Fixedness
+echo "Training SVMs - Unlemmatized + CForms"
+# Train SVMs - Unlemmatized + CForms
 python36 TrainSVMs.py --VECTORS_FILE "embeddings.csv" --MODELS_DIR "./SVM_Models/" --MODEL_EXT "_cForms" \
     --USE_CFORM \
     --C_W2V 0.1 --C_SKIP 1 --C_SCBOW 1 --C_ELMo 1
 
-echo "Training Embeddings + CForms + Fixedness"
+echo "Training SVMs - Unlemmatized + CForms + Fixedness"
 # Train SVMs - Unlemmatized + CForms + Fixedness
 python36 TrainSVMs.py --VECTORS_FILE "embeddings.csv" --MODELS_DIR "./SVM_Models/" --MODEL_EXT "_cForms_Fix" \
     --USE_CFORM --USE_SYN_FIX --USE_LEX_FIX --USE_OVA_FIX \
     --C_W2V 0.1 --C_SKIP 1 --C_SCBOW 1 --C_ELMo 1
 
-echo "Training Embeddings Lemmatized"
-# Train SVMs - Lemmatized + CForms + Fixedness
+echo "Training SVMs - Lemmatized"
+# Train SVMs - Lemmatized
 python36 TrainSVMs.py --VECTORS_FILE "embeddings_lemm.csv" --MODELS_DIR "./SVM_Models/" --MODEL_EXT "_lemm" \
     --C_W2V 0.1 --C_SKIP 1 --C_SCBOW 1 --C_ELMo 1
 
-echo "Training Embeddings Lemmatized + CForms"
-# Train SVMs - Unlemmatized + CForms + Fixedness
+echo "Training SVMs - Lemmatized + CForms"
+# Train SVMs - Lemmatized + CForms
 python36 TrainSVMs.py --VECTORS_FILE "embeddings_lemm.csv" --MODELS_DIR "./SVM_Models/" --MODEL_EXT "_lemm_cForms" \
     --USE_CFORM \
     --C_W2V 0.1 --C_SKIP 1 --C_SCBOW 1 --C_ELMo 1
 
-echo "Training Embeddings Lemmatized + CForms + Fixedness"
+echo "Training SVMs - Lemmatized + CForms + Fixedness"
 # Train SVMs - Lemmatized + CForms + Fixedness
 python36 TrainSVMs.py --VECTORS_FILE "embeddings_lemm.csv" --MODELS_DIR "./SVM_Models/" --MODEL_EXT "_lemm_cForms_Fix" \
     --USE_CFORM --USE_SYN_FIX --USE_LEX_FIX --USE_OVA_FIX \
@@ -820,8 +820,18 @@ python36 Experiment_2_1.py --VECTORS_FILE "embeddings_lemm.csv" --RESULTS_DIR ".
 # ========== PMI========== #
 # Clustering Proposal - k-Means - Embeddings + CForm + Fazly's Fixedness Metrics
 echo "Experiment 2-2 : Clustering Proposal - k-Means - Embeddings - 6 Clusters"
-python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_PMI.csv" --RESULTS_DIR "./results/Experiment_2_2/PMI/Clean_k2/" --EXP_EXT "_k2" \
+python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_PMI.csv" --RESULTS_DIR "./results/Experiment_2_2/PMI/Clean_k6/" --EXP_EXT "_k6" \
+    --OG_SENT_DIR "../targets/Extracted_Sentences_cand_PMI.txt" --TARGETS_DIR "../targets/VNC-Tokens_candidates_PMI" \
     --SEED_VECTORS_FILE "embeddings.csv" \
+    --N_CLUSTERS 6 \
+    --RND_STATE 42 \
+    --SAVE_PLT
+
+# Clustering Proposal - k-Means - Lemmatized Embeddings + CForm + Fazly's Fixedness Metrics
+echo "Experiment 2-2 : Clustering Proposal - k-Means - Lemmatized Embeddings - 6 Clusters"
+python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_PMI_lemm.csv" --RESULTS_DIR "./results/Experiment_2_2/PMI/Lemm_k6/" --EXP_EXT "_k6" \
+    --OG_SENT_DIR "../targets/Extracted_Sentences_cand_PMI_lemm.txt" --TARGETS_DIR "../targets/VNC-Tokens_candidates_PMI" \
+    --SEED_VECTORS_FILE "embeddings_lemm.csv" \
     --N_CLUSTERS 6 \
     --RND_STATE 42 \
     --SAVE_PLT
@@ -829,17 +839,37 @@ python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_PMI.csv" --RESULTS_DI
 # ========== LEX========== #
 # Clustering Proposal - k-Means - Embeddings + CForm + Fazly's Fixedness Metrics
 echo "Experiment 2-2 : Clustering Proposal - k-Means - Embeddings - 6 Clusters"
-python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_LEX.csv" --RESULTS_DIR "./results/Experiment_2_2/LEX/Clean_k2/" --EXP_EXT "_k2" \
+python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_LEX.csv" --RESULTS_DIR "./results/Experiment_2_2/LEX/Clean_k6/" --EXP_EXT "_k6" \
+    --OG_SENT_DIR "../targets/Extracted_Sentences_cand_LEX.txt" --TARGETS_DIR "../targets/VNC-Tokens_candidates_LEX" \
     --SEED_VECTORS_FILE "embeddings.csv" \
+    --N_CLUSTERS 6 \
+    --RND_STATE 42 \
+    --SAVE_PLT
+
+# Clustering Proposal - k-Means - Lemmatized Embeddings + CForm + Fazly's Fixedness Metrics
+echo "Experiment 2-2 : Clustering Proposal - k-Means - Lemmatized Embeddings - 6 Clusters"
+python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_LEX_lemm.csv" --RESULTS_DIR "./results/Experiment_2_2/LEX/Lemm_k6/" --EXP_EXT "_k6" \
+    --OG_SENT_DIR "../targets/Extracted_Sentences_cand_LEX_lemm.txt" --TARGETS_DIR "../targets/VNC-Tokens_candidates_LEX" \
+    --SEED_VECTORS_FILE "embeddings_lemm.csv" \
     --N_CLUSTERS 6 \
     --RND_STATE 42 \
     --SAVE_PLT
 
 # ========== SYN========== #
 # Clustering Proposal - k-Means - Embeddings + CForm + Fazly's Fixedness Metrics
-echo "Experiment 2-2 : Clustering Proposal - k-Means - Embeddings - 2 Clusters"
-python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_SYN.csv" --RESULTS_DIR "./results/Experiment_2_2/SYN/Clean_k2/" --EXP_EXT "_k2" \
+echo "Experiment 2-2 : Clustering Proposal - k-Means - Embeddings - 6 Clusters"
+python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_SYN.csv" --RESULTS_DIR "./results/Experiment_2_2/SYN/Clean_k6/" --EXP_EXT "_k6" \
+    --OG_SENT_DIR "../targets/Extracted_Sentences_cand_SYN.txt" --TARGETS_DIR "../targets/VNC-Tokens_candidates_SYN" \
     --SEED_VECTORS_FILE "embeddings.csv" \
+    --N_CLUSTERS 6 \
+    --RND_STATE 42 \
+    --SAVE_PLT
+
+# Clustering Proposal - k-Means - Embeddings + CForm + Fazly's Fixedness Metrics
+echo "Experiment 2-2 : Clustering Proposal - k-Means - Lemmatized Embeddings - 6 Clusters"
+python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_SYN_lemm.csv" --RESULTS_DIR "./results/Experiment_2_2/SYN/Lemm_k6/" --EXP_EXT "_k6" \
+    --OG_SENT_DIR "../targets/Extracted_Sentences_cand_SYN_lemm.txt" --TARGETS_DIR "../targets/VNC-Tokens_candidates_SYN" \
+    --SEED_VECTORS_FILE "embeddings_lemm.csv" \
     --N_CLUSTERS 6 \
     --RND_STATE 42 \
     --SAVE_PLT
@@ -847,8 +877,18 @@ python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_SYN.csv" --RESULTS_DI
 # ========== OVA========== #
 # Clustering Proposal - k-Means - Embeddings + CForm + Fazly's Fixedness Metrics
 echo "Experiment 2-2 : Clustering Proposal - k-Means - Embeddings - 6 Clusters"
-python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_OVA.csv" --RESULTS_DIR "./results/Experiment_2_2/OVA/Clean_k2/" --EXP_EXT "_k2" \
+python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_OVA.csv" --RESULTS_DIR "./results/Experiment_2_2/OVA/Clean_k6/" --EXP_EXT "_k6" \
+    --OG_SENT_DIR "../targets/Extracted_Sentences_cand_OVA.txt" --TARGETS_DIR "../targets/VNC-Tokens_candidates_OVA" \
     --SEED_VECTORS_FILE "embeddings.csv" \
+    --N_CLUSTERS 6 \
+    --RND_STATE 42 \
+    --SAVE_PLT
+
+# Clustering Proposal - k-Means - Embeddings + CForm + Fazly's Fixedness Metrics
+echo "Experiment 2-2 : Clustering Proposal - k-Means - Embeddings - 6 Clusters"
+python36 Experiment_2_2.py --VECTORS_FILE "embeddings_cand_OVA_lemm.csv" --RESULTS_DIR "./results/Experiment_2_2/OVA/Lemm_k6/" --EXP_EXT "_k6" \
+    --OG_SENT_DIR "../targets/Extracted_Sentences_cand_OVA_lemm.txt" --TARGETS_DIR "../targets/VNC-Tokens_candidates_OVA" \
+    --SEED_VECTORS_FILE "embeddings_lemm.csv" \
     --N_CLUSTERS 6 \
     --RND_STATE 42 \
     --SAVE_PLT
