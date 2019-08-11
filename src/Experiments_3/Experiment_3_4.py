@@ -37,10 +37,10 @@ parser.add_argument("--ELMO_DIR"         , "--elmo_directory"                   
 parser.add_argument("--CFORM_DIR"        , "--canonical_forms"                   , type=str, help="Location of the File Indicating the Canonical Forms of the Candidates.")
 parser.add_argument("--VECTORS_FILE"     , "--embedded_vectors_file"             , type=str, help="Name of the Embeddings File.")
 parser.add_argument("--VECTORS_FILE_VNC" , "--embedded_vnc_vectors_file"         , type=str, help="Name of the VNC Embeddings File.")
-parser.add_argument("--W2V_RESULTS"      , "--w2v_results_file_prefix"           , type=str, help="Location of the Output File Containing the Cross-Validation Results for Word2Vec's SVM.")
-parser.add_argument("--SCBOW_RESULTS"    , "--scbow_results_file_prefix"         , type=str, help="Location of the Output File Containing the Cross-Validation Results for Siamese CBOW's SVM.")
-parser.add_argument("--SKIP_RESULTS"     , "--skip-thoughts_results_file_prefix" , type=str, help="Location of the Output File Containing the Cross-Validation Results for Skip-Thoughts's SVM.")
-parser.add_argument("--ELMO_RESULTS"     , "--elmo_results_file_prefix"          , type=str, help="Location of the Output File Containing the Cross-Validation Results for ELMo's SVM.")
+parser.add_argument("--W2V_RESULTS"      , "--w2v_results_file_prefix"           , type=str, help="Location of the Output File Containing the Cross-Validation Results for Word2Vec's Trained Model.")
+parser.add_argument("--SCBOW_RESULTS"    , "--scbow_results_file_prefix"         , type=str, help="Location of the Output File Containing the Cross-Validation Results for Siamese CBOW's Trained Model.")
+parser.add_argument("--SKIP_RESULTS"     , "--skip-thoughts_results_file_prefix" , type=str, help="Location of the Output File Containing the Cross-Validation Results for Skip-Thoughts's Trained Model.")
+parser.add_argument("--ELMO_RESULTS"     , "--elmo_results_file_prefix"          , type=str, help="Location of the Output File Containing the Cross-Validation Results for ELMo's Trained Model.")
 
 parser.add_argument("--RESULTS_DIR" , "--results_directory"     , type=str, help="Results Directory.")
 parser.add_argument("--EXP_EXT"     , "--experiment_extension"  , type=str, help="Experiment Name Extension.")
@@ -191,8 +191,7 @@ def main():
     features_CForm = np.genfromtxt(CFORM_DIR, delimiter=',')
 
     # Split Sets:
-    sent_X, w2v_X, w2v_X_VNC, w2v_X_SVM, scbow_X, scbow_X_VNC, scbow_X_SVM, skip_X, skip_X_VNC, skip_X_SVM, elmo_X, elmo_X_VNC, elmo_X_SVM, cForm_X, y = og_sent, features_w2v, features_w2v_VNC, features_w2v_SVM, features_scbow, features_scbow_VNC, features_scbow_SVM, features_skip, features_skip_VNC, features_skip_SVM, features_elmo, features_elmo_VNC, features_elmo_SVM, features_CForm, targets_idiomatic
-
+    sent_X, w2v_X, w2v_X_VNC, scbow_X, scbow_X_VNC, skip_X, skip_X_VNC, elmo_X, elmo_X_VNC, cForm_X, y = og_sent, features_w2v, features_w2v_VNC, features_scbow, features_scbow_VNC, features_skip, features_skip_VNC, features_elmo, features_elmo_VNC, features_CForm, targets_idiomatic
 
     print("<===================> Word2Vec <===================>")
     # - Calculate Cosine Similarity
