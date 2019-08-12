@@ -181,25 +181,19 @@ def main():
     features_elmo_VNC  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE_VNC, delimiter=',')[indexes]
 
     # Initialize Results DataFrames
-    df_w2v_accuracy  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
-    df_w2v_f1_score  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
-    df_w2v_precision = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
-    df_w2v_recall    = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    data_metrics  = {"Threshold": COS_DIST_T}
 
-    df_scbow_accuracy  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
-    df_scbow_f1_score  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
-    df_scbow_precision = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
-    df_scbow_recall    = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_w2v_metrics_i = pd.DataFrame(index=COS_DIST_T, data=data_metrics)
+    df_w2v_metrics_l = pd.DataFrame(index=COS_DIST_T, data=data_metrics)
 
-    df_skip_accuracy  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
-    df_skip_f1_score  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
-    df_skip_precision = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
-    df_skip_recall    = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_scbow_metrics_i = pd.DataFrame(index=COS_DIST_T, data=data_metrics)
+    df_scbow_metrics_l = pd.DataFrame(index=COS_DIST_T, data=data_metrics)
 
-    df_elmo_accuracy  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
-    df_elmo_f1_score  = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
-    df_elmo_precision = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
-    df_elmo_recall    = pd.DataFrame(index=COS_DIST_T, columns=["Threshold"])
+    df_skip_metrics_i = pd.DataFrame(index=COS_DIST_T, data=data_metrics)
+    df_skip_metrics_l = pd.DataFrame(index=COS_DIST_T, data=data_metrics)
+
+    df_elmo_metrics_i = pd.DataFrame(index=COS_DIST_T, data=data_metrics)
+    df_elmo_metrics_l = pd.DataFrame(index=COS_DIST_T, data=data_metrics)
 
     # Shuffle Sets:
     sent_X, w2v_X, w2v_X_VNC, scbow_X, scbow_X_VNC, skip_X, skip_X_VNC, elmo_X, elmo_X_VNC, y = og_sent, features_w2v, features_w2v_VNC, features_scbow, features_scbow_VNC, features_skip, features_skip_VNC, features_elmo, features_elmo_VNC, targets_idiomatic
@@ -222,10 +216,15 @@ def main():
         results_w2v = pd.DataFrame.from_dict(classification_report(y, w2v_pred, output_dict=True))
         results_w2v.to_csv(RESULTS_DIR + W2V_RESULTS + exp_ext + CSV_EXT)
 
-        df_w2v_accuracy.at[cos_dist_t, "Threshold"]  = accuracy_score(y, w2v_pred)
-        df_w2v_f1_score.at[cos_dist_t, "Threshold"]  = results_w2v['True']['f1-score']
-        df_w2v_precision.at[cos_dist_t, "Threshold"] = results_w2v['True']['precision']
-        df_w2v_recall.at[cos_dist_t, "Threshold"]    = results_w2v['True']['recall']
+        df_w2v_metrics_i.at[cos_dist_t, "Accuracy"]  = accuracy_score(y, w2v_pred)
+        df_w2v_metrics_i.at[cos_dist_t, "F1_Score"]  = results_w2v['True']['f1-score']
+        df_w2v_metrics_i.at[cos_dist_t, "Precision"] = results_w2v['True']['precision']
+        df_w2v_metrics_i.at[cos_dist_t, "Recall"]    = results_w2v['True']['recall']
+
+        df_w2v_metrics_l.at[cos_dist_t, "Accuracy"]  = accuracy_score(y, w2v_pred)
+        df_w2v_metrics_l.at[cos_dist_t, "F1_Score"]  = results_w2v['False']['f1-score']
+        df_w2v_metrics_l.at[cos_dist_t, "Precision"] = results_w2v['False']['precision']
+        df_w2v_metrics_l.at[cos_dist_t, "Recall"]    = results_w2v['False']['recall']
 
         print("<=================> Siamese CBOW <=================>")
         # - Calculate Cosine Similarity
@@ -242,10 +241,15 @@ def main():
         results_scbow = pd.DataFrame.from_dict(classification_report(y, scbow_pred, output_dict=True))
         results_scbow.to_csv(RESULTS_DIR + SCBOW_RESULTS + exp_ext + CSV_EXT)
 
-        df_scbow_accuracy.at[cos_dist_t, "Threshold"]  = accuracy_score(y, scbow_pred)
-        df_scbow_f1_score.at[cos_dist_t, "Threshold"]  = results_scbow['True']['f1-score']
-        df_scbow_precision.at[cos_dist_t, "Threshold"] = results_scbow['True']['precision']
-        df_scbow_recall.at[cos_dist_t, "Threshold"]    = results_scbow['True']['recall']
+        df_scbow_metrics_i.at[cos_dist_t, "Accuracy"]  = accuracy_score(y, scbow_pred)
+        df_scbow_metrics_i.at[cos_dist_t, "F1_Score"]  = results_scbow['True']['f1-score']
+        df_scbow_metrics_i.at[cos_dist_t, "Precision"] = results_scbow['True']['precision']
+        df_scbow_metrics_i.at[cos_dist_t, "Recall"]    = results_scbow['True']['recall']
+
+        df_scbow_metrics_l.at[cos_dist_t, "Accuracy"]  = accuracy_score(y, scbow_pred)
+        df_scbow_metrics_l.at[cos_dist_t, "F1_Score"]  = results_scbow['False']['f1-score']
+        df_scbow_metrics_l.at[cos_dist_t, "Precision"] = results_scbow['False']['precision']
+        df_scbow_metrics_l.at[cos_dist_t, "Recall"]    = results_scbow['False']['recall']
 
         print("<================> Skip - Thoughts <===============>")
         # - Calculate Cosine Similarity
@@ -262,10 +266,15 @@ def main():
         results_skip = pd.DataFrame.from_dict(classification_report(y, skip_pred, output_dict=True))
         results_skip.to_csv(RESULTS_DIR + SKIP_RESULTS + exp_ext + CSV_EXT)
 
-        df_skip_accuracy.at[cos_dist_t, "Threshold"]  = accuracy_score(y, skip_pred)
-        df_skip_f1_score.at[cos_dist_t, "Threshold"]  = results_skip['True']['f1-score']
-        df_skip_precision.at[cos_dist_t, "Threshold"] = results_skip['True']['precision']
-        df_skip_recall.at[cos_dist_t, "Threshold"]    = results_skip['True']['recall']
+        df_skip_metrics_i.at[cos_dist_t, "Accuracy"]  = accuracy_score(y, skip_pred)
+        df_skip_metrics_i.at[cos_dist_t, "F1_Score"]  = results_skip['True']['f1-score']
+        df_skip_metrics_i.at[cos_dist_t, "Precision"] = results_skip['True']['precision']
+        df_skip_metrics_i.at[cos_dist_t, "Recall"]    = results_skip['True']['recall']
+
+        df_skip_metrics_l.at[cos_dist_t, "Accuracy"]  = accuracy_score(y, skip_pred)
+        df_skip_metrics_l.at[cos_dist_t, "F1_Score"]  = results_skip['False']['f1-score']
+        df_skip_metrics_l.at[cos_dist_t, "Precision"] = results_skip['False']['precision']
+        df_skip_metrics_l.at[cos_dist_t, "Recall"]    = results_skip['False']['recall']
 
         print("<=====================> ELMo <=====================>")
         # - Calculate Cosine Similarity
@@ -282,31 +291,28 @@ def main():
         results_elmo = pd.DataFrame.from_dict(classification_report(y, elmo_pred, output_dict=True))
         results_elmo.to_csv(RESULTS_DIR + ELMO_RESULTS + exp_ext + CSV_EXT)
 
-        df_elmo_accuracy.at[cos_dist_t, "Threshold"]  = accuracy_score(y, elmo_pred)
-        df_elmo_f1_score.at[cos_dist_t, "Threshold"]  = results_elmo['True']['f1-score']
-        df_elmo_precision.at[cos_dist_t, "Threshold"] = results_elmo['True']['precision']
-        df_elmo_recall.at[cos_dist_t, "Threshold"]    = results_elmo['True']['recall']
+        df_elmo_metrics_i.at[cos_dist_t, "Accuracy"]  = accuracy_score(y, elmo_pred)
+        df_elmo_metrics_i.at[cos_dist_t, "F1_Score"]  = results_elmo['True']['f1-score']
+        df_elmo_metrics_i.at[cos_dist_t, "Precision"] = results_elmo['True']['precision']
+        df_elmo_metrics_i.at[cos_dist_t, "Recall"]    = results_elmo['True']['recall']
+
+        df_elmo_metrics_l.at[cos_dist_t, "Accuracy"]  = accuracy_score(y, elmo_pred)
+        df_elmo_metrics_l.at[cos_dist_t, "F1_Score"]  = results_elmo['False']['f1-score']
+        df_elmo_metrics_l.at[cos_dist_t, "Precision"] = results_elmo['False']['precision']
+        df_elmo_metrics_l.at[cos_dist_t, "Recall"]    = results_elmo['False']['recall']
 
     # Store Result Grid
-    df_w2v_accuracy.to_csv(RESULTS_DIR  + W2V_RESULTS + "_ACCURACY"  + EXP_EXT + CSV_EXT)  
-    df_w2v_f1_score.to_csv(RESULTS_DIR  + W2V_RESULTS + "_F1-SCORE"  + EXP_EXT + CSV_EXT)  
-    df_w2v_precision.to_csv(RESULTS_DIR + W2V_RESULTS + "_PREVISION" + EXP_EXT + CSV_EXT) 
-    df_w2v_recall.to_csv(RESULTS_DIR    + W2V_RESULTS + "_RECALL"    + EXP_EXT + CSV_EXT)    
+    df_w2v_metrics_i.to_csv(RESULTS_DIR  + W2V_RESULTS + "_ALL_RESULTS" + EXP_EXT + "_i" + CSV_EXT)
+    df_w2v_metrics_l.to_csv(RESULTS_DIR  + W2V_RESULTS + "_ALL_RESULTS" + EXP_EXT + "_l" + CSV_EXT)   
 
-    df_scbow_accuracy.to_csv(RESULTS_DIR  + SCBOW_RESULTS + "_ACCURACY"  + EXP_EXT + CSV_EXT)  
-    df_scbow_f1_score.to_csv(RESULTS_DIR  + SCBOW_RESULTS + "_F1-SCORE"  + EXP_EXT + CSV_EXT)  
-    df_scbow_precision.to_csv(RESULTS_DIR + SCBOW_RESULTS + "_PREVISION" + EXP_EXT + CSV_EXT) 
-    df_scbow_recall.to_csv(RESULTS_DIR    + SCBOW_RESULTS + "_RECALL"    + EXP_EXT + CSV_EXT)    
+    df_scbow_metrics_i.to_csv(RESULTS_DIR  + SCBOW_RESULTS + "_ALL_RESULTS" + EXP_EXT + "_i" + CSV_EXT)  
+    df_scbow_metrics_l.to_csv(RESULTS_DIR  + SCBOW_RESULTS + "_ALL_RESULTS" + EXP_EXT + "_l" + CSV_EXT)
 
-    df_skip_accuracy.to_csv(RESULTS_DIR  + SKIP_RESULTS + "_ACCURACY"  + EXP_EXT + CSV_EXT) 
-    df_skip_f1_score.to_csv(RESULTS_DIR  + SKIP_RESULTS + "_F1-SCORE"  + EXP_EXT + CSV_EXT) 
-    df_skip_precision.to_csv(RESULTS_DIR + SKIP_RESULTS + "_PREVISION" + EXP_EXT + CSV_EXT)
-    df_skip_recall.to_csv(RESULTS_DIR    + SKIP_RESULTS + "_RECALL"    + EXP_EXT + CSV_EXT)   
+    df_skip_metrics_i.to_csv(RESULTS_DIR  + SKIP_RESULTS + "_ALL_RESULTS" + EXP_EXT + "_i" + CSV_EXT) 
+    df_skip_metrics_l.to_csv(RESULTS_DIR  + SKIP_RESULTS + "_ALL_RESULTS" + EXP_EXT + "_l" + CSV_EXT) 
 
-    df_elmo_accuracy.to_csv(RESULTS_DIR  + ELMO_RESULTS + "_ACCURACY"  + EXP_EXT + CSV_EXT) 
-    df_elmo_f1_score.to_csv(RESULTS_DIR  + ELMO_RESULTS + "_F1-SCORE"  + EXP_EXT + CSV_EXT) 
-    df_elmo_precision.to_csv(RESULTS_DIR + ELMO_RESULTS + "_PREVISION" + EXP_EXT + CSV_EXT)
-    df_elmo_recall.to_csv(RESULTS_DIR    + ELMO_RESULTS + "_RECALL"    + EXP_EXT + CSV_EXT)
+    df_elmo_metrics_i.to_csv(RESULTS_DIR  + ELMO_RESULTS + "_ALL_RESULTS" + EXP_EXT + "_i" + CSV_EXT) 
+    df_elmo_metrics_l.to_csv(RESULTS_DIR  + ELMO_RESULTS + "_ALL_RESULTS" + EXP_EXT + "_l" + CSV_EXT)
 
 if __name__ == '__main__':
 

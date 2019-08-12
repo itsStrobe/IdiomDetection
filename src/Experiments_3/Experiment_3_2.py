@@ -194,25 +194,41 @@ def main():
     features_elmo_VNC  = np.genfromtxt(ELMO_DIR  + VECTORS_FILE_VNC, delimiter=',')[indexes]
 
     # Initialize Results DataFrames
-    df_w2v_accuracy  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
-    df_w2v_f1_score  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
-    df_w2v_precision = pd.DataFrame(columns=BETA, index=UNM_MET_T)
-    df_w2v_recall    = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_w2v_accuracy_i  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_w2v_f1_score_i  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_w2v_precision_i = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_w2v_recall_i    = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_w2v_accuracy_l  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_w2v_f1_score_l  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_w2v_precision_l = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_w2v_recall_l    = pd.DataFrame(columns=BETA, index=UNM_MET_T)
 
-    df_scbow_accuracy  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
-    df_scbow_f1_score  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
-    df_scbow_precision = pd.DataFrame(columns=BETA, index=UNM_MET_T)
-    df_scbow_recall    = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_scbow_accuracy_i  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_scbow_f1_score_i  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_scbow_precision_i = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_scbow_recall_i    = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_scbow_accuracy_l  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_scbow_f1_score_l  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_scbow_precision_l = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_scbow_recall_l    = pd.DataFrame(columns=BETA, index=UNM_MET_T)
 
-    df_skip_accuracy  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
-    df_skip_f1_score  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
-    df_skip_precision = pd.DataFrame(columns=BETA, index=UNM_MET_T)
-    df_skip_recall    = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_skip_accuracy_i  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_skip_f1_score_i  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_skip_precision_i = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_skip_recall_i    = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_skip_accuracy_l  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_skip_f1_score_l  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_skip_precision_l = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_skip_recall_l    = pd.DataFrame(columns=BETA, index=UNM_MET_T)
 
-    df_elmo_accuracy  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
-    df_elmo_f1_score  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
-    df_elmo_precision = pd.DataFrame(columns=BETA, index=UNM_MET_T)
-    df_elmo_recall    = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_elmo_accuracy_i  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_elmo_f1_score_i  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_elmo_precision_i = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_elmo_recall_i    = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_elmo_accuracy_l  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_elmo_f1_score_l  = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_elmo_precision_l = pd.DataFrame(columns=BETA, index=UNM_MET_T)
+    df_elmo_recall_l    = pd.DataFrame(columns=BETA, index=UNM_MET_T)
 
     # Pre-Calculated Overall Fixedness
     features_CFORM = np.genfromtxt(CFORM_DIR, delimiter=',')[indexes]
@@ -284,10 +300,15 @@ def main():
             results_w2v = pd.DataFrame.from_dict(classification_report(y, w2v_pred, output_dict=True))
             results_w2v.to_csv(RESULTS_DIR + TEST_RESULTS_DIR + W2V_RESULTS + exp_ext + CSV_EXT)
 
-            df_w2v_accuracy.at[unm_met_t, beta]  = accuracy_score(y, w2v_pred)
-            df_w2v_f1_score.at[unm_met_t, beta]  = results_w2v['True']['f1-score']
-            df_w2v_precision.at[unm_met_t, beta] = results_w2v['True']['precision']
-            df_w2v_recall.at[unm_met_t, beta]    = results_w2v['True']['recall']
+            df_w2v_accuracy_i.at[unm_met_t, beta]  = accuracy_score(y, w2v_pred)
+            df_w2v_f1_score_i.at[unm_met_t, beta]  = results_w2v['True']['f1-score']
+            df_w2v_precision_i.at[unm_met_t, beta] = results_w2v['True']['precision']
+            df_w2v_recall_i.at[unm_met_t, beta]    = results_w2v['True']['recall']
+
+            df_w2v_accuracy_l.at[unm_met_t, beta]  = accuracy_score(y, w2v_pred)
+            df_w2v_f1_score_l.at[unm_met_t, beta]  = results_w2v['False']['f1-score']
+            df_w2v_precision_l.at[unm_met_t, beta] = results_w2v['False']['precision']
+            df_w2v_recall_l.at[unm_met_t, beta]    = results_w2v['False']['recall']
 
             # Store Best Parameters
             if(results_w2v['True']['f1-score'] > best_params['Idiomatic']['F1']):
@@ -323,10 +344,15 @@ def main():
             results_scbow = pd.DataFrame.from_dict(classification_report(y, scbow_pred, output_dict=True))
             results_scbow.to_csv(RESULTS_DIR + TEST_RESULTS_DIR + SCBOW_RESULTS + exp_ext + CSV_EXT)
 
-            df_scbow_accuracy.at[unm_met_t, beta]  = accuracy_score(y, scbow_pred)
-            df_scbow_f1_score.at[unm_met_t, beta]  = results_scbow['True']['f1-score']
-            df_scbow_precision.at[unm_met_t, beta] = results_scbow['True']['precision']
-            df_scbow_recall.at[unm_met_t, beta]    = results_scbow['True']['recall']
+            df_scbow_accuracy_i.at[unm_met_t, beta]  = accuracy_score(y, scbow_pred)
+            df_scbow_f1_score_i.at[unm_met_t, beta]  = results_scbow['True']['f1-score']
+            df_scbow_precision_i.at[unm_met_t, beta] = results_scbow['True']['precision']
+            df_scbow_recall_i.at[unm_met_t, beta]    = results_scbow['True']['recall']
+
+            df_scbow_accuracy_l.at[unm_met_t, beta]  = accuracy_score(y, scbow_pred)
+            df_scbow_f1_score_l.at[unm_met_t, beta]  = results_scbow['False']['f1-score']
+            df_scbow_precision_l.at[unm_met_t, beta] = results_scbow['False']['precision']
+            df_scbow_recall_l.at[unm_met_t, beta]    = results_scbow['False']['recall']
 
             # Store Best Parameters
             if(results_scbow['True']['f1-score'] > best_params['Idiomatic']['F1']):
@@ -362,10 +388,15 @@ def main():
             results_skip = pd.DataFrame.from_dict(classification_report(y, skip_pred, output_dict=True))
             results_skip.to_csv(RESULTS_DIR + TEST_RESULTS_DIR + SKIP_RESULTS + exp_ext + CSV_EXT)
 
-            df_skip_accuracy.at[unm_met_t, beta]  = accuracy_score(y, skip_pred)
-            df_skip_f1_score.at[unm_met_t, beta]  = results_skip['True']['f1-score']
-            df_skip_precision.at[unm_met_t, beta] = results_skip['True']['precision']
-            df_skip_recall.at[unm_met_t, beta]    = results_skip['True']['recall']
+            df_skip_accuracy_i.at[unm_met_t, beta]  = accuracy_score(y, skip_pred)
+            df_skip_f1_score_i.at[unm_met_t, beta]  = results_skip['True']['f1-score']
+            df_skip_precision_i.at[unm_met_t, beta] = results_skip['True']['precision']
+            df_skip_recall_i.at[unm_met_t, beta]    = results_skip['True']['recall']
+
+            df_skip_accuracy_l.at[unm_met_t, beta]  = accuracy_score(y, skip_pred)
+            df_skip_f1_score_l.at[unm_met_t, beta]  = results_skip['False']['f1-score']
+            df_skip_precision_l.at[unm_met_t, beta] = results_skip['False']['precision']
+            df_skip_recall_l.at[unm_met_t, beta]    = results_skip['False']['recall']
 
             # Store Best Parameters
             if(results_skip['True']['f1-score'] > best_params['Idiomatic']['F1']):
@@ -401,10 +432,15 @@ def main():
             results_elmo = pd.DataFrame.from_dict(classification_report(y, elmo_pred, output_dict=True))
             results_elmo.to_csv(RESULTS_DIR + TEST_RESULTS_DIR + ELMO_RESULTS + exp_ext + CSV_EXT)
 
-            df_elmo_accuracy.at[unm_met_t, beta]  = accuracy_score(y, elmo_pred)
-            df_elmo_f1_score.at[unm_met_t, beta]  = results_elmo['True']['f1-score']
-            df_elmo_precision.at[unm_met_t, beta] = results_elmo['True']['precision']
-            df_elmo_recall.at[unm_met_t, beta]    = results_elmo['True']['recall']
+            df_elmo_accuracy_i.at[unm_met_t, beta]  = accuracy_score(y, elmo_pred)
+            df_elmo_f1_score_i.at[unm_met_t, beta]  = results_elmo['True']['f1-score']
+            df_elmo_precision_i.at[unm_met_t, beta] = results_elmo['True']['precision']
+            df_elmo_recall_i.at[unm_met_t, beta]    = results_elmo['True']['recall']
+
+            df_elmo_accuracy_l.at[unm_met_t, beta]  = accuracy_score(y, elmo_pred)
+            df_elmo_f1_score_l.at[unm_met_t, beta]  = results_elmo['False']['f1-score']
+            df_elmo_precision_l.at[unm_met_t, beta] = results_elmo['False']['precision']
+            df_elmo_recall_l.at[unm_met_t, beta]    = results_elmo['False']['recall']
 
             # Store Best Parameters
             if(results_elmo['True']['f1-score'] > best_params['Idiomatic']['F1']):
@@ -430,25 +466,45 @@ def main():
     best_params_pd.to_csv(RESULTS_DIR + BEST_RESULTS + EXP_EXT + CSV_EXT)
 
     # Store Result Grid
-    df_w2v_accuracy.to_csv(RESULTS_DIR  + W2V_RESULTS + "_ACCURACY"  + EXP_EXT + CSV_EXT)  
-    df_w2v_f1_score.to_csv(RESULTS_DIR  + W2V_RESULTS + "_F1-SCORE"  + EXP_EXT + CSV_EXT)  
-    df_w2v_precision.to_csv(RESULTS_DIR + W2V_RESULTS + "_PREVISION" + EXP_EXT + CSV_EXT) 
-    df_w2v_recall.to_csv(RESULTS_DIR    + W2V_RESULTS + "_RECALL"    + EXP_EXT + CSV_EXT)    
+    df_w2v_accuracy_i.to_csv(RESULTS_DIR  + W2V_RESULTS + "_ACCURACY"  + EXP_EXT + "_i" + CSV_EXT)
+    df_w2v_f1_score_i.to_csv(RESULTS_DIR  + W2V_RESULTS + "_F1-SCORE"  + EXP_EXT + "_i" + CSV_EXT)
+    df_w2v_precision_i.to_csv(RESULTS_DIR + W2V_RESULTS + "_PRECISION" + EXP_EXT + "_i" + CSV_EXT)
+    df_w2v_recall_i.to_csv(RESULTS_DIR    + W2V_RESULTS + "_RECALL"    + EXP_EXT + "_i" + CSV_EXT)
 
-    df_scbow_accuracy.to_csv(RESULTS_DIR  + SCBOW_RESULTS + "_ACCURACY"  + EXP_EXT + CSV_EXT)  
-    df_scbow_f1_score.to_csv(RESULTS_DIR  + SCBOW_RESULTS + "_F1-SCORE"  + EXP_EXT + CSV_EXT)  
-    df_scbow_precision.to_csv(RESULTS_DIR + SCBOW_RESULTS + "_PREVISION" + EXP_EXT + CSV_EXT) 
-    df_scbow_recall.to_csv(RESULTS_DIR    + SCBOW_RESULTS + "_RECALL"    + EXP_EXT + CSV_EXT)    
+    df_w2v_accuracy_l.to_csv(RESULTS_DIR  + W2V_RESULTS + "_ACCURACY"  + EXP_EXT + "_l" + CSV_EXT)
+    df_w2v_f1_score_l.to_csv(RESULTS_DIR  + W2V_RESULTS + "_F1-SCORE"  + EXP_EXT + "_l" + CSV_EXT)
+    df_w2v_precision_l.to_csv(RESULTS_DIR + W2V_RESULTS + "_PRECISION" + EXP_EXT + "_l" + CSV_EXT)
+    df_w2v_recall_l.to_csv(RESULTS_DIR    + W2V_RESULTS + "_RECALL"    + EXP_EXT + "_l" + CSV_EXT)
 
-    df_skip_accuracy.to_csv(RESULTS_DIR  + SKIP_RESULTS + "_ACCURACY"  + EXP_EXT + CSV_EXT) 
-    df_skip_f1_score.to_csv(RESULTS_DIR  + SKIP_RESULTS + "_F1-SCORE"  + EXP_EXT + CSV_EXT) 
-    df_skip_precision.to_csv(RESULTS_DIR + SKIP_RESULTS + "_PREVISION" + EXP_EXT + CSV_EXT)
-    df_skip_recall.to_csv(RESULTS_DIR    + SKIP_RESULTS + "_RECALL"    + EXP_EXT + CSV_EXT)   
+    df_scbow_accuracy_i.to_csv(RESULTS_DIR  + SCBOW_RESULTS + "_ACCURACY"  + EXP_EXT + "_i" + CSV_EXT)
+    df_scbow_f1_score_i.to_csv(RESULTS_DIR  + SCBOW_RESULTS + "_F1-SCORE"  + EXP_EXT + "_i" + CSV_EXT)
+    df_scbow_precision_i.to_csv(RESULTS_DIR + SCBOW_RESULTS + "_PRECISION" + EXP_EXT + "_i" + CSV_EXT)
+    df_scbow_recall_i.to_csv(RESULTS_DIR    + SCBOW_RESULTS + "_RECALL"    + EXP_EXT + "_i" + CSV_EXT)
 
-    df_elmo_accuracy.to_csv(RESULTS_DIR  + ELMO_RESULTS + "_ACCURACY"  + EXP_EXT + CSV_EXT) 
-    df_elmo_f1_score.to_csv(RESULTS_DIR  + ELMO_RESULTS + "_F1-SCORE"  + EXP_EXT + CSV_EXT) 
-    df_elmo_precision.to_csv(RESULTS_DIR + ELMO_RESULTS + "_PREVISION" + EXP_EXT + CSV_EXT)
-    df_elmo_recall.to_csv(RESULTS_DIR    + ELMO_RESULTS + "_RECALL"    + EXP_EXT + CSV_EXT)   
+    df_scbow_accuracy_l.to_csv(RESULTS_DIR  + SCBOW_RESULTS + "_ACCURACY"  + EXP_EXT + "_l" + CSV_EXT)
+    df_scbow_f1_score_l.to_csv(RESULTS_DIR  + SCBOW_RESULTS + "_F1-SCORE"  + EXP_EXT + "_l" + CSV_EXT)
+    df_scbow_precision_l.to_csv(RESULTS_DIR + SCBOW_RESULTS + "_PRECISION" + EXP_EXT + "_l" + CSV_EXT)
+    df_scbow_recall_l.to_csv(RESULTS_DIR    + SCBOW_RESULTS + "_RECALL"    + EXP_EXT + "_l" + CSV_EXT)
+
+    df_skip_accuracy_i.to_csv(RESULTS_DIR  + SKIP_RESULTS + "_ACCURACY"  + EXP_EXT + "_i" + CSV_EXT)
+    df_skip_f1_score_i.to_csv(RESULTS_DIR  + SKIP_RESULTS + "_F1-SCORE"  + EXP_EXT + "_i" + CSV_EXT)
+    df_skip_precision_i.to_csv(RESULTS_DIR + SKIP_RESULTS + "_PRECISION" + EXP_EXT + "_i" + CSV_EXT)
+    df_skip_recall_i.to_csv(RESULTS_DIR    + SKIP_RESULTS + "_RECALL"    + EXP_EXT + "_i" + CSV_EXT)
+
+    df_skip_accuracy_l.to_csv(RESULTS_DIR  + SKIP_RESULTS + "_ACCURACY"  + EXP_EXT + "_l" + CSV_EXT)
+    df_skip_f1_score_l.to_csv(RESULTS_DIR  + SKIP_RESULTS + "_F1-SCORE"  + EXP_EXT + "_l" + CSV_EXT)
+    df_skip_precision_l.to_csv(RESULTS_DIR + SKIP_RESULTS + "_PRECISION" + EXP_EXT + "_l" + CSV_EXT)
+    df_skip_recall_l.to_csv(RESULTS_DIR    + SKIP_RESULTS + "_RECALL"    + EXP_EXT + "_l" + CSV_EXT)
+
+    df_elmo_accuracy_i.to_csv(RESULTS_DIR  + ELMO_RESULTS + "_ACCURACY"  + EXP_EXT + "_i" + CSV_EXT)
+    df_elmo_f1_score_i.to_csv(RESULTS_DIR  + ELMO_RESULTS + "_F1-SCORE"  + EXP_EXT + "_i" + CSV_EXT)
+    df_elmo_precision_i.to_csv(RESULTS_DIR + ELMO_RESULTS + "_PRECISION" + EXP_EXT + "_i" + CSV_EXT)
+    df_elmo_recall_i.to_csv(RESULTS_DIR    + ELMO_RESULTS + "_RECALL"    + EXP_EXT + "_i" + CSV_EXT)
+
+    df_elmo_accuracy_l.to_csv(RESULTS_DIR  + ELMO_RESULTS + "_ACCURACY"  + EXP_EXT + "_l" + CSV_EXT)
+    df_elmo_f1_score_l.to_csv(RESULTS_DIR  + ELMO_RESULTS + "_F1-SCORE"  + EXP_EXT + "_l" + CSV_EXT)
+    df_elmo_precision_l.to_csv(RESULTS_DIR + ELMO_RESULTS + "_PRECISION" + EXP_EXT + "_l" + CSV_EXT)
+    df_elmo_recall_l.to_csv(RESULTS_DIR    + ELMO_RESULTS + "_RECALL"    + EXP_EXT + "_l" + CSV_EXT)
 
 
 if __name__ == '__main__':
