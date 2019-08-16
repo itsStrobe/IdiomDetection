@@ -1,5 +1,5 @@
 #!/bin/bash
-# FILE: RunAll.sh 
+# FILE: RunAll_Ceres.sh 
 #
 #$ -cwd
 #$ -j y
