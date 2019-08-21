@@ -1,13 +1,13 @@
 #!/bin/bash
 # Prepare the BNC XML for processing
 
+echo "PrepareData.sh"
+
 # - VIRTUAL EVIRONMENT SETUP - #
 virtualenv -p python3 venv && source venv/bin/activate
 pip3 install -r requirements.txt
 python3 -c "import nltk; nltk.download()"
 ################################
-
-echo "PrepareData.sh"
 
 echo "Cleaning BNC"
 python3 CleanBNC.py

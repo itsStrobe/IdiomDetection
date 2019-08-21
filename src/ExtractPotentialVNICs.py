@@ -1,3 +1,11 @@
+"""
+    File:   ExtractPotentialVNICs
+    Author: Jose Juan Zavala Iglesias
+    Date:   14/06/2019
+
+    Tool to extract potential VNIC Candidates from a Corpora based on the top scoring VNCs
+    in the PMI, Syntactical Fixedness, Lexical Fixedness, and Overall Fixednes metrics.
+"""
 
 import os
 import re
@@ -92,13 +100,6 @@ def main():
     vnics.to_csv(path_or_buf=VNIC_DIR_OVA, sep=',')
 
 if __name__ == '__main__':
-
-
-
-
-
-
-
 
     if(args.VNIC_DIR_PMI):
         VNIC_DIR_PMI = args.VNIC_DIR_PMI

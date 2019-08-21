@@ -1,3 +1,11 @@
+"""
+    File:   ExtractPotentialVNICs
+    Author: Jose Juan Zavala Iglesias
+    Date:   18/05/2019
+
+    Tool to clean the BNC-XML Corpora, removing all unecessary tags and character clean-up.
+"""
+
 import os
 import re
 import time

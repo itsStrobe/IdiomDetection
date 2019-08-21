@@ -1,3 +1,12 @@
+"""
+    File:   ExtractTargetSentences
+    Author: Jose Juan Zavala Iglesias
+    Date:   01/07/2019
+
+    Find the instances in which VNIC Candidates appear in the Corpora (BNC-XML)
+    Outputs a dataset in the VNC-Dataset format.
+"""
+
 import numpy as np
 import pandas as pd
 import progressbar

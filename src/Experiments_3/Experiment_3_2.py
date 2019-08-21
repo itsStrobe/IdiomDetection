@@ -3,7 +3,7 @@
     Author: Jose Juan Zavala Iglesias
     Date:   23/06/2019
 
-    Unsupervised (Cosine Similarity) Classification evaluation for VNC Tokens Dataset using word embeddings generated with:
+    Unsupervised (Cosine Similarity + Overall Fixedness) Classification evaluation for VNC Tokens Dataset using word embeddings generated with:
         >Word2Vec
         >Skip-Thoughts
         >Siamese CBOW

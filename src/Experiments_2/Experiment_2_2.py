@@ -3,7 +3,7 @@
     Author: Jose Juan Zavala Iglesias
     Date:   16/06/2019
 
-    k-Means Classification evaluation for VNC Tokens Dataset using word embeddings generated with:
+    k-Means Classification evaluation for VNIC Candidates Dataset using word embeddings generated with:
         >Word2Vec
         >Skip-Thoughts
         >Siamese CBOW

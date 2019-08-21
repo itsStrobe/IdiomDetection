@@ -18,4 +18,8 @@ echo "RunAll.sh"
 
 ./GenerateEmbeddings.sh
 
+./TrainSVMs.sh
+
+./GenerateSilverStandard.sh
+
 ./RunExperiments.sh
