@@ -1,6 +1,6 @@
-# skip-thoughts
+# Automatic Detection of Idiomatic Language.
 
-Sent2Vec encoder and training code from the paper [Skip-Thought Vectors](http://arxiv.org/abs/1506.06726).
+Code for research on idiomatic detection in text via supervised and semi-supervised methods.
 
 ## Dependencies
 
