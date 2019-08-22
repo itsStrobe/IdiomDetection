@@ -25,7 +25,7 @@ from sklearn.utils import shuffle
 # ------------- ARGS ------------- #
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--TARGETS_DIR"   , "--targets_directory"                 , type=str, help="Location of the File Containing the Targets in VNC-Token format.")
+parser.add_argument("--TARG_DIR"      , "--targets_directory"                 , type=str, help="Location of the File Containing the Targets in VNC-Token format.")
 parser.add_argument("--W2V_DIR"       , "--w2v_directory"                     , type=str, help="Location of the Input Dir Containing the Word2Vec Embeddings.")
 parser.add_argument("--SCBOW_DIR"     , "--scbow_directory"                   , type=str, help="Location of the Input Dir Containing the Siamese SCBOW Embeddings.")
 parser.add_argument("--SKIP_DIR"      , "--skip-thoughts_directory"           , type=str, help="Location of the Input Dir Containing the Skip-Thoughts Embeddings.")
@@ -59,7 +59,7 @@ args = parser.parse_args()
 # ------------- ARGS ------------- #
 
 # Files and Directories:
-TARGETS_DIR   = "./targets/English_VNC_Cook/VNC-Tokens_cleaned"
+TARG_DIR      = "./targets/English_VNC_Cook/VNC-Tokens_cleaned"
 W2V_DIR       = "./Word2Vec/"
 SCBOW_DIR     = "./SiameseCBOW/"
 SKIP_DIR      = "./SkipThoughts/"
@@ -107,7 +107,7 @@ def main():
 
     # -- EXTRACT DATASETS -- #
     # Extract all targets and remove those where classification is Q (unknown)
-    targets = pd.read_csv(TARGETS_DIR, header=None, usecols=[0], sep=' ').values.flatten()
+    targets = pd.read_csv(TARG_DIR, header=None, usecols=[0], sep=' ').values.flatten()
     indexes = np.where(targets != 'Q')
     targets_idiomatic = (targets[indexes] == 'I')
     targets_literal   = (targets[indexes] == 'L')
@@ -211,8 +211,8 @@ def main():
 
 if __name__ == '__main__':
 
-    if(args.TARGETS_DIR):
-        TARGETS_DIR = args.TARGETS_DIR
+    if(args.TARG_DIR):
+        TARG_DIR = args.TARG_DIR
     if(args.W2V_DIR):
         W2V_DIR = args.W2V_DIR
     if(args.SCBOW_DIR):

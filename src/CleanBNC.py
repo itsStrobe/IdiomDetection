@@ -14,15 +14,15 @@ import argparse
 # ------------- ARGS ------------- #
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--corpDir", "--corpora_dir", type=str, help="Root directory in which Corpora files can be found.")
-parser.add_argument("--outSuf", "--corpora_output_dir_suffix", type=str, help="Suffix to be appended to the output directory.")
+parser.add_argument("--CORPORA_DIR", "--corpora_dir", type=str, help="Root directory in which Corpora files can be found.")
+parser.add_argument("--OUT_SUF", "--corpora_output_dir_suffix", type=str, help="Suffix to be appended to the output directory.")
 
 args = parser.parse_args()
 # ------------- ARGS ------------- #
 
 
-ROOT_DIR = "./Corpora/BNC XML/2554/download/Texts"
-OUT_SUF  = "_CleanXML"
+CORPORA_DIR = "./Corpora/BNC XML/2554/download/Texts"
+OUT_SUF     = "_CleanXML"
 
 ALPH_NUM   = "a-zA-Z0-9"
 ACCNT_TKNS = "À-ÿ"
@@ -333,7 +333,7 @@ def CleanBNCCorpus(inFileDir, outFileDir):
 
 def main():
 
-    outFileDir = ROOT_DIR + OUT_SUF
+    outFileDir = CORPORA_DIR + OUT_SUF
 
     # Create New File Directory
     if not os.path.exists(os.path.dirname(outFileDir)):
@@ -343,23 +343,23 @@ def main():
             if exc.errno != errno.EEXIST:
                 raise
 
-    for root, _, files in os.walk(ROOT_DIR):
+    for root, _, files in os.walk(CORPORA_DIR):
         if files == []:
             continue
 
         print("Extracting Corpora in:", root)
         for corpus in files:
             inFileDir = os.path.join(root, corpus)
-            outFileDir = inFileDir.replace(ROOT_DIR, ROOT_DIR + OUT_SUF)
+            outFileDir = inFileDir.replace(CORPORA_DIR, CORPORA_DIR + OUT_SUF)
             print(inFileDir)
             CleanBNCCorpus(inFileDir, outFileDir)
 
 if __name__ == "__main__":
     
-    if(args.corpDir):
-        ROOT_DIR = args.corpDir
+    if(args.CORPORA_DIR):
+        CORPORA_DIR = args.CORPORA_DIR
 
-    if(args.outSuf):
-        OUT_SUF = args.outSuf
+    if(args.OUT_SUF):
+        OUT_SUF = args.OUT_SUF
 
     main()

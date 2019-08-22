@@ -3,7 +3,7 @@
     Author: Jose Juan Zavala Iglesias
     Date:   19/05/2019
 
-    Word Embedding Models Wrapper for ease of use
+    Word Embedding Models Wrapper for ease of use.
 """
 
 import os

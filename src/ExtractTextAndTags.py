@@ -7,10 +7,10 @@
 """
 from Util import CorpusExtraction
 
-CORPORA_ROOT = "./Corpora/BNC XML/2554/download/Texts_CleanXML"
+CORPORA_DIR = "./Corpora/BNC XML/2554/download/Texts_CleanXML"
 TEXT_SUFFIX  = "_CleanText_Lemma"
 POS_SUFFIX   = "_PosTags"
 GET_LEMMA    = True
 GET_POS_TAGS = True
 
-CorpusExtraction.ExtractCorpora(CORPORA_ROOT, outDirSuffix=TEXT_SUFFIX, posDirSuffix=POS_SUFFIX, getLemma=GET_LEMMA, getPosTags=GET_POS_TAGS)
+CorpusExtraction.ExtractCorpora(CORPORA_DIR, outDirSuffix=TEXT_SUFFIX, posDirSuffix=POS_SUFFIX, getLemma=GET_LEMMA, getPosTags=GET_POS_TAGS)
