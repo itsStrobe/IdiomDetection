@@ -1,13 +1,25 @@
 #!/bin/bash
-# Complete Run.
-# Only run PrepareData.sh if absolutely necessary.
+# FILE: RunAll.sh 
+#
+#$ -cwd
+#$ -j y
+#$ -S /bin/bash
+#$ -q gpu.q
+#$ -l gpu=1
+source /usr/local/gpuallocation.sh
 
 echo "RunAll.sh"
 
 ./PrepareData.sh
 
+./TrainEmbeddings.sh
+
 ./FindVNICs.sh
 
-./TrainAndGenerateEmbeddings.sh
+./GenerateEmbeddings.sh
+
+./TrainSVMs.sh
+
+./GenerateSilverStandard.sh
 
 ./RunExperiments.sh

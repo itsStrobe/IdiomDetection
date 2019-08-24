@@ -1,0 +1,10 @@
+numpy==1.16.2
+pandas
+scipy
+scikit-learn
+bs4
+gensim
+nltk
+theano==1.0.4
+keras==2.2.4
+

@@ -1,0 +1,3 @@
+# Check the rank in which the original VNC
+# Use x-Means for clustering: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.19.3377
+# Use Lexicographer PMI

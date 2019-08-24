@@ -17,7 +17,7 @@ from nltk.stem import WordNetLemmatizer
 
 import VNCPatternCounts
 
-MAX_WINDOW = 5
+MAX_WINDOW = 7
 
 class CForm(object):
 

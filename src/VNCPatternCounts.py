@@ -274,11 +274,13 @@ def ExtractPatternRangeFromSentence(sentence, posTags, vnc, max_window=MAX_WINDO
 """
 Given a Sentence and its sequence of POS Tags (C5 Format), it extracts the VNCs and Pattern numbers.
 """
-def ExtractPatternsFromSentence(sentence, posTags, max_window=MAX_WINDOW):
+def ExtractPatternsFromSentence(sentence, posTags, max_window=MAX_WINDOW, asLower=True):
     if(isinstance(sentence, str)):
         sentence = sentence.split()
     if(isinstance(posTags, str)):
         posTags = posTags.split()
+
+    if(asLower): for idx in range(len(sentence)): sentence[idx] = sentence[idx].lower()
 
     patterns = []
 
@@ -304,7 +306,7 @@ def ExtractPatternsFromSentence(sentence, posTags, max_window=MAX_WINDOW):
 Finds all VNC patterns in a Corpus given a sentence file and a tag file.
 Outputs findings into a new directory.
 """
-def ExtractPatternsFromCorpus(inFileDir, posFileDir, outFileDir, max_window=MAX_WINDOW):
+def ExtractPatternsFromCorpus(inFileDir, posFileDir, outFileDir, max_window=MAX_WINDOW, asLower=True):
     # Create outFileDir
     if not os.path.exists(os.path.dirname(outFileDir)):
         try:
@@ -319,7 +321,7 @@ def ExtractPatternsFromCorpus(inFileDir, posFileDir, outFileDir, max_window=MAX_
         with open(posFileDir, "r", encoding="utf_8") as posFile:
             with open(outFileDir, "w+", encoding="utf_8") as outFile:
                 for (sentence, posTags) in zip(inFile, posFile):
-                    patterns += ExtractPatternsFromSentence(sentence, posTags, max_window=max_window)
+                    patterns += ExtractPatternsFromSentence(sentence, posTags, max_window=max_window, asLower=asLower)
                 for pattern in patterns:
                     outFile.write(' '.join(pattern) + '\n')
 
@@ -327,7 +329,7 @@ def ExtractPatternsFromCorpus(inFileDir, posFileDir, outFileDir, max_window=MAX_
 Envelope function for ExtractPatternsFromCorpus.
 Iterates over all Corpus in the Corpora and writes the pattern files for each Corpus.
 """
-def ExtractPatternsFromCorpora(corporaTextRootDir, outRootDir, cleanTextSuffix="_CleanText", posTagsTextSuffix="_PosTags", max_window=MAX_WINDOW):
+def ExtractPatternsFromCorpora(corporaTextRootDir, outRootDir, cleanTextSuffix="_CleanText", posTagsTextSuffix="_PosTags", max_window=MAX_WINDOW, asLower=True):
     for root, _, files in os.walk(corporaTextRootDir):
         if files == []:
             continue
@@ -341,7 +343,7 @@ def ExtractPatternsFromCorpora(corporaTextRootDir, outRootDir, cleanTextSuffix="
             outFileDir      = inFileDir.replace(corporaTextRootDir, outRootDir).replace('.xml', '.txt')
 
             print(inFileDir)
-            ExtractPatternsFromCorpus(inTextFileDir, inPosTagFileDir, outFileDir, max_window=max_window)
+            ExtractPatternsFromCorpus(inTextFileDir, inPosTagFileDir, outFileDir, max_window=max_window, asLower=asLower)
 
 """
 Gets all the VNC Pattern counts into a Dictionary.
