@@ -6,5 +6,5 @@ bs4
 gensim
 nltk
 theano==1.0.4
-keras==2.2.4
+keras==2.13.1
 
